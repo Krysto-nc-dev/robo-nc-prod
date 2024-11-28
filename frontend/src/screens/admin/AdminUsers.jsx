@@ -10,9 +10,9 @@ import {
 const AdminUsers = () => {
   const navigate = useNavigate();
   const [newUser, setNewUser] = useState({
-    name: "",
+    nom: "",
+    prenom: "",
     email: "",
-    role: "user", // Valeur par défaut
     password: "",
   });
 
@@ -24,7 +24,8 @@ const AdminUsers = () => {
   } = useGetUsersQuery();
 
   // Hooks pour ajouter et supprimer des utilisateurs
-  const [registerUser, { isLoading: isRegisteringUser }] = useRegisterMutation();
+  const [registerUser, { isLoading: isRegisteringUser }] =
+    useRegisterMutation();
   const [deleteUser] = useDeleteUserMutation();
 
   // Gestion des champs pour ajouter un utilisateur
@@ -35,13 +36,13 @@ const AdminUsers = () => {
 
   // Soumettre un nouvel utilisateur via l'endpoint register
   const handleRegisterUser = async () => {
-    if (!newUser.name || !newUser.email || !newUser.password) {
-      toast.error("Tous les champs obligatoires doivent être remplis !");
-      return;
-    }
-
-    if (newUser.password.length < 6) {
-      toast.error("Le mot de passe doit contenir au moins 6 caractères !");
+    if (
+      !newUser.nom ||
+      !newUser.prenom ||
+      !newUser.email ||
+      !newUser.password
+    ) {
+      toast.error("Tous les champs sont obligatoires !");
       return;
     }
 
@@ -50,8 +51,8 @@ const AdminUsers = () => {
         ...newUser,
         email: newUser.email.toLowerCase(), // S'assurer que l'email est en minuscules
       }).unwrap();
-      toast.success("Utilisateur créé avec succès !");
-      setNewUser({ name: "", email: "", role: "user", password: "" });
+      toast.success("Utilisateur créé avec succès ! Un email a été envoyé.");
+      setNewUser({ nom: "", prenom: "", email: "", password: "" });
     } catch (err) {
       toast.error("Erreur lors de la création de l'utilisateur.");
     }
@@ -59,7 +60,9 @@ const AdminUsers = () => {
 
   // Supprimer un utilisateur
   const handleDeleteUser = async (userId) => {
-    if (window.confirm("Êtes-vous sûr de vouloir supprimer cet utilisateur ?")) {
+    if (
+      window.confirm("Êtes-vous sûr de vouloir supprimer cet utilisateur ?")
+    ) {
       try {
         await deleteUser(userId).unwrap();
         toast.success("Utilisateur supprimé avec succès !");
@@ -88,10 +91,18 @@ const AdminUsers = () => {
         <div className="grid grid-cols-4 gap-4 mb-4">
           <input
             type="text"
-            name="name"
-            value={newUser.name}
+            name="nom"
+            value={newUser.nom}
             onChange={handleInputChange}
-            placeholder="Nom complet"
+            placeholder="Nom"
+            className="w-full p-2 border rounded"
+          />
+          <input
+            type="text"
+            name="prenom"
+            value={newUser.prenom}
+            onChange={handleInputChange}
+            placeholder="Prénom"
             className="w-full p-2 border rounded"
           />
           <input
@@ -102,16 +113,6 @@ const AdminUsers = () => {
             placeholder="Email"
             className="w-full p-2 border rounded"
           />
-          <select
-            name="role"
-            value={newUser.role}
-            onChange={handleInputChange}
-            className="w-full p-2 border rounded"
-          >
-            <option value="user">Utilisateur</option>
-            <option value="private">Privé</option>
-            <option value="admin">Administrateur</option>
-          </select>
           <input
             type="password"
             name="password"
@@ -146,17 +147,17 @@ const AdminUsers = () => {
             <thead>
               <tr>
                 <th>Nom</th>
+                <th>Prénom</th>
                 <th>Email</th>
-                <th>Rôle</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {users.map((user) => (
                 <tr key={user._id}>
-                  <td>{user.name || "N/A"}</td>
+                  <td>{user.nom || "N/A"}</td>
+                  <td>{user.prenom || "N/A"}</td>
                   <td>{user.email || "N/A"}</td>
-                  <td>{user.role || "user"}</td>
                   <td>
                     <button
                       onClick={() => handleUserClick(user._id)}

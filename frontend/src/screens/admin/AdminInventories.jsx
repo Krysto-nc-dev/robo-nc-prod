@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   useGetInventoriesQuery,
   useImportZonesMutation,
@@ -54,6 +54,7 @@ const InventoryManager = () => {
       <h1 className="text-xl font-semibold mb-4 text-gray-300">
         Gestion des Inventaires
       </h1>
+      <Link to={"documentation"}> Documentation</Link>
 
       {/* Importer des zones en CSV */}
       <div className="mb-4">

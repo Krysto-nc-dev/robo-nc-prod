@@ -21,6 +21,8 @@ import AdminInventories from "./screens/admin/AdminInventories";
 import AdminInventoryDetails from "./screens/admin/AdminInventoryDetails"; // Import du composant des détails d'inventaire
 import AdminZoneDetails from "./screens/admin/AdminZoneDetails";
 import AdminInventoriesSuivie from "./screens/admin/AdminInventoriesSuivie";
+import AdminInventoryDocumentation from "./screens/admin/AdminInventoryDocumentation";
+import AdminUsers from "./screens/admin/AdminUsers";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -42,7 +44,8 @@ const router = createBrowserRouter(
         {/* Exemple de route admin */}
         <Route path="dashboard" element={<AdminDashboard />} />
         <Route path="inventories" element={<AdminInventories />} />
-        <Route path="inventories/documentation" element={<AdminInventories />} />
+        <Route path="users" element={<AdminUsers />} />
+        <Route path="inventories/documentation" element={<AdminInventoryDocumentation />} />
         <Route path="inventories/:id" element={<AdminInventoryDetails />} /> {/* Route pour les détails d'un inventaire */}
         <Route path="inventories-suivie/:id" element={<AdminInventoriesSuivie />} /> {/* Route pour les détails d'un inventaire */}
         <Route path="zones/:id" element={<AdminZoneDetails/>} /> {/* Route pour les détails d'un inventaire */}

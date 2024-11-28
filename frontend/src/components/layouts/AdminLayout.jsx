@@ -1,12 +1,13 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import {
-  LayoutDashboard,
-  Truck,
   Package,
   FileText,
   Clipboard,
   Settings,
+  User,
+  ScanBarcode,
+  Users,
 } from "lucide-react";
 
 const AdminLayout = ({ children }) => {
@@ -22,32 +23,11 @@ const AdminLayout = ({ children }) => {
         {/* Navigation Links */}
         <nav className="flex flex-col flex-1 p-4 space-y-4">
           <Link
-            to="/admin/dashboard"
+            to="/admin/articles"
             className="flex items-center p-3 rounded-md text-gray-400 hover:text-black hover:bg-highlightColor transition"
           >
-            <LayoutDashboard className="mr-2 w-5 h-5" />
-            Tableaux de bord
-          </Link>
-          <Link
-            to="/admin/supliers"
-            className="flex items-center p-3 rounded-md text-gray-400 hover:text-black hover:bg-highlightColor transition"
-          >
-            <Truck className="mr-2 w-5 h-5" />
-            Fournisseurs
-          </Link>
-          <Link
-            to="/admin/inventories"
-            className="flex items-center p-3 rounded-md text-gray-400 hover:text-black hover:bg-highlightColor transition"
-          >
-            <Package className="mr-2 w-5 h-5" />
+            <ScanBarcode className="mr-2 w-5 h-5" />
             Articles
-          </Link>
-          <Link
-            to="/admin/billing"
-            className="flex items-center p-3 rounded-md text-gray-400 hover:text-black hover:bg-highlightColor transition"
-          >
-            <FileText className="mr-2 w-5 h-5" />
-            Facturation
           </Link>
           <Link
             to="/admin/inventories"
@@ -55,6 +35,13 @@ const AdminLayout = ({ children }) => {
           >
             <Clipboard className="mr-2 w-5 h-5" />
             Inventaires
+          </Link>
+          <Link
+            to="/admin/users"
+            className="flex items-center p-3 rounded-md text-gray-400 hover:text-black hover:bg-highlightColor transition"
+          >
+            <Users className="mr-2 w-5 h-5" />
+            Utilisateurs
           </Link>
           <Link
             to="/admin/settings"
