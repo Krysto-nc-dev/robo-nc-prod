@@ -18,7 +18,7 @@ import { protect, admin } from '../middlewares/authMiddleware.js'; // Middleware
 // Route pour enregistrer un utilisateur ou obtenir tous les utilisateurs (accessible uniquement par les admins)
 router.route('/')
   .post(registerUser) // Route pour enregistrer un utilisateur
-  .get(protect, admin, getUsers); // Route pour obtenir tous les utilisateurs (admin requis)
+  .get( getUsers); // Route pour obtenir tous les utilisateurs (admin requis)
 
 // Route pour authentifier un utilisateur
 router.post('/login', authUser);

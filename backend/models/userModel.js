@@ -1,186 +1,56 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-import {
-  useGetUsersQuery,
-  useRegisterMutation, // Utiliser le hook pour register
-  useDeleteUserMutation,
-} from "../../slices/userApiSlice";
+import mongoose from "mongoose";
+import bcrypt from "bcrypt"; // Import bcrypt
 
-const AdminUsers = () => {
-  const navigate = useNavigate();
-  const [newUser, setNewUser] = useState({
-    name: "",
-    email: "",
-    role: "user", // Valeur par défaut
-    password: "",
-  });
+const UserSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: [true, "Veuillez fournir un nom pour cet utilisateur"],
+      maxlength: [50, "Le nom ne peut pas dépasser 50 caractères"],
+      trim: true,
+    },
+    email: {
+      type: String,
+      required: [true, "Veuillez fournir une adresse email"],
+      unique: true,
+      match: [
+        /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
+        "Veuillez fournir une adresse email valide",
+      ],
+    },
+    role: {
+      type: String,
+      enum: ["user", "private", "admin"],
+      default: "user",
+    },
+    password: {
+      type: String,
+      required: [true, "Veuillez fournir un mot de passe"],
+      minlength: [6, "Le mot de passe doit comporter au moins 6 caractères"],
+      select: false, // Empêche le mot de passe d'être renvoyé par défaut dans les requêtes
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
+  },
+  { timestamps: true }
+);
 
-  // Hook pour récupérer la liste des utilisateurs
-  const {
-    data: users,
-    isLoading: isLoadingUsers,
-    error: usersError,
-  } = useGetUsersQuery();
+// Middleware pour hasher le mot de passe avant de sauvegarder le document
+UserSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) {
+    next();
+  }
+  const salt = await bcrypt.genSalt(10); // Génère un sel
+  this.password = await bcrypt.hash(this.password, salt); // Hash le mot de passe
+  next();
+});
 
-  // Hooks pour ajouter et supprimer des utilisateurs
-  const [registerUser, { isLoading: isRegisteringUser }] = useRegisterMutation();
-  const [deleteUser] = useDeleteUserMutation();
-
-  // Gestion des champs pour ajouter un utilisateur
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewUser((prevState) => ({ ...prevState, [name]: value }));
-  };
-
-  // Soumettre un nouvel utilisateur via l'endpoint register
-  const handleRegisterUser = async () => {
-    if (!newUser.name || !newUser.email || !newUser.password) {
-      toast.error("Tous les champs obligatoires doivent être remplis !");
-      return;
-    }
-
-    if (newUser.password.length < 6) {
-      toast.error("Le mot de passe doit contenir au moins 6 caractères !");
-      return;
-    }
-
-    try {
-      await registerUser({
-        ...newUser,
-        email: newUser.email.toLowerCase(), // S'assurer que l'email est en minuscules
-      }).unwrap();
-      toast.success("Utilisateur créé avec succès !");
-      setNewUser({ name: "", email: "", role: "user", password: "" });
-    } catch (err) {
-      toast.error("Erreur lors de la création de l'utilisateur.");
-    }
-  };
-
-  // Supprimer un utilisateur
-  const handleDeleteUser = async (userId) => {
-    if (window.confirm("Êtes-vous sûr de vouloir supprimer cet utilisateur ?")) {
-      try {
-        await deleteUser(userId).unwrap();
-        toast.success("Utilisateur supprimé avec succès !");
-      } catch (err) {
-        toast.error("Erreur lors de la suppression de l'utilisateur.");
-      }
-    }
-  };
-
-  // Naviguer vers la page des détails d'un utilisateur
-  const handleUserClick = (userId) => {
-    navigate(`/admin/users/${userId}`);
-  };
-
-  return (
-    <div className="p-4">
-      <h1 className="text-xl font-semibold mb-4 text-gray-300">
-        Gestion des Utilisateurs
-      </h1>
-
-      {/* Ajouter un nouvel utilisateur */}
-      <div className="mb-6">
-        <h2 className="text-lg font-medium text-gray-300 mb-2">
-          Ajouter un Utilisateur
-        </h2>
-        <div className="grid grid-cols-4 gap-4 mb-4">
-          <input
-            type="text"
-            name="name"
-            value={newUser.name}
-            onChange={handleInputChange}
-            placeholder="Nom complet"
-            className="w-full p-2 border rounded"
-          />
-          <input
-            type="email"
-            name="email"
-            value={newUser.email}
-            onChange={handleInputChange}
-            placeholder="Email"
-            className="w-full p-2 border rounded"
-          />
-          <select
-            name="role"
-            value={newUser.role}
-            onChange={handleInputChange}
-            className="w-full p-2 border rounded"
-          >
-            <option value="user">Utilisateur</option>
-            <option value="private">Privé</option>
-            <option value="admin">Administrateur</option>
-          </select>
-          <input
-            type="password"
-            name="password"
-            value={newUser.password}
-            onChange={handleInputChange}
-            placeholder="Mot de passe"
-            className="w-full p-2 border rounded"
-          />
-        </div>
-        <button
-          onClick={handleRegisterUser}
-          disabled={isRegisteringUser}
-          className="btn"
-        >
-          {isRegisteringUser ? "Création en cours..." : "Créer Utilisateur"}
-        </button>
-      </div>
-
-      {/* Liste des utilisateurs */}
-      <div>
-        <h2 className="text-lg font-medium text-gray-300 mb-2">
-          Liste des Utilisateurs
-        </h2>
-        {isLoadingUsers ? (
-          <p className="text-mutedColor">Chargement des utilisateurs...</p>
-        ) : usersError ? (
-          <p className="text-dangerColor">
-            Erreur lors du chargement des utilisateurs.
-          </p>
-        ) : users && users.length > 0 ? (
-          <table className="w-full">
-            <thead>
-              <tr>
-                <th>Nom</th>
-                <th>Email</th>
-                <th>Rôle</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((user) => (
-                <tr key={user._id}>
-                  <td>{user.name || "N/A"}</td>
-                  <td>{user.email || "N/A"}</td>
-                  <td>{user.role || "user"}</td>
-                  <td>
-                    <button
-                      onClick={() => handleUserClick(user._id)}
-                      className="btn"
-                    >
-                      Voir Détails
-                    </button>
-                    <button
-                      onClick={() => handleDeleteUser(user._id)}
-                      className="btn btn-danger ml-2"
-                    >
-                      Supprimer
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <p className="text-mutedColor">Aucun utilisateur trouvé.</p>
-        )}
-      </div>
-    </div>
-  );
+// Méthode pour comparer les mots de passe lors de l'authentification
+UserSchema.methods.matchPassword = async function (enteredPassword) {
+  return await bcrypt.compare(enteredPassword, this.password); // Compare le mot de passe entré avec celui stocké
 };
 
-export default AdminUsers;
+export default mongoose.model("User", UserSchema);
+
