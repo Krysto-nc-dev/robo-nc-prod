@@ -51,13 +51,13 @@ const InventoryManager = () => {
 
   return (
     <div className="p-4">
-      <h1 className="text-xl font-semibold mb-4 text-secondaryColor">
+      <h1 className="text-xl font-semibold mb-4 text-gray-300">
         Gestion des Inventaires
       </h1>
 
       {/* Importer des zones en CSV */}
       <div className="mb-4">
-        <h2 className="text-lg font-medium text-secondaryColor mb-2">
+        <h2 className="text-lg font-medium text-gray-300 mb-2">
           Créer un nouvel inventaire
         </h2>
         <div className="flex items-center gap-2">
@@ -79,7 +79,7 @@ const InventoryManager = () => {
 
       {/* Liste des inventaires */}
       <div>
-        <h2 className="text-lg font-medium text-secondaryColor mb-2">
+        <h2 className="text-lg font-medium text-gray-300 mb-2">
           Liste des Inventaires
         </h2>
         {isLoadingInventories ? (

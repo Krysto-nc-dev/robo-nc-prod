@@ -1,13 +1,17 @@
-import React from "react";
+import React, { useState } from "react";
 import axios from "axios";
-import { useParams, useNavigate } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useGetInventoryByIdQuery } from "../../slices/inventorySlice";
 import { useGetRecordsQuery } from "../../slices/recordSlice";
-import Barcode from "react-barcode"; // Importer Barcode
+import { useCreateAgentMutation } from "../../slices/agentSlice";
+import Barcode from "react-barcode";
 
 const AdminInventoryDetails = () => {
   const { id: inventoryId } = useParams();
-  const navigate = useNavigate();
+
+  const [isModalOpen, setIsModalOpen] = useState(false); // État pour la modal
+  const [formData, setFormData] = useState({ nom: "", prenom: "" }); // État pour le formulaire
+  const [createAgent, { isLoading: isCreating }] = useCreateAgentMutation();
 
   // Récupérer les détails de l'inventaire
   const {
@@ -25,15 +29,12 @@ const AdminInventoryDetails = () => {
 
   const handleGeneratePDF = async () => {
     try {
-      // Utilisation d'Axios pour la requête
       const response = await axios.get(
         `https://api.robot-nc.com/inventories/${inventoryId}/generate-pdf`,
         {
-          responseType: "blob", // Reçoit la réponse en tant que Blob
-          headers: {
-            Accept: "application/pdf", // Précise que l'on attend un PDF
-          },
-          withCredentials: true, // Si vous avez besoin d'envoyer des cookies
+          responseType: "blob",
+          headers: { Accept: "application/pdf" },
+          withCredentials: true,
         }
       );
 
@@ -46,12 +47,28 @@ const AdminInventoryDetails = () => {
         document.body.appendChild(link);
         link.click();
         link.remove();
-        window.URL.revokeObjectURL(url); // Nettoyage après utilisation
+        window.URL.revokeObjectURL(url);
       } else {
         console.error("Le PDF généré est vide ou invalide.");
       }
     } catch (error) {
       console.error("Erreur lors de la génération du PDF :", error);
+    }
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await createAgent(formData).unwrap();
+      setFormData({ nom: "", prenom: "" }); // Réinitialiser le formulaire
+      setIsModalOpen(false); // Fermer la modal
+    } catch (error) {
+      console.error("Erreur lors de l'ajout de l'agent :", error);
     }
   };
 
@@ -72,11 +89,6 @@ const AdminInventoryDetails = () => {
       </div>
     );
   }
-
-  // Filtrer les enregistrements pour les zones de l'inventaire
-  const filteredRecords = records?.filter((record) =>
-    inventory?.zones.some((zone) => zone._id === record.zone)
-  );
 
   return (
     <div className="p-4 max-w-7xl mx-auto text-gray-300 bg-gray-800 rounded-lg shadow-md">
@@ -99,26 +111,75 @@ const AdminInventoryDetails = () => {
               </span>
               <button
                 onClick={handleGeneratePDF}
-                className={`py-1 px-4 text-sm font-semibold text-white rounded ${"bg-blue-600 hover:bg-blue-700"}`}
+                className="py-1 px-4 text-sm font-semibold text-white rounded bg-blue-600 hover:bg-blue-700"
               >
                 Générer PDF
               </button>
+
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="py-1 px-4 text-sm font-semibold text-white rounded bg-green-600 hover:bg-green-700"
+              >
+                Ajouter Agent
+              </button>
+              <Link to={`/admin/inventories-suivie/${inventoryId}`}>
+                COMMENCER
+              </Link>
             </div>
           </div>
 
-          {/* Dates */}
-          <div className="mb-4 text-sm">
-            <p>
-              Date de début :{" "}
-              {new Date(inventory.dateDebut).toLocaleDateString()}
-            </p>
-            <p>
-              Date de fin :{" "}
-              {inventory.dateFin
-                ? new Date(inventory.dateFin).toLocaleDateString()
-                : "Non défini"}
-            </p>
-          </div>
+          {/* Modal */}
+          {isModalOpen && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+              <div className="bg-white p-6 rounded-lg shadow-lg w-1/3">
+                <h2 className="text-lg font-bold mb-4">Ajouter un Agent</h2>
+                <form onSubmit={handleSubmit}>
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium mb-2">
+                      Nom
+                    </label>
+                    <input
+                      type="text"
+                      name="nom"
+                      value={formData.nom}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-3 py-2 border rounded-lg"
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium mb-2">
+                      Prénom
+                    </label>
+                    <input
+                      type="text"
+                      name="prenom"
+                      value={formData.prenom}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-3 py-2 border rounded-lg"
+                    />
+                  </div>
+                  <div className="flex justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setIsModalOpen(false)}
+                      className="py-1 px-4 bg-gray-300 text-gray-800 rounded hover:bg-gray-400"
+                    >
+                      Annuler
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isCreating}
+                      className="py-1 px-4 bg-green-600 text-white rounded hover:bg-green-700"
+                    >
+                      Ajouter
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
 
           {/* Zones */}
           <div className="mb-6">
@@ -127,8 +188,7 @@ const AdminInventoryDetails = () => {
               {inventory.zones.map((zone) => (
                 <div
                   key={zone._id}
-                  onClick={() => navigate(`/admin/zones/${zone._id}`)}
-                  className="p-3 bg-gray-700 rounded-md shadow-md cursor-pointer hover:bg-gray-600"
+                  className="p-3 bg-gray-700 rounded-md shadow-md"
                 >
                   <h3 className="text-lg font-bold mb-1">{zone.nom}</h3>
                   <p className="text-sm text-gray-400 mb-2">
@@ -142,65 +202,6 @@ const AdminInventoryDetails = () => {
                 </div>
               ))}
             </div>
-          </div>
-
-          {/* Logs des enregistrements */}
-          <div>
-            <h2 className="text-lg font-semibold mb-3">
-              Logs des Enregistrements
-            </h2>
-            {filteredRecords?.length > 0 ? (
-              <table className="w-full border-collapse border border-gray-700 bg-gray-700">
-                <thead>
-                  <tr>
-                    <th className="py-2 px-3 text-left text-gray-200">
-                      Type d'Action
-                    </th>
-                    <th className="py-2 px-3 text-left text-gray-200">Zone</th>
-                    <th className="py-2 px-3 text-left text-gray-200">Agent</th>
-                    <th className="py-2 px-3 text-left text-gray-200">
-                      Code Barre
-                    </th>
-                    <th className="py-2 px-3 text-left text-gray-200">Date</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredRecords.map((record) => (
-                    <tr
-                      key={record._id}
-                      className="border-t border-gray-600 hover:bg-gray-600"
-                    >
-                      <td className="py-2 px-3 text-sm text-gray-300 font-semibold">
-                        {record.typeAction}
-                      </td>
-                      <td className="py-2 px-3 text-sm text-gray-300">
-                        {inventory.zones.find(
-                          (zone) => zone._id === record.zone
-                        )?.nom || "N/A"}
-                      </td>
-                      <td className="py-2 px-3 text-sm text-gray-300">
-                        {inventory.agents.find(
-                          (agent) => agent._id === record.agent
-                        )?.nom || "N/A"}{" "}
-                        {inventory.agents.find(
-                          (agent) => agent._id === record.agent
-                        )?.prenom || ""}
-                      </td>
-                      <td className="py-2 px-3 text-sm text-gray-300">
-                        {record.codeBarre}
-                      </td>
-                      <td className="py-2 px-3 text-sm text-gray-300">
-                        {new Date(record.dateAction).toLocaleDateString()}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            ) : (
-              <p className="text-gray-400">
-                Aucun enregistrement trouvé pour cet inventaire.
-              </p>
-            )}
           </div>
         </div>
       ) : (

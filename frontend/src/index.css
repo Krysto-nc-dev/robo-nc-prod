@@ -3,11 +3,11 @@
 @tailwind utilities;
 
 :root {
-  --primaryColor: #1a1a1a; /* Noir/gris foncé pour les éléments principaux */
+  --primaryColor: #d4d4d4; /* Noir/gris foncé pour les éléments principaux */
   --secondaryColor: #ffffff; /* Blanc pour les textes */
   --accentColor: #4a90e2; /* Bleu doux pour les liens et accents */
   --textColor: #d6d6d6; /* Gris clair pour les textes */
-  --backgroundColor: #121212; /* Noir pour le fond général */
+  --backgroundColor: #d6d6d6; /* Noir pour le fond général */
   --grayColor: #2e2e2e; /* Gris foncé pour les arrière-plans */
   --highlightColor: #3c3c3c; /* Gris moyen pour surbrillance */
   --mutedColor: #9e9e9e; /* Gris neutre pour le texte secondaire */
@@ -21,7 +21,7 @@
 }
 
 .btn:hover {
-  @apply bg-accentColor text-accentColor;
+  @apply bg-yellow-500 text-accentColor;
 }
 
 /* Arrière-plan */
@@ -45,11 +45,11 @@ input {
 
 /* Tableaux */
 table {
-  @apply w-full border-collapse border border-gray-700 bg-grayColor text-sm;
+  @apply w-full border-collapse border border-gray-700 bg-gray-500 text-sm;
 }
 
 th {
-  @apply py-2 px-3 text-left border-b border-gray-600 bg-grayColor text-secondaryColor font-medium;
+  @apply py-2 px-3 text-left border-b border-gray-600 bg-gray-800 text-gray-300 font-medium;
 }
 
 td {
@@ -57,7 +57,7 @@ td {
 }
 
 tr:hover {
-  @apply bg-highlightColor text-secondaryColor cursor-pointer transition duration-150;
+  @apply bg-blue-300 text-secondaryColor cursor-pointer transition duration-150;
 }
 
 thead {

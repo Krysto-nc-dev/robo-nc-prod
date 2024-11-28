@@ -8,8 +8,8 @@ const zones = [
     observation: "Zone de stockage des articles de décoration. Attention à bien compter les cartons derrière les étagères.",
     lieu: "Dock",
     parties: [
-      { type: "COMPTAGE", codeBarre: generateBarcode(), status: "À faire" },
-      { type: "BIPAGE", codeBarre: generateBarcode(), status: "À faire" },
+      { type: "COMPTAGE", codeBarre: generateBarcode(), status: "Terminé" },
+      { type: "BIPAGE", codeBarre: generateBarcode(), status: "En cours" },
       { type: "CONTROLE", codeBarre: generateBarcode(), status: "À faire" },
     ],
     inventaire: "6f3b514b5d2c12c7449be100", // Ajout de la référence à l'inventaire
@@ -22,8 +22,8 @@ const zones = [
     observation: "Zone réservée aux articles de jardinage. Veuillez vérifier la présence des outils derrière les présentoirs.",
     lieu: "Dock",
     parties: [
-      { type: "COMPTAGE", codeBarre: generateBarcode(), status: "À faire" },
-      { type: "BIPAGE", codeBarre: generateBarcode(), status: "À faire" },
+      { type: "COMPTAGE", codeBarre: generateBarcode(), status: "Terminé" },
+      { type: "BIPAGE", codeBarre: generateBarcode(), status: "Terminé" },
       { type: "CONTROLE", codeBarre: generateBarcode(), status: "À faire" },
     ],
     inventaire: "6f3b514b5d2c12c7449be100",
@@ -36,9 +36,9 @@ const zones = [
     observation: "Zone des matériaux de maçonnerie. Bien vérifier le nombre de sacs entreposés et leur état.",
     lieu: "Dock",
     parties: [
-      { type: "COMPTAGE", codeBarre: generateBarcode(), status: "À faire" },
-      { type: "BIPAGE", codeBarre: generateBarcode(), status: "À faire" },
-      { type: "CONTROLE", codeBarre: generateBarcode(), status: "À faire" },
+      { type: "COMPTAGE", codeBarre: generateBarcode(), status: "Terminé" },
+      { type: "BIPAGE", codeBarre: generateBarcode(), status: "Terminé" },
+      { type: "CONTROLE", codeBarre: generateBarcode(), status: "En cours" },
     ],
     inventaire: "6f3b514b5d2c12c7449be100",
     createdAt: "2024-01-01T00:00:00.000Z",
