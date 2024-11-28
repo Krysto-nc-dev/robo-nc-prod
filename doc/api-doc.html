@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="fr">
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    color: #333;
+  }
+
+  main {
+    height: 95vh;
+  }
+
+  header {
+    background-color: rgb(193, 191, 36);
+    color: #222;
+    padding: 10px;
+
+    height: 5vh;
+
+    text-align: center;
+  }
+
+  .green {
+    color: darkgreen;
+    font-weight: bold;
+  }
+
+  section {
+    margin-bottom: 50px;
+  }
+
+  .container {
+    display: flex;
+    margin-bottom: 10px;
+    margin-top: 10px
+  }
+
+  aside {
+    width: 200px;
+    background-color: #e3e3e3;
+    padding: 20px;
+  }
+
+  aside nav ul {
+    list-style: none;
+  }
+
+  aside nav ul li {
+    margin-bottom: 10px;
+  }
+
+  aside nav ul li a {
+    color: #007acc;
+    text-decoration: none;
+  }
+
+  aside nav ul li a:hover {
+    text-decoration: underline;
+  }
+
+  main {
+    flex-grow: 1;
+    padding: 20px;
+  }
+
+  h1 {
+    font-size: 1.3rem;
+  }
+
+  h2 {
+    color: #007acc;
+    margin-bottom: 10px;
+  }
+
+  p.subtitle {
+    font-size: 1.2em;
+    margin: 10px 0;
+    text-align: center;
+  }
+
+  ul {
+    list-style: disc;
+    padding-left: 20px;
+  }
+
+  footer {
+    text-align: center;
+    padding: 10px;
+    font-size: 0.9em;
+    color: #777;
+    background-color: #f4f4f9;
+    margin-top: 20px;
+  }
+</style>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Documentation de l'API Quincaillerie Calédonienne</title>
+  <link rel="stylesheet" href="./style.css">
+
+</head>
+
+<body>
+  <header>
+    <h1>Documentation de l'API Quincaillerie Calédonienne</h1>
+    <p class="green">L'API est en cours d'exécution !</p>
+  </header>
+
+  <div class="container">
+    <aside>
+      <nav>
+        <ul>
+          <li><a href="#overview">Présentation de l'API</a></li>
+          <li><a href="#authentication">Authentification</a></li>
+          <li><a href="#endpoints">Endpoints</a></li>
+          <li><a href="#errors">Gestion des erreurs</a></li>
+          <li><a href="#examples">Exemples de requêtes</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <main>
+      <section id="overview">
+        <h2>Présentation de l'API</h2>
+        <p>Bienvenue sur l'API de la Quincaillerie Calédonienne, un outil interne destiné à faciliter la gestion des
+          stocks, des ventes, et des inventaires. Consultez les sections ci-contre pour plus d'informations sur les
+          fonctionnalités disponibles.</p>
+      </section>
+
+      <section id="authentication">
+        <h2>Authentification</h2>
+        <p>Cette API utilise une authentification basée sur des tokens pour sécuriser les accès. Vous devez inclure un
+          token valide dans chaque requête.</p>
+      </section>
+
+      <section id="endpoints">
+        <h2>Endpoints</h2>
+        <p>Liste des principales routes disponibles :</p>
+        <ul>
+          <li><strong>GET /</strong> : Vérifie si l'API est en cours d'exécution.</li>
+          <li><strong>POST /zones</strong> : Ajouter une nouvelle zone d'inventaire.</li>
+          <li><strong>GET /zones</strong> : Récupérer toutes les zones d'inventaire.</li>
+          <li><strong>PUT /zones/:id</strong> : Mettre à jour une zone d'inventaire.</li>
+          <li><strong>DELETE /zones/:id</strong> : Supprimer une zone d'inventaire.</li>
+          <li><strong>POST /agents</strong> : Ajouter un nouvel agent.</li>
+          <li><strong>GET /agents</strong> : Récupérer tous les agents.</li>
+          <li><strong>POST /records</strong> : Enregistrer une action (comptage, bipage, contrôle).</li>
+          <li><strong>GET /inventory</strong> : Récupérer l'historique des inventaires.</li>
+        </ul>
+      </section>
+
+      <section id="errors">
+        <h2>Gestion des erreurs</h2>
+        <p>Les erreurs sont renvoyées sous forme de réponses JSON contenant le code et le message d'erreur pour aider au
+          débogage.</p>
+        <pre><code>{
+  "error": {
+    "code": 400,
+    "message": "Requête invalide. Veuillez vérifier les paramètres."
+  }
+}</code></pre>
+      </section>
+
+      <section id="examples">
+        <h2>Exemples de requêtes</h2>
+        <p>Voici quelques exemples de requêtes courantes pour interagir avec l'API.</p>
+        <pre><code>curl -X GET https://api.quincaillerie-caledonienne.com/zones</code></pre>
+        <pre><code>curl -X POST https://api.quincaillerie-caledonienne.com/records \
+  -H "Content-Type: application/json" \
+  -d '{"zone": "60f1b5c5f5d6f20015e0b567", "typeAction": "Comptage", "agent": "60f1b5c5f5d6f20015e0b678"}'</code></pre>
+      </section>
+    </main>
+  </div>
+
+  <footer>&copy; Quincaillerie Calédonienne - Gestion des Inventaires et Stocks</footer>
+</body>
+
+</html>

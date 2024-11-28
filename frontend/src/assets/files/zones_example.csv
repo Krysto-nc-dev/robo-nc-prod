@@ -1,0 +1,11 @@
+nom,designation,lieu,observation
+ZONE_A1,Décoration Intérieure,Dock A,Aucun problème signalé
+ZONE_B2,Jardin Public,Dock B,Plantation à vérifier
+ZONE_C3,Maçonnerie Générale,Dock C,Travaux en cours
+ZONE_D4,Peinture Externe,Dock D,Retouches nécessaires
+ZONE_E5,Accessoires de Jardinage,Dock E,Stock à vérifier
+ZONE_F6,Éclairage Extérieur,Dock F,Inspection régulière requise
+ZONE_G7,Sécurité Incendie,Dock G,Vérification des extincteurs
+ZONE_H8,Plomberie,Dock H,Fuites possibles à inspecter
+ZONE_I9,Revêtements de Sol,Dock I,Usure notable des matériaux
+ZONE_J10,Végétation Murale,Dock J,Taillage nécessaire
