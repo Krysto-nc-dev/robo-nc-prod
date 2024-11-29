@@ -10,7 +10,12 @@ const sendEmail = async (options) => {
       user: process.env.SMTP_EMAIL,
       pass: process.env.SMTP_PASSWORD,
     },
+    
+    connectionTimeout: 60000, // Timeout en millisecondes (60 secondes)
+    logger: true, // Active les logs
+    debug: true, // Active le mode debug
   });
+
 
   const message = {
     from: `${process.env.FROM_NAME} <${process.env.FROM_EMAIL}>`,

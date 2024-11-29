@@ -38,7 +38,7 @@ router
 // Routes pour la gestion des utilisateurs spécifiques par ID (admin requis)
 router
   .route('/:id')
-  .delete(protect, admin, deleteUser) // Supprimer un utilisateur (admin requis)
+  .delete(deleteUser) // Supprimer un utilisateur (admin requis)
   .get(protect, admin, getUserById) // Obtenir les informations d'un utilisateur spécifique (admin requis)
   .put(protect, admin, updateUser); // Modifier les informations d'un utilisateur spécifique (admin requis)
 
