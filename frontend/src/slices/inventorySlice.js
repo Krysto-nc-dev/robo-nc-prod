@@ -34,28 +34,30 @@ export const inventoriesApiSlice = apiSlice.injectEndpoints({
         method: 'GET',
         credentials: 'include',
       }),
+      providesTags: (result, error, inventoryId) => [{ type: 'Inventory', id: inventoryId }],
       keepUnusedDataFor: 5,
     }),
 
     // Update an inventory
     updateInventory: builder.mutation({
       query: (data) => ({
-        url: `${INVENTORIES_URL}/${data.inventoryId}`,
-        method: 'PUT',
+        url: `${INVENTORIES_URL}/${data.inventoryId}`, // Remplacez bien data.inventoryId par l'ID exact
+        method: "PUT",
         body: data,
-        credentials: 'include',
+        credentials: "include",
       }),
-      invalidatesTags: ['Inventory'],
+      invalidatesTags: ["Inventory"],
     }),
+    
 
-    // Delete an inventory
+    // Delete an inventory and its associated agents
     deleteInventory: builder.mutation({
       query: (inventoryId) => ({
         url: `${INVENTORIES_URL}/${inventoryId}`,
         method: 'DELETE',
         credentials: 'include',
       }),
-      invalidatesTags: ['Inventory'],
+      invalidatesTags: ['Inventory', 'Agent'], // Invalidate both inventory and agent lists
     }),
 
     // Import zones from a CSV file
@@ -76,7 +78,7 @@ export const inventoriesApiSlice = apiSlice.injectEndpoints({
         method: 'GET',
         credentials: 'include',
         headers: {
-          Accept: 'application/pdf', // S'assurer que le client attend un PDF
+          Accept: 'application/pdf', // Ensure the client expects a PDF
         },
       }),
       responseHandler: (response) => response.blob(), // Handle the PDF response as a blob

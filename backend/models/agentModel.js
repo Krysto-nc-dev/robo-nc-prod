@@ -1,7 +1,5 @@
-
 import mongoose from 'mongoose';
 
-// 2. Schéma de l'Agent (AGENT)
 const AgentSchema = new mongoose.Schema(
   {
     nom: {
@@ -15,6 +13,11 @@ const AgentSchema = new mongoose.Schema(
       required: [true, "Veuillez fournir le prénom de l'agent"],
       maxlength: [50, "Le prénom ne peut pas dépasser 50 caractères"],
       trim: true,
+    },
+    inventaire: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Inventory',
+      required: [true, "Veuillez fournir un inventaire associé"],
     },
     createdAt: {
       type: Date,

@@ -4,13 +4,13 @@ import mongoose from 'mongoose';
 const ZonePartSchema = new mongoose.Schema({
   type: {
     type: String,
-    enum: ['COMPTAGE', 'BIPAGE', 'CONTROLE'], // Types de parties autorisés
+    enum: ['COMPTAGE', 'BIPAGE', 'CONTROLE'],
     required: [true, 'Le type de la partie est requis.'],
   },
   codeBarre: {
-    type: String, // Code-barre unique généré automatiquement
+    type: String,
     required: [true, 'Le code-barre est requis.'],
-    unique: true, // Garantit l'unicité du code-barre dans toute la collection
+    unique: true,
     validate: {
       validator: function (value) {
         return /^\d{13}$/.test(value); // Valide si le code-barre est un EAN-13 valide
@@ -20,8 +20,17 @@ const ZonePartSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['À faire', 'En cours', 'Terminé'], // Statuts autorisés
+    enum: ['À faire', 'En cours', 'Terminé'],
     default: 'À faire',
+  },
+  agent: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Agent',
+    required: false,
+  },
+  dateScan: {
+    type: Date,
+    required: false,
   },
 });
 
@@ -30,7 +39,7 @@ const ZoneSchema = new mongoose.Schema({
   nom: {
     type: String,
     required: [true, 'Le nom de la zone est requis.'],
-    trim: true, // Supprime les espaces inutiles
+    trim: true,
   },
   designation: {
     type: String,
@@ -42,25 +51,27 @@ const ZoneSchema = new mongoose.Schema({
     required: [true, 'Le lieu de la zone est requis.'],
     trim: true,
   },
-  
   observation: {
     type: String,
     trim: true,
   },
-  
+  remarques: {
+    type: String,
+    trim: true,
+  },
   parties: {
-    type: [ZonePartSchema], // Liste des parties de la zone
+    type: [ZonePartSchema],
     required: [true, 'Les parties de la zone sont requises.'],
     validate: {
       validator: function (value) {
-        return value.length === 3; // La zone doit avoir exactement 3 parties
+        return value.length === 3;
       },
       message: 'Chaque zone doit contenir exactement 3 parties.',
     },
   },
   inventaire: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Inventory', // Référence à un inventaire
+    ref: 'Inventory',
     required: [true, 'La zone doit être associée à un inventaire.'],
   },
   createdAt: {
@@ -69,10 +80,7 @@ const ZoneSchema = new mongoose.Schema({
   },
 });
 
-// Ajout d'un index unique pour permettre des noms identiques dans des inventaires différents
 ZoneSchema.index({ nom: 1, inventaire: 1 }, { unique: true });
-
-// Ajout d'un index pour garantir l'unicité des `codeBarre` globalement
 ZoneSchema.index({ 'parties.codeBarre': 1 }, { unique: true });
 
 export default mongoose.model('Zone', ZoneSchema);

@@ -1,25 +1,29 @@
 import asyncHandler from '../middlewares/async.js';
 import Zone from '../models/zoneModel.js';
-import { v4 as uuidv4 } from 'uuid'; // Pour générer des identifiants uniques
+import { v4 as uuidv4 } from 'uuid';
 
 // Fonction pour générer un code-barre unique
-const generateCodeBarre = () => uuidv4().slice(0, 8); // Exemple : 8 caractères uniques
+const generateCodeBarre = () => uuidv4().slice(0, 8);
 
 // @desc    Get all zones
 // @route   GET /api/zones
 // @access  Public
 const getZones = asyncHandler(async (req, res) => {
-  const zones = await Zone.find();
+  const zones = await Zone.find().populate('inventaire'); // Inclure les données d'inventaire si nécessaires
   res.status(200).json(zones);
 });
 
-// @desc    Create a new zone with auto-generated barcodes and default statuses
+// @desc    Create a new zone
 // @route   POST /api/zones
 // @access  Public
 const createZone = asyncHandler(async (req, res) => {
-  const { nom, designation, lieu, observation } = req.body;
+  const { nom, designation, lieu, observation, inventaire } = req.body;
 
-  // Générer automatiquement les parties avec codes-barres et statuts
+  if (!nom || !designation || !lieu) {
+    res.status(400);
+    throw new Error('Veuillez fournir le nom, la désignation et le lieu.');
+  }
+
   const parties = [
     { type: 'COMPTAGE', codeBarre: generateCodeBarre(), status: 'À faire' },
     { type: 'BIPAGE', codeBarre: generateCodeBarre(), status: 'À faire' },
@@ -32,6 +36,7 @@ const createZone = asyncHandler(async (req, res) => {
     observation,
     lieu,
     parties,
+    inventaire,
   });
 
   const createdZone = await zone.save();
@@ -42,7 +47,7 @@ const createZone = asyncHandler(async (req, res) => {
 // @route   GET /api/zones/:id
 // @access  Public
 const getZoneById = asyncHandler(async (req, res) => {
-  const zone = await Zone.findById(req.params.id);
+  const zone = await Zone.findById(req.params.id).populate('inventaire');
 
   if (zone) {
     res.status(200).json(zone);
@@ -52,40 +57,67 @@ const getZoneById = asyncHandler(async (req, res) => {
   }
 });
 
-// @desc    Update zone and its parts
+// @desc    Update a zone and its parts
 // @route   PUT /api/zones/:id
 // @access  Public
 const updateZone = asyncHandler(async (req, res) => {
-  const { nom, designation, lieu, parties } = req.body;
+  const { nom, designation, lieu, observation, parties } = req.body;
 
   const zone = await Zone.findById(req.params.id);
 
-  if (zone) {
-    zone.nom = nom || zone.nom;
-    zone.designation = designation || zone.designation;
-    zone.lieu = lieu || zone.lieu;
-
-    // Mettre à jour les parties si elles sont fournies
-    if (parties) {
-      const updatedParties = zone.parties.map((existingPart) => {
-        const updatedPart = parties.find((p) => p.type === existingPart.type);
-        return updatedPart
-          ? { ...existingPart, ...updatedPart }
-          : existingPart;
-      });
-
-      zone.parties = updatedParties;
-    }
-
-    const updatedZone = await zone.save();
-    res.status(200).json(updatedZone);
-  } else {
+  if (!zone) {
     res.status(404);
     throw new Error('Zone not found');
   }
+
+  zone.nom = nom || zone.nom;
+  zone.designation = designation || zone.designation;
+  zone.lieu = lieu || zone.lieu;
+  zone.observation = observation || zone.observation;
+
+  if (parties) {
+    zone.parties = zone.parties.map((existingPart) => {
+      const updatedPart = parties.find((p) => p.type === existingPart.type);
+      return updatedPart ? { ...existingPart.toObject(), ...updatedPart } : existingPart;
+    });
+  }
+
+  const updatedZone = await zone.save();
+  res.status(200).json(updatedZone);
 });
 
-// @desc    Delete zone
+// @desc    Scan a zone part
+// @route   POST /api/zones/:zoneId/scan
+// @access  Public
+const scanZonePart = asyncHandler(async (req, res) => {
+  const { type, agentId } = req.body;
+  const zone = await Zone.findById(req.params.zoneId);
+
+  if (!zone) {
+    res.status(404);
+    throw new Error('Zone not found');
+  }
+
+  const part = zone.parties.find((p) => p.type === type);
+  if (!part) {
+    res.status(400);
+    throw new Error(`Part ${type} not found in this zone.`);
+  }
+
+  if (part.status === 'Terminé') {
+    res.status(400);
+    throw new Error(`Part ${type} is already marked as completed.`);
+  }
+
+  part.status = 'Terminé';
+  part.agent = agentId;
+  part.dateScan = new Date();
+
+  await zone.save();
+  res.status(200).json({ message: `Part ${type} scanned successfully.`, part });
+});
+
+// @desc    Delete a zone
 // @route   DELETE /api/zones/:id
 // @access  Public
 const deleteZone = asyncHandler(async (req, res) => {
@@ -100,10 +132,12 @@ const deleteZone = asyncHandler(async (req, res) => {
   }
 });
 
+// Exportation des fonctions
 export {
   getZones,
   createZone,
   getZoneById,
   updateZone,
+  scanZonePart,
   deleteZone,
 };

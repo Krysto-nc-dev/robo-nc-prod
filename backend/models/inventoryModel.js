@@ -5,8 +5,7 @@ const InventorySchema = new mongoose.Schema(
     zones: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Zone', // Référence aux zones modifiées
-       
+        ref: 'Zone',
       },
     ],
     agents: [
@@ -40,5 +39,11 @@ const InventorySchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+// Middleware pour supprimer les agents liés à cet inventaire
+InventorySchema.pre('deleteOne', { document: true, query: false }, async function (next) {
+  await mongoose.model('Agent').deleteMany({ inventaire: this._id });
+  next();
+});
 
 export default mongoose.model('Inventory', InventorySchema);

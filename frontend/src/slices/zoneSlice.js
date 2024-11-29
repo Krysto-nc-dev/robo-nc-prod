@@ -57,6 +57,17 @@ export const zonesApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ['Zone'],
     }),
+
+    // Scan a zone part
+    scanZonePart: builder.mutation({
+      query: ({ zoneId, data }) => ({
+        url: `${ZONES_URL}/${zoneId}/scan`,
+        method: 'POST',
+        body: data,
+        credentials: 'include',
+      }),
+      invalidatesTags: ['Zone'],
+    }),
   }),
 });
 
@@ -67,4 +78,5 @@ export const {
   useGetZoneByIdQuery,
   useUpdateZoneMutation,
   useDeleteZoneMutation,
+  useScanZonePartMutation, // Ajout du hook pour scanner une étape
 } = zonesApiSlice;

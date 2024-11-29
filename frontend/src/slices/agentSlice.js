@@ -5,27 +5,31 @@ import { AGENTS_URL } from './constants.js';
 // Use apiSlice to inject endpoints
 export const agentsApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    // Get all agents
+    // Get all agents (optionally filter by inventory ID)
     getAgents: builder.query({
-      query: () => ({
-        url: `${AGENTS_URL}`,
+      query: (inventoryId) => ({
+        url: inventoryId ? `${AGENTS_URL}?inventoryId=${inventoryId}` : `${AGENTS_URL}`,
         method: 'GET',
         credentials: 'include', // Include cookies if needed
       }),
-      providesTags: ['Agent'], // Invalidate when agents change
+      providesTags: (result, error, inventoryId) =>
+        result
+          ? [...result.map(({ _id }) => ({ type: 'Agent', id: _id })), 'Agent']
+          : ['Agent'], // Tag all fetched agents
       keepUnusedDataFor: 5, // Cache data for 5 seconds
     }),
 
-    // Create a new agent
+    // Create a new agent for a specific inventory
     createAgent: builder.mutation({
       query: (data) => ({
         url: `${AGENTS_URL}`,
-        method: 'POST',
+        method: "POST",
         body: data,
-        credentials: 'include', // Include cookies if needed
+        credentials: "include", // Inclure les cookies si nécessaire
       }),
-      invalidatesTags: ['Agent'], // Invalidate agent list after creation
+      invalidatesTags: ["Agent"], // Invalider le cache après création
     }),
+    
 
     // Get an agent by ID
     getAgentById: builder.query({
@@ -34,24 +38,35 @@ export const agentsApiSlice = apiSlice.injectEndpoints({
         method: 'GET',
         credentials: 'include', // Include cookies if needed
       }),
+      providesTags: (result, error, agentId) => [{ type: 'Agent', id: agentId }],
       keepUnusedDataFor: 5, // Cache data for 5 seconds
     }),
 
     // Update an agent
     updateAgent: builder.mutation({
-      query: (data) => ({
-        url: `${AGENTS_URL}/${data.agentId}`,
+      query: ({ agentId, ...data }) => ({
+        url: `${AGENTS_URL}/${agentId}`,
         method: 'PUT',
         body: data,
         credentials: 'include', // Include cookies if needed
       }),
-      invalidatesTags: ['Agent'], // Invalidate agent list after update
+      invalidatesTags: (result, error, { agentId }) => [{ type: 'Agent', id: agentId }],
     }),
 
     // Delete an agent
     deleteAgent: builder.mutation({
       query: (agentId) => ({
         url: `${AGENTS_URL}/${agentId}`,
+        method: 'DELETE',
+        credentials: 'include', // Include cookies if needed
+      }),
+      invalidatesTags: (result, error, agentId) => [{ type: 'Agent', id: agentId }],
+    }),
+
+    // Delete agents by inventory ID (when an inventory is deleted)
+    deleteAgentsByInventory: builder.mutation({
+      query: (inventoryId) => ({
+        url: `${AGENTS_URL}?inventoryId=${inventoryId}`,
         method: 'DELETE',
         credentials: 'include', // Include cookies if needed
       }),
@@ -67,4 +82,5 @@ export const {
   useGetAgentByIdQuery,
   useUpdateAgentMutation,
   useDeleteAgentMutation,
+  useDeleteAgentsByInventoryMutation,
 } = agentsApiSlice;
