@@ -28,16 +28,21 @@ const AdminInventoryDetails = () => {
   } = useGetRecordsQuery();
 
   const handleGeneratePDF = async () => {
+    const baseUrl =
+      process.env.NODE_ENV === "production"
+        ? "https://api.robot-nc.com"
+        : "http://localhost:4000";
+  
     try {
       const response = await axios.get(
-        `https://api.robot-nc.com/inventories/${inventoryId}/generate-pdf`,
+        `${baseUrl}/inventories/${inventoryId}/generate-pdf`,
         {
           responseType: "blob",
           headers: { Accept: "application/pdf" },
           withCredentials: true,
         }
       );
-
+  
       const blob = response.data;
       if (blob && blob.size > 0) {
         const url = window.URL.createObjectURL(blob);

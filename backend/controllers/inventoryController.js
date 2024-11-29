@@ -174,6 +174,9 @@ const importZonesFromCSV = asyncHandler(async (req, res) => {
 // @desc    Generate PDF for inventory zones
 // @route   GET /api/inventories/:id/generate-pdf
 // @access  Public
+// @desc    Generate PDF for inventory zones
+// @route   GET /api/inventories/:id/generate-pdf
+// @access  Public
 const generatePDFForInventory = asyncHandler(async (req, res) => {
   const inventory = await Inventory.findById(req.params.id).populate('zones');
 
@@ -227,16 +230,24 @@ const generatePDFForInventory = asyncHandler(async (req, res) => {
         doc.fontSize(10).fillColor('red').text('Erreur code-barre', xPosition + 10, startY + 50);
       }
 
-      // Carré pour la quantité
+      // Champ pour le nom
       doc
-        .rect(xPosition + 10, startY + 120, 40, 30) // Carré pour quantité
+        .rect(xPosition + 10, startY + 120, caseWidth - 20, 20) // Champ pour le nom
         .stroke()
         .fontSize(10)
         .fillColor('gray')
-        .text('Qté', xPosition + 15, startY + 125);
+        .text('Nom :', xPosition + 15, startY + 125);
+
+      // Champ pour la signature
+      doc
+        .rect(xPosition + 10, startY + 150, caseWidth - 20, 20) // Champ pour la signature
+        .stroke()
+        .fontSize(10)
+        .fillColor('gray')
+        .text('Signature :', xPosition + 15, startY + 155);
 
       // Ajout du nom de la zone dans chaque case
-      doc.fontSize(10).fillColor('black').text(zone.nom, xPosition + 10, startY + 160, {
+      doc.fontSize(10).fillColor('black').text(zone.nom, xPosition + 10, startY + 170, {
         align: 'left',
       });
     });
@@ -266,6 +277,8 @@ const generatePDFForInventory = asyncHandler(async (req, res) => {
     res.status(500).json({ message: 'Erreur lors de la génération du PDF.' });
   });
 });
+
+
 
 
 export {

@@ -3,42 +3,42 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import {
   useGetUsersQuery,
-  useRegisterMutation, // Utiliser le hook pour register
+  useRegisterMutation,
   useDeleteUserMutation,
 } from "../../slices/userApiSlice";
+import { Eye, Trash2 } from "lucide-react";
+
 
 const AdminUsers = () => {
   const navigate = useNavigate();
   const [newUser, setNewUser] = useState({
-    nom: "",
-    prenom: "",
+    name: "",
+    role: "",
     email: "",
     password: "",
   });
 
-  // Hook pour récupérer la liste des utilisateurs
+  const roles = ["user", "private", "admin"]; // Liste des rôles disponibles
+
   const {
     data: users,
     isLoading: isLoadingUsers,
     error: usersError,
   } = useGetUsersQuery();
 
-  // Hooks pour ajouter et supprimer des utilisateurs
   const [registerUser, { isLoading: isRegisteringUser }] =
     useRegisterMutation();
   const [deleteUser] = useDeleteUserMutation();
 
-  // Gestion des champs pour ajouter un utilisateur
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewUser((prevState) => ({ ...prevState, [name]: value }));
   };
 
-  // Soumettre un nouvel utilisateur via l'endpoint register
   const handleRegisterUser = async () => {
     if (
-      !newUser.nom ||
-      !newUser.prenom ||
+      !newUser.name ||
+      !newUser.role ||
       !newUser.email ||
       !newUser.password
     ) {
@@ -49,16 +49,15 @@ const AdminUsers = () => {
     try {
       await registerUser({
         ...newUser,
-        email: newUser.email.toLowerCase(), // S'assurer que l'email est en minuscules
+        email: newUser.email.toLowerCase(),
       }).unwrap();
       toast.success("Utilisateur créé avec succès ! Un email a été envoyé.");
-      setNewUser({ nom: "", prenom: "", email: "", password: "" });
+      setNewUser({ name: "", role: "", email: "", password: "" });
     } catch (err) {
       toast.error("Erreur lors de la création de l'utilisateur.");
     }
   };
 
-  // Supprimer un utilisateur
   const handleDeleteUser = async (userId) => {
     if (
       window.confirm("Êtes-vous sûr de vouloir supprimer cet utilisateur ?")
@@ -72,7 +71,6 @@ const AdminUsers = () => {
     }
   };
 
-  // Naviguer vers la page des détails d'un utilisateur
   const handleUserClick = (userId) => {
     navigate(`/admin/users/${userId}`);
   };
@@ -91,20 +89,25 @@ const AdminUsers = () => {
         <div className="grid grid-cols-4 gap-4 mb-4">
           <input
             type="text"
-            name="nom"
-            value={newUser.nom}
+            name="name"
+            value={newUser.name}
             onChange={handleInputChange}
             placeholder="Nom"
             className="w-full p-2 border rounded"
           />
-          <input
-            type="text"
-            name="prenom"
-            value={newUser.prenom}
+          <select
+            name="role"
+            value={newUser.role}
             onChange={handleInputChange}
-            placeholder="Prénom"
             className="w-full p-2 border rounded"
-          />
+          >
+            <option value="">Choisir un rôle</option>
+            {roles.map((role) => (
+              <option key={role} value={role}>
+                {role}
+              </option>
+            ))}
+          </select>
           <input
             type="email"
             name="email"
@@ -147,7 +150,7 @@ const AdminUsers = () => {
             <thead>
               <tr>
                 <th>Nom</th>
-                <th>Prénom</th>
+                <th>Rôle</th>
                 <th>Email</th>
                 <th>Actions</th>
               </tr>
@@ -155,21 +158,21 @@ const AdminUsers = () => {
             <tbody>
               {users.map((user) => (
                 <tr key={user._id}>
-                  <td>{user.nom || "N/A"}</td>
-                  <td>{user.prenom || "N/A"}</td>
+                  <td>{user.name || "N/A"}</td>
+                  <td>{user.role || "N/A"}</td>
                   <td>{user.email || "N/A"}</td>
-                  <td>
+                  <td className="flex ">
                     <button
                       onClick={() => handleUserClick(user._id)}
-                      className="btn"
+                      className="bg-blue-600 rounded-md p-2 text-gray-300"
                     >
-                      Voir Détails
+                     <Eye />
                     </button>
                     <button
                       onClick={() => handleDeleteUser(user._id)}
-                      className="btn btn-danger ml-2"
+                      className=" btn-danger bg-red-700 ml-2 p-2 rounded-md  text-gray-300"
                     >
-                      Supprimer
+                      <Trash2 />
                     </button>
                   </td>
                 </tr>

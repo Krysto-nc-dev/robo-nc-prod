@@ -4,6 +4,8 @@ import generateToken from '../utils/generateToken.js';
 import User from '../models/userModel.js';
 import ErrorResponse from '../utils/errorResponse.js';
 import bcrypt from 'bcryptjs';
+import sendEmail from '../utils/sendEmail.js';
+import { welcomeEmailTemplate } from '../utils/emailsTemplate.js';
 
 // @desc Auth user & get token
 // @route POST /api/users/login
@@ -31,8 +33,39 @@ const authUser = asyncHandler(async (req, res) => {
 // @desc Register a new user
 // @route POST /api/users
 // @access Public
+// const registerUser = asyncHandler(async (req, res) => {
+//   const { name, email, password, role } = req.body;
+
+//   const userExists = await User.findOne({ email });
+
+//   if (userExists) {
+//     res.status(400);
+//     throw new Error('Cet utilisateur existe déjà');
+//   }
+
+//   const user = await User.create({
+//     name,
+//     email,
+//     password,
+//     role,
+//   });
+
+//   if (user) {
+//     generateToken(res, user._id);
+//     res.status(201).json({
+//       _id: user._id,
+//       name: user.name,
+//       email: user.email,
+//       role: user.role,
+//       createdAt: user.createdAt,
+//     });
+//   } else {
+//     res.status(400);
+//     throw new Error('Données invalides');
+//   }
+// });
 const registerUser = asyncHandler(async (req, res) => {
-  const { name, email, password, role } = req.body;
+  const { name, lastname, email, password, role } = req.body;
 
   const userExists = await User.findOne({ email });
 
@@ -49,11 +82,28 @@ const registerUser = asyncHandler(async (req, res) => {
   });
 
   if (user) {
+    try {
+      // Utiliser le template pour l'email de bienvenue
+      const emailContent = welcomeEmailTemplate(name, email, password);
+      
+      await sendEmail({
+        email: user.email,
+        subject: 'Bienvenue sur Robot-NC !',
+        message: emailContent, // Contenu HTML
+        isHtml: true,
+      });
+
+      console.log('Email de bienvenue envoyé avec succès à:', user.email);
+    } catch (err) {
+      console.error('Erreur lors de l\'envoi de l\'email :', err.message);
+    }
+
     generateToken(res, user._id);
     res.status(201).json({
       _id: user._id,
       name: user.name,
       email: user.email,
+      password: user.password,
       role: user.role,
       createdAt: user.createdAt,
     });

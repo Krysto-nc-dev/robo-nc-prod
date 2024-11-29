@@ -31,7 +31,7 @@ body {
 
 /* Inputs */
 input {
-  @apply w-full px-3 py-2 text-sm border rounded-md outline-none text-secondaryColor bg-grayColor border-mutedColor focus:ring-2 focus:ring-accentColor placeholder-mutedColor transition duration-200;
+  @apply w-full px-3 py-2 text-sm border rounded-md outline-none text-secondaryColor bg-gray-300 border-mutedColor focus:ring-2 focus:ring-accentColor placeholder-gray-600 transition duration-200;
 }
 
 /* Cards */
@@ -45,7 +45,7 @@ input {
 
 /* Tableaux */
 table {
-  @apply w-full border-collapse border border-gray-700 bg-gray-500 text-sm;
+  @apply w-full border-collapse border border-gray-700 bg-gray-300 text-sm;
 }
 
 th {
@@ -61,7 +61,7 @@ tr:hover {
 }
 
 thead {
-  @apply bg-grayColor text-secondaryColor;
+  @apply bg-gray-300 text-secondaryColor;
 }
 
 tbody tr:last-child td {
