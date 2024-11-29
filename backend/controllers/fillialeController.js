@@ -1,5 +1,5 @@
 import asyncHandler from '../middlewares/async.js';
-import Filliale from '../models/fillialeModel.js';
+import Filliale from '../models/filialeModel.js';
 
 // @desc    Get all filliales
 // @route   GET /api/filliales

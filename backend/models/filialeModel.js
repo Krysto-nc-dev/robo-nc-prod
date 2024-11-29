@@ -32,10 +32,6 @@ const FillialeSchema = new mongoose.Schema(
         type : String,
     },
 
-    createdAt: {
-      type: Date,
-      default: Date.now,
-    },
   },
   { timestamps: true }
 );

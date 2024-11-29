@@ -3,8 +3,10 @@ import { Link, useNavigate } from "react-router-dom";
 import {
   useGetInventoriesQuery,
   useImportZonesMutation,
+  useDeleteInventoryMutation,
 } from "../../slices/inventorySlice";
 import { toast } from "react-toastify";
+import { Eye, Loader2, Trash2 } from "lucide-react";
 
 const InventoryManager = () => {
   const navigate = useNavigate();
@@ -19,6 +21,10 @@ const InventoryManager = () => {
 
   // Hook pour importer des zones en CSV
   const [importZones, { isLoading: isImporting }] = useImportZonesMutation();
+
+  // Hook pour supprimer un inventaire
+  const [deleteInventory, { isLoading: isDeleting }] =
+    useDeleteInventoryMutation();
 
   // Gestion du fichier CSV
   const handleFileChange = (e) => {
@@ -47,6 +53,18 @@ const InventoryManager = () => {
   // Fonction pour naviguer vers la page dédiée à un inventaire
   const handleInventoryClick = (inventoryId) => {
     navigate(`/admin/inventories/${inventoryId}`);
+  };
+
+  // Fonction pour supprimer un inventaire
+  const handleDeleteInventory = async (inventoryId) => {
+    if (window.confirm("Êtes-vous sûr de vouloir supprimer cet inventaire ?")) {
+      try {
+        await deleteInventory(inventoryId).unwrap();
+        toast.success("Inventaire supprimé avec succès !");
+      } catch (err) {
+        toast.error("Erreur lors de la suppression de l'inventaire.");
+      }
+    }
   };
 
   return (
@@ -111,12 +129,19 @@ const InventoryManager = () => {
                       ? new Date(inventory.dateFin).toLocaleDateString()
                       : "En cours"}
                   </td>
-                  <td>
+                  <td className="flex items-center gap-1">
                     <button
                       onClick={() => handleInventoryClick(inventory._id)}
                       className="btn"
                     >
-                      Voir Détails
+                      <Eye />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteInventory(inventory._id)}
+                      className="btn btn-danger ml-2 "
+                      disabled={isDeleting}
+                    >
+                      {isDeleting ? <Loader2 /> : <Trash2 />}
                     </button>
                   </td>
                 </tr>
