@@ -6,6 +6,7 @@ import {
   useUpdateInventoryMutation,
 } from "../../slices/inventorySlice";
 import { useCreateAgentMutation } from "../../slices/agentSlice";
+import { CopyX, PencilLineIcon, Save } from "lucide-react";
 
 const AdminInventoryDetails = () => {
   const { id: inventoryId } = useParams();
@@ -138,7 +139,7 @@ const AdminInventoryDetails = () => {
   }
 
   return (
-    <div className="p-6 max-w-6xl mx-auto text-gray-200 bg-gray-900 rounded-lg shadow-xl">
+    <div className="p-6  mx-auto text-gray-200 bg-gray-900 rounded-lg shadow-xl">
       {inventory ? (
         <div>
           <div className="flex justify-between items-center mb-6">
@@ -153,15 +154,15 @@ const AdminInventoryDetails = () => {
                 />
                 <button
                   onClick={handleUpdateInventoryName}
-                  className="py-2 px-4 bg-green-700 text-white text-sm rounded hover:bg-green-800 shadow-md"
+                  className="py-1 px-2 bg-green-700 text-white text-sm rounded hover:bg-green-800 shadow-md"
                 >
-                  Sauvegarder
+                  <Save />
                 </button>
                 <button
                   onClick={() => setEditMode(false)}
-                  className="py-2 px-4 bg-gray-700 text-white text-sm rounded hover:bg-gray-800 shadow-md"
+                  className="py-1 px-2 bg-red-700 text-white text-sm rounded hover:bg-gray-800 shadow-md"
                 >
-                  Annuler
+                  <CopyX />
                 </button>
               </div>
             ) : (
@@ -174,7 +175,7 @@ const AdminInventoryDetails = () => {
                   }}
                   className="text-sm text-blue-400 underline ml-2"
                 >
-                  Modifier
+                  <PencilLineIcon className="mt-3" />
                 </button>
               </h1>
             )}
@@ -209,17 +210,17 @@ const AdminInventoryDetails = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-6 mb-8">
             <div className="bg-gray-800 p-6 rounded-lg shadow-md">
-              <h2 className="text-lg font-bold mb-2">Nombre de zones</h2>
+              <h2 className="text-md font-bold mb-2">Nombre de zones</h2>
               <p className="text-3xl font-semibold">{totalZonesCount}</p>
             </div>
             <div className="bg-gray-800 p-6 rounded-lg shadow-md">
-              <h2 className="text-lg font-bold mb-2">Zones terminées</h2>
+              <h2 className="text-md font-bold mb-2">Zones terminées</h2>
               <p className="text-3xl font-semibold">{completedZonesCount}</p>
             </div>
             <div className="bg-gray-800 p-6 rounded-lg shadow-md">
-              <h2 className="text-lg font-bold mb-2">Zones à faire</h2>
+              <h2 className="text-md font-bold mb-2">Zones à faire</h2>
               <p className="text-3xl font-semibold">{todoZonesCount}</p>
             </div>
             <div className="bg-gray-800 p-6 rounded-lg shadow-md">
