@@ -7,7 +7,7 @@ import User from "./models/userModel.js";
 import Agent from "./models/agentModel.js";
 import Zone from "./models/zoneModel.js";
 import Inventory from "./models/inventoryModel.js";
-import Record from "./models/recordModel.js";
+
 import Filiale from "./models/filialeModel.js";
 
 //  ============= DATA =============
@@ -15,7 +15,6 @@ import users from "./_data/users.js";
 import agents from "./_data/agents.js";
 import zones from "./_data/zones.js";
 import inventories from "./_data/inventories.js";
-import records from "./_data/records.js";
 import filiales from "./_data/filiales.js";
 
 
@@ -31,7 +30,6 @@ const importData = async () => {
     await Agent.deleteMany();
     await Zone.deleteMany();
     await Inventory.deleteMany();
-    await Record.deleteMany();
     await Filiale.deleteMany();
 
 
@@ -40,7 +38,6 @@ const importData = async () => {
     await Agent.insertMany(agents);
     await Zone.insertMany(zones);
     await Inventory.insertMany(inventories);
-    await Record.insertMany(records);
     await Filiale.insertMany(filiales);
 
 
@@ -58,6 +55,8 @@ const destroyData = async () => {
     await User.deleteMany();
     await Agent.deleteMany();
     await Filiale.deleteMany();
+    await Zone.deleteMany();
+    await Inventory.deleteMany();
 
     console.log("Data Destroyed!".red.inverse);
     process.exit();

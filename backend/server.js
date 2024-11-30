@@ -13,7 +13,7 @@ import  userRoutes from "./routes/userRoutes.js";
 import zoneRoutes from "./routes/zoneRoutes.js";
 import agentRoutes from "./routes/agentRoutes.js";
 import inventoryRoutes from "./routes/inventoryRoutes.js";
-import recordRoutes from "./routes/recordRoutes.js";
+
 import filialeRoutes from "./routes/fillialeRoutes.js";
 
 // Configuration des variables d'environnement
@@ -81,7 +81,6 @@ app.use("/users", userRoutes);
 app.use("/zones", zoneRoutes);
 app.use("/agents", agentRoutes);
 app.use("/inventories", inventoryRoutes);
-app.use("/records", recordRoutes);
 app.use("/filiales", filialeRoutes);
 
 // Middleware pour gérer les erreurs 404

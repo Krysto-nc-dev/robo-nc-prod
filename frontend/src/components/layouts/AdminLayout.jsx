@@ -1,11 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import {
-  Package,
-  FileText,
   Clipboard,
   Settings,
-  User,
   ScanBarcode,
   Users,
   ChartColumnDecreasing,
@@ -62,7 +59,7 @@ const AdminLayout = ({ children }) => {
 
         {/* Footer */}
         <div className="p-4 text-sm text-center text-gray-500">
-          © 2024 QC Admin
+          © 2024 Robot NC
         </div>
       </div>
 

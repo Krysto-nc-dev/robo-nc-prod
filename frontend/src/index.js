@@ -27,6 +27,7 @@ import AdminUserDetails from "./screens/admin/AdminUserDetails";
 import AdminSettings from "./screens/admin/AdminSettings";
 import AdminArticles from "./screens/admin/AdminArticles";
 import AdminRepports from "./screens/admin/AdminRepports";
+import AdminFilliales from "./screens/admin/AdminFilliales";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -49,6 +50,7 @@ const router = createBrowserRouter(
         <Route path="dashboard" element={<AdminDashboard />} />
         <Route path="inventories" element={<AdminInventories />} />
         <Route path="users" element={<AdminUsers />} />
+        <Route path="filliales" element={<AdminFilliales/>} />
         <Route path="rapports" element={<AdminRepports/>} />
         <Route path="users/:id" element={<AdminUserDetails/>} />
         <Route path="inventories/documentation" element={<AdminInventoryDocumentation />} />

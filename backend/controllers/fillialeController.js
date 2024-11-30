@@ -13,7 +13,20 @@ const getFilliales = asyncHandler(async (req, res) => {
 // @route   POST /api/filliales
 // @access  Public
 const createFilliale = asyncHandler(async (req, res) => {
-  const { nom, acronyme, website, adresse, logo } = req.body;
+  const {
+    nom,
+    acronyme,
+    website,
+    adresse,
+    logo,
+    debutAnneeFiscale,
+    finAnneeFiscale,
+  } = req.body;
+
+  if (!debutAnneeFiscale || !finAnneeFiscale) {
+    res.status(400);
+    throw new Error('Veuillez fournir les mois de début et de fin de l\'année fiscale');
+  }
 
   const filliale = new Filliale({
     nom,
@@ -21,6 +34,8 @@ const createFilliale = asyncHandler(async (req, res) => {
     website,
     adresse,
     logo,
+    debutAnneeFiscale,
+    finAnneeFiscale,
   });
 
   const createdFilliale = await filliale.save();
@@ -37,7 +52,7 @@ const getFillialeById = asyncHandler(async (req, res) => {
     res.status(200).json(filliale);
   } else {
     res.status(404);
-    throw new Error('Filliale not found');
+    throw new Error('Filliale introuvable');
   }
 });
 
@@ -45,7 +60,15 @@ const getFillialeById = asyncHandler(async (req, res) => {
 // @route   PUT /api/filliales/:id
 // @access  Public
 const updateFilliale = asyncHandler(async (req, res) => {
-  const { nom, acronyme, website, adresse, logo } = req.body;
+  const {
+    nom,
+    acronyme,
+    website,
+    adresse,
+    logo,
+    debutAnneeFiscale,
+    finAnneeFiscale,
+  } = req.body;
 
   const filliale = await Filliale.findById(req.params.id);
 
@@ -55,12 +78,14 @@ const updateFilliale = asyncHandler(async (req, res) => {
     filliale.website = website || filliale.website;
     filliale.adresse = adresse || filliale.adresse;
     filliale.logo = logo || filliale.logo;
+    filliale.debutAnneeFiscale = debutAnneeFiscale || filliale.debutAnneeFiscale;
+    filliale.finAnneeFiscale = finAnneeFiscale || filliale.finAnneeFiscale;
 
     const updatedFilliale = await filliale.save();
     res.status(200).json(updatedFilliale);
   } else {
     res.status(404);
-    throw new Error('Filliale not found');
+    throw new Error('Filliale introuvable');
   }
 });
 
@@ -72,10 +97,10 @@ const deleteFilliale = asyncHandler(async (req, res) => {
 
   if (filliale) {
     await filliale.deleteOne();
-    res.status(200).json({ message: 'Filliale removed' });
+    res.status(200).json({ message: 'Filliale supprimée' });
   } else {
     res.status(404);
-    throw new Error('Filliale not found');
+    throw new Error('Filliale introuvable');
   }
 });
 
