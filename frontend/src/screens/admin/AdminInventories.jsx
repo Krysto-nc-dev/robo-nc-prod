@@ -7,6 +7,19 @@ import {
 } from "../../slices/inventorySlice";
 import { toast } from "react-toastify";
 import { Eye, Loader2, Trash2 } from "lucide-react";
+import {
+  Button,
+  CircularProgress,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Typography,
+  Box,
+} from "@mui/material";
 
 const InventoryManager = () => {
   const navigate = useNavigate();
@@ -68,91 +81,136 @@ const InventoryManager = () => {
   };
 
   return (
-    <div className="p-4">
-      <h1 className="text-xl font-semibold mb-4 text-gray-300">
+    <Box
+      sx={{
+        padding: "16px",
+        backgroundColor: "#f9f9f9",
+        borderRadius: "8px",
+        boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+      }}
+    >
+      <Typography
+        variant="h4"
+        gutterBottom
+        sx={{ textAlign: "center", color: "#333", fontWeight: "bold" }}
+      >
         Gestion des Inventaires
-      </h1>
-      <Link to={"documentation"}> Documentation</Link>
+      </Typography>
+      <Link to={"documentation"} className="text-blue-500 underline">
+        Documentation
+      </Link>
 
       {/* Importer des zones en CSV */}
-      <div className="mb-4">
-        <h2 className="text-lg font-medium text-gray-300 mb-2">
+      <Box
+        sx={{
+          marginBottom: "24px",
+          padding: "16px",
+          backgroundColor: "#fff",
+          borderRadius: "8px",
+          boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+        }}
+      >
+        <Typography
+          variant="h6"
+          gutterBottom
+          sx={{ color: "#555", fontWeight: "bold" }}
+        >
           Créer un nouvel inventaire
-        </h2>
-        <div className="flex items-center gap-2">
+        </Typography>
+        <Box display="flex" alignItems="center" gap={2}>
           <input
             type="file"
             accept=".csv"
             onChange={handleFileChange}
-            className="w-1/2"
+            className="file-input file-input-bordered w-1/2"
           />
-          <button
+          <Button
             onClick={handleImportZones}
+            variant="contained"
+            color="primary"
             disabled={isImporting}
-            className="btn"
           >
-            {isImporting ? "Importation..." : "Importer Zones"}
-          </button>
-        </div>
-      </div>
+            {isImporting ? (
+              <CircularProgress size={20} color="inherit" />
+            ) : (
+              "Importer Zones"
+            )}
+          </Button>
+        </Box>
+      </Box>
 
       {/* Liste des inventaires */}
-      <div>
-        <h2 className="text-lg font-medium text-gray-300 mb-2">
+      <Box>
+        <Typography
+          variant="h6"
+          gutterBottom
+          sx={{ color: "#555", fontWeight: "bold" }}
+        >
           Liste des Inventaires
-        </h2>
+        </Typography>
         {isLoadingInventories ? (
-          <p className="text-mutedColor">Chargement des inventaires...</p>
+          <Box display="flex" justifyContent="center" padding="16px">
+            <CircularProgress />
+          </Box>
         ) : error ? (
-          <p className="text-dangerColor">
+          <Typography color="error">
             Erreur lors du chargement des inventaires.
-          </p>
+          </Typography>
         ) : inventories && inventories.length > 0 ? (
-          <table className="w-full">
-            <thead>
-              <tr>
-                <th>Nom</th>
-                <th>Statut</th>
-                <th>Date de début</th>
-                <th>Date de fin</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {inventories.map((inventory) => (
-                <tr key={inventory._id}>
-                  <td>{inventory.nom || "N/A"}</td>
-                  <td>{inventory.statut || "Inconnu"}</td>
-                  <td>{new Date(inventory.dateDebut).toLocaleDateString()}</td>
-                  <td>
-                    {inventory.dateFin
-                      ? new Date(inventory.dateFin).toLocaleDateString()
-                      : "En cours"}
-                  </td>
-                  <td className="flex items-center gap-1">
-                    <button
-                      onClick={() => handleInventoryClick(inventory._id)}
-                      className="btn"
-                    >
-                      <Eye />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteInventory(inventory._id)}
-                      className="btn btn-danger ml-2 "
-                      disabled={isDeleting}
-                    >
-                      {isDeleting ? <Loader2 /> : <Trash2 />}
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <TableContainer component={Paper} sx={{ borderRadius: "8px" }}>
+            <Table>
+              <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
+                <TableRow>
+                  <TableCell>Nom</TableCell>
+                  <TableCell>Statut</TableCell>
+                  <TableCell>Date de début</TableCell>
+                  <TableCell>Date de fin</TableCell>
+                  <TableCell align="center">Actions</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {inventories.map((inventory) => (
+                  <TableRow key={inventory._id}>
+                    <TableCell>{inventory.nom || "N/A"}</TableCell>
+                    <TableCell>{inventory.statut || "Inconnu"}</TableCell>
+                    <TableCell>
+                      {new Date(inventory.dateDebut).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell>
+                      {inventory.dateFin
+                        ? new Date(inventory.dateFin).toLocaleDateString()
+                        : "En cours"}
+                    </TableCell>
+                    <TableCell align="center">
+                      <Button
+                        onClick={() => handleInventoryClick(inventory._id)}
+                        variant="text"
+                        color="primary"
+                        size="small"
+                      >
+                        <Eye />
+                      </Button>
+                      <Button
+                        onClick={() => handleDeleteInventory(inventory._id)}
+                        variant="text"
+                        color="error"
+                        size="small"
+                        disabled={isDeleting}
+                        sx={{ marginLeft: "8px" }}
+                      >
+                        {isDeleting ? <Loader2 /> : <Trash2 />}
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
         ) : (
-          <p className="text-mutedColor">Aucun inventaire trouvé.</p>
+          <Typography>Aucun inventaire trouvé.</Typography>
         )}
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 };
 
