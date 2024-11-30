@@ -1,5 +1,7 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { logout } from "../../slices/authSlice";
 import {
   AppBar,
   Toolbar,
@@ -38,6 +40,8 @@ const AdminLayout = ({ children }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const toggleDrawer = () => {
     setDrawerOpen(!drawerOpen);
@@ -49,6 +53,11 @@ const AdminLayout = ({ children }) => {
 
   const handleMenuClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleLogout = () => {
+    dispatch(logout()); // Déconnecte l'utilisateur
+    navigate("/login"); // Redirige vers la page de connexion
   };
 
   const drawerContent = (
@@ -145,10 +154,16 @@ const AdminLayout = ({ children }) => {
             onClose={handleMenuClose}
             sx={{ mt: 3 }}
           >
-            <MenuItem onClick={handleMenuClose}>Profil</MenuItem>
-            <MenuItem onClick={handleMenuClose}>Mon compte</MenuItem>
+            <MenuItem
+              component={Link}
+              to="/admin/profile"
+              onClick={handleMenuClose}
+            >
+              Profil
+            </MenuItem>
+
             <Divider />
-            <MenuItem onClick={handleMenuClose}>Déconnexion</MenuItem>
+            <MenuItem onClick={handleLogout}>Déconnexion</MenuItem>
           </Menu>
         </Toolbar>
       </AppBar>
@@ -165,6 +180,7 @@ const AdminLayout = ({ children }) => {
           "& .MuiDrawer-paper": {
             width: 250,
             boxSizing: "border-box",
+            overflow: "hidden", // Désactive le défilement
           },
         }}
       >

@@ -33,6 +33,7 @@ import AdminSettings from "./screens/admin/AdminSettings";
 import AdminArticles from "./screens/admin/AdminArticles";
 import AdminRepports from "./screens/admin/AdminRepports";
 import AdminFilliales from "./screens/admin/AdminFilliales";
+import AdminProfileScreen from "./screens/admin/AdminProfileScreen.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -55,6 +56,7 @@ const router = createBrowserRouter(
         <Route path="inventories-suivie/:id" element={<AdminInventoriesSuivie />} />
         <Route path="zones/:id" element={<AdminZoneDetails />} />
         <Route path="settings" element={<AdminSettings />} />
+        <Route path="profile" element={<AdminProfileScreen />} />
       </Route>
       <Route path="user" element={<UserRoutes />}>
         <Route path="profile" element={<h2>User Profile</h2>} />
