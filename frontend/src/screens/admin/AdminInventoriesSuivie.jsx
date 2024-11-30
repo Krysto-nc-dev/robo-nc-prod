@@ -25,10 +25,17 @@ const AdminInventoriesSuivie = () => {
     }
   }, [selectedPart]);
 
+  useEffect(() => {
+    // Rafraîchir les données chaque fois que la modal est fermée
+    if (!isModalOpen) {
+      refetch();
+    }
+  }, [isModalOpen, refetch]);
+
   if (inventoryLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <span className="text-lg text-gray-500">Chargement...</span>
+        <span className="text-base text-gray-500">Chargement...</span>
       </div>
     );
   }
@@ -36,7 +43,7 @@ const AdminInventoriesSuivie = () => {
   if (inventoryError) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <span className="text-lg text-red-500">
+        <span className="text-base text-red-500">
           Erreur lors du chargement des données.
         </span>
       </div>
@@ -77,7 +84,7 @@ const AdminInventoriesSuivie = () => {
       setIsModalOpen(false);
       setSelectedPart(null);
       setSelectedAgent("");
-      refetch(); // Rafraîchir les données après mise à jour
+      refetch();
     } catch (error) {
       console.error("Erreur lors de la mise à jour de la partie :", error);
     }
@@ -99,9 +106,18 @@ const AdminInventoriesSuivie = () => {
     }
   };
 
+  // Calcul du pourcentage de progression de l'inventaire
+  const totalZones = inventory?.zones.length || 0;
+  const completedZones = inventory?.zones.filter((zone) =>
+    zone.parties.every((part) => part.status === "Terminé")
+  ).length;
+
+  const progressPercentage =
+    totalZones > 0 ? (completedZones / totalZones) * 100 : 0;
+
   return (
-    <div className="p-4  mx-auto">
-      <h1 className="text-2xl font-bold text-gray-300 mb-4">
+    <div className="p-4 mx-auto">
+      <h1 className="text-xl font-bold text-gray-300 mb-4">
         Suivi des zones de l'inventaire : {inventory?.nom}
       </h1>
       <div className="mb-4">
@@ -113,17 +129,64 @@ const AdminInventoriesSuivie = () => {
             type="text"
             value={barcodeInput}
             onChange={(e) => setBarcodeInput(e.target.value)}
-            className="px-3 py-2 rounded-lg border text-black w-80"
+            className="px-3 py-2 rounded-lg border text-black w-64 text-sm"
             placeholder="Entrer le code-barres"
           />
           <button
             onClick={handleBarcodeScan}
-            className="py-1 px-4 bg-blue-600 text-white rounded hover:bg-blue-700"
+            className="py-1 px-4 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
           >
             Scanner
           </button>
         </div>
       </div>
+
+      {/* Barre de progression de l'inventaire */}
+      <div className="mb-6">
+        <h2 className="text-md font-semibold mb-2">
+          Progression de l'inventaire
+        </h2>
+        <div className="w-full bg-gray-700 rounded-full h-3 mb-4">
+          <div
+            className="bg-green-500 h-3 rounded-full"
+            style={{ width: `${progressPercentage}%` }}
+          ></div>
+        </div>
+        <p className="text-xs text-gray-400">
+          {progressPercentage.toFixed(2)}% de l'inventaire terminé
+        </p>
+      </div>
+
+      {/* KPI Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div className="p-4 bg-gray-700 rounded-md shadow-md">
+          <h3 className="text-sm font-semibold text-gray-200">
+            Total des Zones
+          </h3>
+          <p className="text-xl font-bold text-white">{totalZones}</p>
+        </div>
+        <div className="p-4 bg-gray-700 rounded-md shadow-md">
+          <h3 className="text-sm font-semibold text-gray-200">
+            Zones Terminées
+          </h3>
+          <p className="text-xl font-bold text-white">{completedZones}</p>
+        </div>
+        <div className="p-4 bg-gray-700 rounded-md shadow-md">
+          <h3 className="text-sm font-semibold text-gray-200">
+            Zones En Cours
+          </h3>
+          <p className="text-xl font-bold text-white">
+            {totalZones - completedZones}
+          </p>
+        </div>
+        <div className="p-4 bg-gray-700 rounded-md shadow-md">
+          <h3 className="text-sm font-semibold text-gray-200">Progression</h3>
+          <p className="text-xl font-bold text-white">
+            {progressPercentage.toFixed(2)}%
+          </p>
+        </div>
+      </div>
+
       <div className="grid grid-cols-3 sm:grid-cols-6 md:grid-cols-6 lg:grid-cols-8 gap-2">
         {inventory?.zones.map((zone) => (
           <div
@@ -131,7 +194,7 @@ const AdminInventoriesSuivie = () => {
             className="p-2 border border-gray-300 bg-gray-600 rounded-md shadow-md"
           >
             {/* Nom de la zone */}
-            <h3 className="text-center text-white font-bold text-sm mb-2">
+            <h3 className="text-center text-white font-bold text-xs mb-2">
               {zone.nom}
             </h3>
 
@@ -140,7 +203,7 @@ const AdminInventoriesSuivie = () => {
               {zone.parties.map((partie) => (
                 <div
                   key={partie.type}
-                  className={`w-6 h-6 flex justify-center items-center rounded ${getStatusColor(
+                  className={`w-5 h-5 flex justify-center items-center rounded ${getStatusColor(
                     partie.status
                   )}`}
                   title={partie.type} // Infobulle pour afficher le type
@@ -178,13 +241,13 @@ const AdminInventoriesSuivie = () => {
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="py-1 px-4 bg-gray-300 text-gray-800 rounded hover:bg-gray-400"
+                className="py-1 px-4 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 text-sm"
               >
                 Annuler
               </button>
               <button
                 onClick={handleScanSubmit}
-                className="py-1 px-4 bg-green-600 text-white rounded hover:bg-green-700"
+                className="py-1 px-4 bg-green-600 text-white rounded hover:bg-green-700 text-sm"
               >
                 Sauvegarder
               </button>
