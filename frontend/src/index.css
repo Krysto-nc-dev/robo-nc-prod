@@ -2,97 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --primaryColor: #d4d4d4; /* Noir/gris foncé pour les éléments principaux */
-  --secondaryColor: #ffffff; /* Blanc pour les textes */
-  --accentColor: #4a90e2; /* Bleu doux pour les liens et accents */
-  --textColor: #d6d6d6; /* Gris clair pour les textes */
-  --backgroundColor: #d6d6d6; /* Noir pour le fond général */
-  --grayColor: #2e2e2e; /* Gris foncé pour les arrière-plans */
-  --highlightColor: #3c3c3c; /* Gris moyen pour surbrillance */
-  --mutedColor: #9e9e9e; /* Gris neutre pour le texte secondaire */
-  --dangerColor: #d9534f; /* Rouge pour les alertes */
-  --successColor: #5cb85c; /* Vert doux pour les succès */
-}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Noto+Sans+JP:wght@100..900&display=swap');
 
-/* Boutons */
-.btn {
-  @apply px-4 py-2 flex justify-center items-center text-sm font-medium text-secondaryColor rounded-md bg-primaryColor hover:bg-highlightColor transition-all duration-150 ease-in-out;
-}
 
-.btn:hover {
-  @apply bg-yellow-500 text-accentColor;
-}
-
-/* Arrière-plan */
-body {
-  @apply text-sm text-textColor bg-backgroundColor font-sans;
-}
-
-/* Inputs */
-input {
-  @apply w-full px-3 py-2 text-sm border rounded-md outline-none text-secondaryColor bg-gray-300 border-mutedColor focus:ring-2 focus:ring-accentColor placeholder-gray-600 transition duration-200;
-}
-
-/* Cards */
-.card {
-  @apply bg-grayColor text-textColor rounded-md shadow p-4 transition-transform duration-150 hover:scale-105;
-}
-
-.card:hover {
-  @apply bg-highlightColor;
-}
-
-/* Tableaux */
-table {
-  @apply w-full border-collapse border border-gray-700 bg-gray-300 text-sm;
-}
-
-th {
-  @apply py-2 px-3 text-left border-b border-gray-600 bg-gray-800 text-gray-300 font-medium;
-}
-
-td {
-  @apply py-2 px-3 border-b border-gray-600 text-textColor;
-}
-
-tr:hover {
-  @apply bg-blue-300 text-secondaryColor cursor-pointer transition duration-150;
-}
-
-thead {
-  @apply bg-gray-300 text-secondaryColor;
-}
-
-tbody tr:last-child td {
-  @apply border-none;
-}
-
-/* Liens */
-a {
-  @apply text-accentColor text-sm hover:underline transition duration-150;
-}
-
-a:hover {
-  @apply text-highlightColor;
-}
-
-/* Loader */
-.loader {
-  animation: spin 1s linear infinite;
-  color: var(--accentColor);
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-/* Composant de retour */
-.btn-back {
-  @apply bg-grayColor text-secondaryColor px-4 py-2 text-sm rounded-md font-medium hover:bg-highlightColor hover:text-accentColor transition-all;
+html,
+body,
+#root,
+.app {
+  height: 100% ;
+  width: 100%;
+  font-familly : 'Inter', sans-serif;
 }
