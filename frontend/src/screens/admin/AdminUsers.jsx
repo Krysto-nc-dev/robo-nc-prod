@@ -20,7 +20,7 @@ const AdminUsers = () => {
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const roles = ["Utilisateur", "Privé", "Admin"];
+  const roles = ["utilisateur", "private", "admin"];
 
   const {
     data: users,
