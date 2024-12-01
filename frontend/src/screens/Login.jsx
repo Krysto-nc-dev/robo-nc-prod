@@ -48,52 +48,63 @@ const Login = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-700">
-      <div className="w-full max-w-md bg-gray-800 text-white shadow-xl rounded-lg p-8">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500">
+      <div className="w-full max-w-md bg-white text-gray-800 shadow-lg rounded-lg p-8">
         {/* Logo de la quincaillerie */}
         <div className="flex justify-center mb-6">
-          {/* <img
+          <img
             src={logoImage}
             alt="Quincaillerie Calédonienne"
             className="h-16 w-auto"
-          /> */}
+          />
         </div>
 
-        <h2 className="text-center text-lg text-gray-400 mb-8">
-          Connectez-vous pour accéder à votre compte.
+        <h2 className="text-center text-xl font-bold text-gray-700 mb-8">
+          Bienvenue, connectez-vous pour continuer.
         </h2>
 
-        <form onSubmit={submitHandler} className="space-y-4">
-          <input
-            type="email"
-            id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full p-3 bg-gray-700 text-gray-200 border border-gray-600 rounded-md focus:ring-2 focus:ring-primaryColor focus:outline-none placeholder-gray-400"
-            placeholder="Adresse e-mail"
-          />
-          <input
-            type="password"
-            id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-3 bg-gray-700 text-gray-200 border border-gray-600 rounded-md focus:ring-2 focus:ring-primaryColor focus:outline-none placeholder-gray-400"
-            placeholder="Mot de passe"
-          />
+        <form onSubmit={submitHandler} className="space-y-6">
+          <div className="relative">
+            <input
+              type="email"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full p-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder-gray-400 shadow-sm"
+              placeholder="Adresse e-mail"
+            />
+          </div>
+          <div className="relative">
+            <input
+              type="password"
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full p-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder-gray-400 shadow-sm"
+              placeholder="Mot de passe"
+            />
+          </div>
           <button
             type="submit"
-            className="w-full bg-primaryColor text-black font-bold p-3 rounded-md hover:bg-highlightColor transition duration-150 flex justify-center items-center"
+            className="w-full p-4 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition duration-200 flex justify-center items-center shadow-md"
           >
             {isLoading ? <Loader className="animate-spin" /> : "Se connecter"}
           </button>
         </form>
 
-        <div className="flex justify-between items-center mt-6 text-sm">
-          <Link
-            to="/forgot-password"
-            className="text-blue-400 hover:underline transition duration-150"
-          >
+        <div className="mt-6 text-center text-sm text-gray-600">
+          <Link to="/forgot-password" className="text-blue-600 hover:underline">
             Mot de passe oublié ?
+          </Link>
+        </div>
+
+        <div className="mt-6 text-center text-sm text-gray-600">
+          <span className="mr-2">Nouveau ici ?</span>
+          <Link
+            to="/register"
+            className="text-blue-600 hover:underline font-medium"
+          >
+            Créez un compte
           </Link>
         </div>
       </div>

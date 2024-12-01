@@ -354,7 +354,7 @@ const AdminInventoriesSuivie = () => {
     totalZones > 0 ? (completedZones / totalZones) * 100 : 0;
 
   return (
-    <div className="p-4 mx-auto max-w-[1280px]">
+    <div className="p-4 mx-auto">
       <h1 className="text-2xl font-bold text-gray-700 mb-6 text-center">
         Suivi des Zones de l'Inventaire
       </h1>
@@ -391,7 +391,7 @@ const AdminInventoriesSuivie = () => {
       </div>
 
       {/* Mini Cartes Zones */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-8 gap-4">
         {inventory?.zones.map((zone) => (
           <div
             key={zone._id}
@@ -399,7 +399,7 @@ const AdminInventoriesSuivie = () => {
               zone
             )}`}
           >
-            <h3 className="text-sm font-bold text-gray-800 text-center mb-3">
+            <h3 className="text-sm font-bold lg:text-[10px] text-gray-800 text-center mb-3">
               {zone.nom}
             </h3>
             <div className="flex justify-center gap-1 flex-wrap">

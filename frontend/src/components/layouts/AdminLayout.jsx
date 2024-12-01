@@ -14,14 +14,15 @@ import {
   ListItemText,
   CssBaseline,
   Box,
-  useTheme,
-  useMediaQuery,
   InputBase,
   Menu,
   MenuItem,
   Avatar,
   Divider,
+  Collapse,
+  useMediaQuery,
 } from "@mui/material";
+import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Brightness4, Brightness7 } from "@mui/icons-material";
 import {
@@ -35,20 +36,27 @@ import {
   ScanBarcode,
   Users,
   ChartColumnDecreasing,
+  Package,
 } from "lucide-react";
 
 const AdminLayout = ({ children }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [moduleOpen, setModuleOpen] = useState(false);
+  const [rapportOpen, setRapportOpen] = useState(false); // État pour le menu déroulant "Rapports"
   const [mode, setMode] = useState("light");
+  const isMobile = useMediaQuery("(max-width:600px)");
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const theme = createTheme({
     palette: {
-      mode: mode,
+      mode,
       ...(mode === "light"
         ? {
             background: {
-              default: "#ffffff",
-              paper: "#f7f7f7",
+              default: "#f9f9f9",
+              paper: "#ffffff",
             },
           }
         : {
@@ -59,60 +67,166 @@ const AdminLayout = ({ children }) => {
           }),
     },
   });
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
 
-  const toggleDrawer = () => {
-    setDrawerOpen(!drawerOpen);
-  };
-
-  const handleMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
-
+  const toggleDrawer = () => setDrawerOpen(!drawerOpen);
+  const handleMenuOpen = (event) => setAnchorEl(event.currentTarget);
+  const handleMenuClose = () => setAnchorEl(null);
   const handleLogout = () => {
     dispatch(logout());
     navigate("/login");
   };
-
-  const toggleThemeMode = () => {
+  const toggleThemeMode = () =>
     setMode((prevMode) => (prevMode === "light" ? "dark" : "light"));
-  };
+  const toggleModuleOpen = () => setModuleOpen(!moduleOpen);
+  const toggleRapportOpen = () => setRapportOpen(!rapportOpen); // Fonction pour ouvrir/fermer le menu "Rapports"
 
   const drawerContent = (
-    <Box sx={{ width: 250 }}>
-      <List>
-        <ListItem button component={Link} to="/admin/articles">
-          <ListItemIcon>
+    <Box
+      sx={{
+        width: 180, // Réduction de la largeur de la Sidebar
+        backgroundColor: theme.palette.background.paper,
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        borderRight: `1px solid ${theme.palette.divider}`,
+      }}
+    >
+      <List sx={{ padding: 0 }}>
+        <ListItem
+          button
+          component={Link}
+          to="/admin/articles"
+          sx={{
+            padding: "8px 12px",
+            fontSize: "0.8rem",
+            "&:hover": { backgroundColor: theme.palette.action.hover },
+          }}
+        >
+          <ListItemIcon sx={{ minWidth: 28 }}>
             <ScanBarcode />
           </ListItemIcon>
           <ListItemText primary="Articles" />
         </ListItem>
-        <ListItem button component={Link} to="/admin/rapports">
-          <ListItemIcon>
+
+        {/* Menu déroulant Rapports */}
+        <ListItem
+          button
+          onClick={toggleRapportOpen}
+          sx={{
+            padding: "8px 12px",
+            fontSize: "0.8rem",
+            "&:hover": { backgroundColor: theme.palette.action.hover },
+          }}
+        >
+          <ListItemIcon sx={{ minWidth: 28 }}>
             <ChartColumnDecreasing />
           </ListItemIcon>
           <ListItemText primary="Rapports" />
+          {rapportOpen ? <ExpandLess /> : <ExpandMore />}
         </ListItem>
-        <ListItem button component={Link} to="/admin/inventories">
-          <ListItemIcon>
-            <Clipboard />
+        <Collapse in={rapportOpen} timeout="auto" unmountOnExit>
+          <List component="div" disablePadding>
+            <ListItem
+              button
+              component={Link}
+              to="/admin/rapports/access"
+              sx={{
+                padding: "6px 24px",
+                fontSize: "0.75rem",
+                "&:hover": { backgroundColor: theme.palette.action.hover },
+              }}
+            >
+              <ListItemText primary="Access" />
+            </ListItem>
+            <ListItem
+              button
+              component={Link}
+              to="/admin/rapports/global"
+              sx={{
+                padding: "6px 24px",
+                fontSize: "0.75rem",
+                "&:hover": { backgroundColor: theme.palette.action.hover },
+              }}
+            >
+              <ListItemText primary="Global" />
+            </ListItem>
+            <ListItem
+              button
+              component={Link}
+              to="/admin/rapports/master"
+              sx={{
+                padding: "6px 24px",
+                fontSize: "0.75rem",
+                "&:hover": { backgroundColor: theme.palette.action.hover },
+              }}
+            >
+              <ListItemText primary="Master" />
+            </ListItem>
+          </List>
+        </Collapse>
+
+        {/* Menu déroulant Modules */}
+        <ListItem
+          button
+          onClick={toggleModuleOpen}
+          sx={{
+            padding: "8px 12px",
+            fontSize: "0.8rem",
+            "&:hover": { backgroundColor: theme.palette.action.hover },
+          }}
+        >
+          <ListItemIcon sx={{ minWidth: 28 }}>
+            <Package />
           </ListItemIcon>
-          <ListItemText primary="Inventaires" />
+          <ListItemText primary="Modules" />
+          {moduleOpen ? <ExpandLess /> : <ExpandMore />}
         </ListItem>
-        <ListItem button component={Link} to="/admin/users">
-          <ListItemIcon>
+        <Collapse in={moduleOpen} timeout="auto" unmountOnExit>
+          <List component="div" disablePadding>
+            <ListItem
+              button
+              component={Link}
+              to="/admin/inventories"
+              sx={{
+                padding: "6px 24px",
+                fontSize: "0.75rem",
+                "&:hover": { backgroundColor: theme.palette.action.hover },
+              }}
+            >
+              <ListItemIcon sx={{ minWidth: 28 }}>
+                <Clipboard />
+              </ListItemIcon>
+              <ListItemText primary="Inventaires" />
+            </ListItem>
+          </List>
+        </Collapse>
+
+        <ListItem
+          button
+          component={Link}
+          to="/admin/users"
+          sx={{
+            padding: "8px 12px",
+            fontSize: "0.8rem",
+            "&:hover": { backgroundColor: theme.palette.action.hover },
+          }}
+        >
+          <ListItemIcon sx={{ minWidth: 28 }}>
             <Users />
           </ListItemIcon>
           <ListItemText primary="Utilisateurs" />
         </ListItem>
-        <ListItem button component={Link} to="/admin/settings">
-          <ListItemIcon>
+        <ListItem
+          button
+          component={Link}
+          to="/admin/settings"
+          sx={{
+            padding: "8px 12px",
+            fontSize: "0.8rem",
+            "&:hover": { backgroundColor: theme.palette.action.hover },
+          }}
+        >
+          <ListItemIcon sx={{ minWidth: 28 }}>
             <Settings />
           </ListItemIcon>
           <ListItemText primary="Paramètres" />
@@ -129,9 +243,18 @@ const AdminLayout = ({ children }) => {
         {/* AppBar */}
         <AppBar
           position="fixed"
-          sx={{ backgroundColor: theme.palette.primary.main }}
+          elevation={1}
+          sx={{
+            backgroundColor: theme.palette.background.paper,
+            color: theme.palette.text.primary,
+            borderBottom: `1px solid ${theme.palette.divider}`,
+            height: 56,
+            justifyContent: "center",
+          }}
         >
-          <Toolbar>
+          <Toolbar
+            sx={{ minHeight: 56, display: "flex", alignItems: "center" }}
+          >
             {isMobile && (
               <IconButton
                 color="inherit"
@@ -142,8 +265,10 @@ const AdminLayout = ({ children }) => {
                 <MenuIcon />
               </IconButton>
             )}
-
-            <Typography variant="h6" sx={{ flexGrow: 1 }}>
+            <Typography
+              variant="h6"
+              sx={{ flexGrow: 1, fontSize: "1rem", fontWeight: 500 }}
+            >
               QC Administration
             </Typography>
 
@@ -152,20 +277,24 @@ const AdminLayout = ({ children }) => {
               sx={{
                 display: { xs: "none", sm: "flex" },
                 alignItems: "center",
-                backgroundColor: "rgba(255, 255, 255, 0.15)",
-                borderRadius: theme.shape.borderRadius,
+                backgroundColor: theme.palette.action.hover,
+                borderRadius: "20px",
                 padding: "0 10px",
                 marginRight: "20px",
               }}
             >
-              <SearchIcon />
+              <SearchIcon sx={{ color: theme.palette.text.secondary }} />
               <InputBase
                 placeholder="Rechercher…"
-                sx={{ ml: 1, color: "inherit" }}
+                sx={{
+                  ml: 1,
+                  color: "inherit",
+                  fontSize: "0.875rem",
+                }}
               />
             </Box>
 
-            {/* Icône de profil utilisateur */}
+            {/* Icône de changement de thème */}
             <IconButton
               edge="end"
               color="inherit"
@@ -175,6 +304,7 @@ const AdminLayout = ({ children }) => {
               {mode === "dark" ? <Brightness7 /> : <Brightness4 />}
             </IconButton>
 
+            {/* Icône de profil utilisateur */}
             <IconButton
               edge="end"
               color="inherit"
@@ -198,7 +328,6 @@ const AdminLayout = ({ children }) => {
               >
                 Profil
               </MenuItem>
-
               <Divider />
               <MenuItem onClick={handleLogout}>Déconnexion</MenuItem>
             </Menu>
@@ -215,9 +344,8 @@ const AdminLayout = ({ children }) => {
           }}
           sx={{
             "& .MuiDrawer-paper": {
-              width: 250,
+              width: 180,
               boxSizing: "border-box",
-              overflow: "hidden",
             },
           }}
         >
@@ -235,9 +363,9 @@ const AdminLayout = ({ children }) => {
           sx={{
             flexGrow: 1,
             p: 3,
-            width: { sm: `calc(100% - 250px)` },
-            ml: { sm: "250px" },
-            mt: { xs: 8, sm: 0 },
+            width: { sm: `calc(100% - 180px)` },
+            ml: { sm: "180px" },
+            mt: { xs: 7, sm: 0 },
           }}
         >
           <Toolbar />

@@ -19,14 +19,19 @@ const ReusableModal = ({ open, onClose, title, content, actions }) => {
           left: "50%",
           transform: "translate(-50%, -50%)",
           width: 400,
-          bgcolor: theme.palette.secondary.main,
+          bgcolor: theme.palette.primary.main,
           color: theme.palette.text.primary,
           boxShadow: 24,
           p: 4,
           borderRadius: 2,
         }}
       >
-        <Typography id="modal-title" variant="h6" component="h2" sx={{ mb: 2 }}>
+        <Typography
+          id="modal-title"
+          variant="h6"
+          component="h2"
+          sx={{ color: "white", mb: 2 }}
+        >
           {title}
         </Typography>
         <Typography id="modal-description" sx={{ mb: 3 }}>
