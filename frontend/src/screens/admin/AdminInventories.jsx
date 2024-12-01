@@ -17,7 +17,6 @@ import {
   TableHead,
   TableRow,
   Paper,
-  Typography,
   Box,
 } from "@mui/material";
 
@@ -73,30 +72,19 @@ const InventoryManager = () => {
   };
 
   return (
-    <Box
-      sx={{
-        padding: "24px",
-        backgroundColor: "#f8fafc",
-        borderRadius: "12px",
-        boxShadow: "0 8px 16px rgba(0, 0, 0, 0.1)",
-      }}
-    >
-      <Typography
-        variant="h4"
-        gutterBottom
-        sx={{
-          textAlign: "center",
-          color: "#2d3748",
-          fontWeight: "bold",
-          marginBottom: "16px",
-        }}
-      >
+    <div className="">
+      <h1 className="text-lg font-semibold text-gray-800 mb-2">
         Gestion des Inventaires
-      </Typography>
+      </h1>
+      <p className="text-sm text-gray-600 mb-6">
+        Cette page vous permet de gérer vos inventaires : importer des zones,
+        consulter et gérer les informations existantes.
+      </p>
 
       <Link
         to={"documentation"}
-        className="text-blue-500 hover:underline block text-center mb-6"
+        className="text-blue-500 hover:underline block mb-6"
+        style={{ textAlign: "left" }}
       >
         Documentation
       </Link>
@@ -111,17 +99,9 @@ const InventoryManager = () => {
           boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
         }}
       >
-        <Typography
-          variant="h6"
-          gutterBottom
-          sx={{
-            color: "#4a5568",
-            fontWeight: "bold",
-            marginBottom: "12px",
-          }}
-        >
+        <h2 className="text-md font-bold text-gray-700 mb-4">
           Créer un nouvel inventaire
-        </Typography>
+        </h2>
         <Box display="flex" alignItems="center" gap={2}>
           <input
             type="file"
@@ -157,25 +137,17 @@ const InventoryManager = () => {
 
       {/* Liste des inventaires */}
       <Box>
-        <Typography
-          variant="h6"
-          gutterBottom
-          sx={{
-            color: "#4a5568",
-            fontWeight: "bold",
-            marginBottom: "12px",
-          }}
-        >
+        <h2 className="text-md font-bold text-gray-700 mb-4">
           Liste des Inventaires
-        </Typography>
+        </h2>
         {isLoadingInventories ? (
           <Box display="flex" justifyContent="center" padding="16px">
             <CircularProgress />
           </Box>
         ) : error ? (
-          <Typography color="error">
+          <p className="text-red-500">
             Erreur lors du chargement des inventaires.
-          </Typography>
+          </p>
         ) : inventories && inventories.length > 0 ? (
           <TableContainer component={Paper} sx={{ borderRadius: "12px" }}>
             <Table>
@@ -263,10 +235,10 @@ const InventoryManager = () => {
             </Table>
           </TableContainer>
         ) : (
-          <Typography>Aucun inventaire trouvé.</Typography>
+          <p className="text-gray-600">Aucun inventaire trouvé.</p>
         )}
       </Box>
-    </Box>
+    </div>
   );
 };
 

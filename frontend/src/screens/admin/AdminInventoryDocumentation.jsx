@@ -1,140 +1,191 @@
 import React from "react";
+import { Box, Typography } from "@mui/material";
 
 const AdminInventoryDocumentation = () => {
   return (
-    <div className="mx-auto p-6 bg-white text-gray-700 rounded-lg shadow-lg ">
-      <h1 className="text-2xl font-bold text-blue-600 mb-8 text-center">
+    <Box>
+      <Typography variant="h5" fontWeight="bold" color="text.primary" mb={2}>
         Documentation Utilisateur - Gestion des Inventaires
-      </h1>
+      </Typography>
+      <Typography variant="body2" color="text.secondary" mb={4}>
+        Retrouvez ici toutes les informations nécessaires pour utiliser la
+        plateforme de gestion des inventaires. Ce guide couvre la création,
+        modification, exportation, gestion des zones et les nouvelles
+        fonctionnalités avancées.
+      </Typography>
 
-      <section className="mb-10">
-        <h2 className="text-2xl font-semibold text-green-600 mb-4">
+      {/* Section Introduction */}
+      <Box mb={8}>
+        <Typography variant="h6" fontWeight="bold" color="success.main" mb={2}>
           Introduction
-        </h2>
-        <p className="leading-relaxed">
-          Bienvenue dans la documentation utilisateur de ROBOT-NC. Ce guide a
-          pour objectif de vous accompagner dans l’utilisation de la plateforme
-          de gestion des inventaires. Apprenez à créer de nouveaux inventaires,
-          gérer vos données et exporter des informations essentielles en toute
-          simplicité.
-        </p>
-      </section>
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          Bienvenue dans la documentation utilisateur de ROBOT-NC. Ce guide vous
+          accompagne dans l’utilisation de la plateforme pour une gestion
+          optimale des inventaires. Prenez en main rapidement les
+          fonctionnalités essentielles et avancées.
+        </Typography>
+      </Box>
 
-      <section className="mb-10">
-        <h2 className="text-2xl font-semibold text-green-600 mb-4">
-          1. Création d'un Inventaire par Importation CSV
-        </h2>
-        <ol className="list-decimal ml-8 leading-relaxed space-y-3">
-          <li>
-            Cliquez sur le bouton{" "}
-            <strong className="text-blue-600">"Créer un Inventaire"</strong> sur
-            le tableau de bord principal.
-          </li>
-          <li>
-            Sélectionnez un fichier CSV contenant les informations des zones.
-            Assurez-vous que le fichier respecte le format requis. Vous pouvez
-            télécharger un exemple en cliquant ci-dessous :
-            <br />
-            <a
-              href="/exemple_zones.csv"
-              download
-              className="text-blue-600 underline mt-2 inline-block"
-            >
-              Télécharger l'exemple de fichier CSV
-            </a>
-          </li>
-          <li>
-            Cliquez sur le bouton{" "}
-            <strong className="text-blue-600">"Importer Zones"</strong>.
-          </li>
-          <li>
-            Une confirmation apparaîtra indiquant que l'importation est réussie.
-          </li>
-        </ol>
-      </section>
+      {/* Fonctionnalité : Recherche Avancée */}
+      <Box mb={8} display="flex" gap={2}>
+        <Box flex={2}>
+          <Typography
+            variant="h6"
+            fontWeight="bold"
+            color="success.main"
+            mb={2}
+          >
+            1. Recherche Avancée
+          </Typography>
+          <Typography variant="body2" color="text.secondary" mb={2}>
+            Utilisez la recherche avancée pour filtrer vos inventaires selon des
+            critères spécifiques.
+          </Typography>
+          <ol>
+            <li>
+              <Typography variant="body2" color="text.secondary">
+                Cliquez sur l’icône{" "}
+                <strong style={{ color: "#1976d2" }}>
+                  "Recherche Avancée"
+                </strong>{" "}
+                dans la barre supérieure.
+              </Typography>
+            </li>
+            <li>
+              <Typography variant="body2" color="text.secondary">
+                Sélectionnez vos critères : nom, statut, date, etc.
+              </Typography>
+            </li>
+            <li>
+              <Typography variant="body2" color="text.secondary">
+                Cliquez sur{" "}
+                <strong style={{ color: "#1976d2" }}>"Rechercher"</strong>.
+              </Typography>
+            </li>
+            <li>
+              <Typography variant="body2" color="text.secondary">
+                Les résultats apparaîtront sous forme de tableau interactif.
+              </Typography>
+            </li>
+          </ol>
+        </Box>
+        <Box flex={1} display="flex" justifyContent="center">
+          <img
+            src="https://via.placeholder.com/300x200?text=Recherche+Avancée"
+            alt="Exemple de Recherche Avancée"
+            style={{
+              borderRadius: "8px",
+              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+            }}
+          />
+        </Box>
+      </Box>
 
-      <section className="mb-10">
-        <h2 className="text-2xl font-semibold text-green-600 mb-4">
-          2. Modification d'un Inventaire
-        </h2>
-        <p className="leading-relaxed">
-          Pour modifier un inventaire existant :
-        </p>
-        <ol className="list-decimal ml-8 leading-relaxed space-y-3">
-          <li>Accédez à la liste des inventaires.</li>
-          <li>
-            Cliquez sur l’icône{" "}
-            <strong className="text-blue-600">"Modifier"</strong>.
-          </li>
-          <li>
-            Apportez les modifications nécessaires et cliquez sur{" "}
-            <strong className="text-blue-600">"Enregistrer"</strong>.
-          </li>
-        </ol>
-      </section>
+      {/* Fonctionnalité : Notifications Automatisées */}
+      <Box mb={8} display="flex" gap={2}>
+        <Box flex={2}>
+          <Typography
+            variant="h6"
+            fontWeight="bold"
+            color="success.main"
+            mb={2}
+          >
+            2. Notifications Automatisées
+          </Typography>
+          <Typography variant="body2" color="text.secondary" mb={2}>
+            Recevez des notifications pour des tâches importantes ou des rappels
+            liés à vos inventaires.
+          </Typography>
+          <ul>
+            <li>
+              <Typography variant="body2" color="text.secondary">
+                Activez les notifications dans les paramètres utilisateur.
+              </Typography>
+            </li>
+            <li>
+              <Typography variant="body2" color="text.secondary">
+                Configurez les types de rappels :{" "}
+                <em>fin d’inventaire, validation en attente, etc.</em>
+              </Typography>
+            </li>
+            <li>
+              <Typography variant="body2" color="text.secondary">
+                Les notifications apparaîtront sous forme de pop-ups ou
+                d’emails.
+              </Typography>
+            </li>
+          </ul>
+        </Box>
+        <Box flex={1} display="flex" justifyContent="center">
+          <img
+            src="https://via.placeholder.com/300x200?text=Notifications"
+            alt="Exemple de Notifications"
+            style={{
+              borderRadius: "8px",
+              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+            }}
+          />
+        </Box>
+      </Box>
 
-      <section className="mb-10">
-        <h2 className="text-2xl font-semibold text-green-600 mb-4">
-          3. Exportation de Fiches de Zones (PDF)
-        </h2>
-        <p className="leading-relaxed">
-          Générer des fiches PDF pour vos zones est simple :
-        </p>
-        <ol className="list-decimal ml-8 leading-relaxed space-y-3">
-          <li>
-            Accédez aux détails de l'inventaire contenant les zones souhaitées.
-          </li>
-          <li>
-            Cliquez sur le bouton{" "}
-            <strong className="text-blue-600">"Générer PDF"</strong>.
-          </li>
-          <li>
-            Le fichier sera téléchargé automatiquement sur votre appareil.
-          </li>
-        </ol>
-      </section>
+      {/* Fonctionnalité : Visualisation Graphique */}
+      <Box mb={8} display="flex" gap={2}>
+        <Box flex={2}>
+          <Typography
+            variant="h6"
+            fontWeight="bold"
+            color="success.main"
+            mb={2}
+          >
+            3. Visualisation Graphique des Inventaires
+          </Typography>
+          <Typography variant="body2" color="text.secondary" mb={2}>
+            Visualisez vos données d’inventaires sous forme de graphiques
+            interactifs.
+          </Typography>
+          <ol>
+            <li>
+              <Typography variant="body2" color="text.secondary">
+                Accédez à l'onglet{" "}
+                <strong style={{ color: "#1976d2" }}>"Graphiques"</strong>.
+              </Typography>
+            </li>
+            <li>
+              <Typography variant="body2" color="text.secondary">
+                Sélectionnez le type de graphique :{" "}
+                <em>barres, camembert, chronologique</em>.
+              </Typography>
+            </li>
+            <li>
+              <Typography variant="body2" color="text.secondary">
+                Personnalisez les filtres (par date, statut, zones).
+              </Typography>
+            </li>
+            <li>
+              <Typography variant="body2" color="text.secondary">
+                Les graphiques sont exportables en PDF ou PNG.
+              </Typography>
+            </li>
+          </ol>
+        </Box>
+        <Box flex={1} display="flex" justifyContent="center">
+          <img
+            src="https://via.placeholder.com/300x200?text=Graphiques"
+            alt="Exemple de Graphiques"
+            style={{
+              borderRadius: "8px",
+              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+            }}
+          />
+        </Box>
+      </Box>
 
-      <section className="mb-10">
-        <h2 className="text-2xl font-semibold text-green-600 mb-4">
-          4. Gestion des Zones
-        </h2>
-        <ul className="list-disc ml-8 leading-relaxed space-y-3">
-          <li>
-            Pour ajouter une zone, cliquez sur{" "}
-            <strong className="text-blue-600">"Ajouter une Zone"</strong>.
-          </li>
-          <li>Renseignez les informations nécessaires : nom, lieu, etc.</li>
-          <li>
-            Cliquez sur <strong className="text-blue-600">"Enregistrer"</strong>{" "}
-            pour valider.
-          </li>
-        </ul>
-      </section>
-
-      <section className="mb-10">
-        <h2 className="text-2xl font-semibold text-green-600 mb-4">
-          5. Bonnes Pratiques
-        </h2>
-        <ul className="list-disc ml-8 leading-relaxed space-y-3">
-          <li>
-            Assurez-vous que les informations des inventaires sont complètes et
-            cohérentes avant validation.
-          </li>
-          <li>
-            Exportez régulièrement des fiches PDF pour les besoins d’audit.
-          </li>
-          <li>
-            Archivez les inventaires terminés pour maintenir une interface
-            claire.
-          </li>
-        </ul>
-      </section>
-
-      <footer className="mt-8 text-center text-sm text-gray-500">
+      <Box mt={4} textAlign="center" fontSize="12px" color="text.secondary">
         Cette documentation est destinée à un usage interne. Pour toute
-        assistance, veuillez contacter l'équipe technique.
-      </footer>
-    </div>
+        assistance, contactez l'équipe technique.
+      </Box>
+    </Box>
   );
 };
 
