@@ -25,26 +25,20 @@ const InventoryManager = () => {
   const navigate = useNavigate();
   const [selectedFile, setSelectedFile] = useState(null);
 
-  // Hook pour récupérer la liste des inventaires
   const {
     data: inventories,
     isLoading: isLoadingInventories,
     error,
   } = useGetInventoriesQuery();
 
-  // Hook pour importer des zones en CSV
   const [importZones, { isLoading: isImporting }] = useImportZonesMutation();
-
-  // Hook pour supprimer un inventaire
   const [deleteInventory, { isLoading: isDeleting }] =
     useDeleteInventoryMutation();
 
-  // Gestion du fichier CSV
   const handleFileChange = (e) => {
     setSelectedFile(e.target.files[0]);
   };
 
-  // Envoi du fichier CSV pour créer un inventaire
   const handleImportZones = async () => {
     if (!selectedFile) {
       toast.error("Veuillez sélectionner un fichier CSV !");
@@ -63,12 +57,10 @@ const InventoryManager = () => {
     }
   };
 
-  // Fonction pour naviguer vers la page dédiée à un inventaire
   const handleInventoryClick = (inventoryId) => {
     navigate(`/admin/inventories/${inventoryId}`);
   };
 
-  // Fonction pour supprimer un inventaire
   const handleDeleteInventory = async (inventoryId) => {
     if (window.confirm("Êtes-vous sûr de vouloir supprimer cet inventaire ?")) {
       try {
@@ -83,20 +75,29 @@ const InventoryManager = () => {
   return (
     <Box
       sx={{
-        padding: "16px",
-        backgroundColor: "#f9f9f9",
-        borderRadius: "8px",
-        boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+        padding: "24px",
+        backgroundColor: "#f8fafc",
+        borderRadius: "12px",
+        boxShadow: "0 8px 16px rgba(0, 0, 0, 0.1)",
       }}
     >
       <Typography
         variant="h4"
         gutterBottom
-        sx={{ textAlign: "center", color: "#333", fontWeight: "bold" }}
+        sx={{
+          textAlign: "center",
+          color: "#2d3748",
+          fontWeight: "bold",
+          marginBottom: "16px",
+        }}
       >
         Gestion des Inventaires
       </Typography>
-      <Link to={"documentation"} className="text-blue-500 underline">
+
+      <Link
+        to={"documentation"}
+        className="text-blue-500 hover:underline block text-center mb-6"
+      >
         Documentation
       </Link>
 
@@ -104,16 +105,20 @@ const InventoryManager = () => {
       <Box
         sx={{
           marginBottom: "24px",
-          padding: "16px",
-          backgroundColor: "#fff",
-          borderRadius: "8px",
-          boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+          padding: "20px",
+          backgroundColor: "#ffffff",
+          borderRadius: "12px",
+          boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
         }}
       >
         <Typography
           variant="h6"
           gutterBottom
-          sx={{ color: "#555", fontWeight: "bold" }}
+          sx={{
+            color: "#4a5568",
+            fontWeight: "bold",
+            marginBottom: "12px",
+          }}
         >
           Créer un nouvel inventaire
         </Typography>
@@ -122,13 +127,24 @@ const InventoryManager = () => {
             type="file"
             accept=".csv"
             onChange={handleFileChange}
-            className="file-input file-input-bordered w-1/2"
+            className="file-input file-input-bordered w-full md:w-2/3"
+            style={{
+              border: "1px solid #cbd5e0",
+              borderRadius: "8px",
+              padding: "8px",
+            }}
           />
           <Button
             onClick={handleImportZones}
             variant="contained"
             color="primary"
             disabled={isImporting}
+            sx={{
+              backgroundColor: "#4c51bf",
+              "&:hover": {
+                backgroundColor: "#434190",
+              },
+            }}
           >
             {isImporting ? (
               <CircularProgress size={20} color="inherit" />
@@ -144,7 +160,11 @@ const InventoryManager = () => {
         <Typography
           variant="h6"
           gutterBottom
-          sx={{ color: "#555", fontWeight: "bold" }}
+          sx={{
+            color: "#4a5568",
+            fontWeight: "bold",
+            marginBottom: "12px",
+          }}
         >
           Liste des Inventaires
         </Typography>
@@ -157,20 +177,40 @@ const InventoryManager = () => {
             Erreur lors du chargement des inventaires.
           </Typography>
         ) : inventories && inventories.length > 0 ? (
-          <TableContainer component={Paper} sx={{ borderRadius: "8px" }}>
+          <TableContainer component={Paper} sx={{ borderRadius: "12px" }}>
             <Table>
-              <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
+              <TableHead sx={{ backgroundColor: "#f7fafc" }}>
                 <TableRow>
-                  <TableCell>Nom</TableCell>
-                  <TableCell>Statut</TableCell>
-                  <TableCell>Date de début</TableCell>
-                  <TableCell>Date de fin</TableCell>
-                  <TableCell align="center">Actions</TableCell>
+                  <TableCell sx={{ fontWeight: "bold", color: "#2d3748" }}>
+                    Nom
+                  </TableCell>
+                  <TableCell sx={{ fontWeight: "bold", color: "#2d3748" }}>
+                    Statut
+                  </TableCell>
+                  <TableCell sx={{ fontWeight: "bold", color: "#2d3748" }}>
+                    Date de début
+                  </TableCell>
+                  <TableCell sx={{ fontWeight: "bold", color: "#2d3748" }}>
+                    Date de fin
+                  </TableCell>
+                  <TableCell
+                    sx={{ fontWeight: "bold", color: "#2d3748" }}
+                    align="center"
+                  >
+                    Actions
+                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {inventories.map((inventory) => (
-                  <TableRow key={inventory._id}>
+                  <TableRow
+                    key={inventory._id}
+                    sx={{
+                      "&:hover": {
+                        backgroundColor: "#edf2f7",
+                      },
+                    }}
+                  >
                     <TableCell>{inventory.nom || "N/A"}</TableCell>
                     <TableCell>{inventory.statut || "Inconnu"}</TableCell>
                     <TableCell>
@@ -184,19 +224,35 @@ const InventoryManager = () => {
                     <TableCell align="center">
                       <Button
                         onClick={() => handleInventoryClick(inventory._id)}
-                        variant="text"
+                        variant="outlined"
                         color="primary"
                         size="small"
+                        sx={{
+                          borderColor: "#4c51bf",
+                          color: "#4c51bf",
+                          "&:hover": {
+                            backgroundColor: "#4c51bf",
+                            color: "#ffffff",
+                          },
+                        }}
                       >
                         <Eye />
                       </Button>
                       <Button
                         onClick={() => handleDeleteInventory(inventory._id)}
-                        variant="text"
+                        variant="outlined"
                         color="error"
                         size="small"
                         disabled={isDeleting}
-                        sx={{ marginLeft: "8px" }}
+                        sx={{
+                          marginLeft: "8px",
+                          borderColor: "#e53e3e",
+                          color: "#e53e3e",
+                          "&:hover": {
+                            backgroundColor: "#e53e3e",
+                            color: "#ffffff",
+                          },
+                        }}
                       >
                         {isDeleting ? <Loader2 /> : <Trash2 />}
                       </Button>
