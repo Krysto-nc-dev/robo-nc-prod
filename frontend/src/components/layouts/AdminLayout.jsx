@@ -15,6 +15,7 @@ import {
   ListItemText,
   CssBaseline,
   Box,
+  InputBase,
   Menu,
   MenuItem,
   Avatar,
@@ -25,7 +26,7 @@ import {
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Brightness4, Brightness7 } from "@mui/icons-material";
-import { Menu as MenuIcon } from "@mui/icons-material";
+import { Menu as MenuIcon, Search as SearchIcon } from "@mui/icons-material";
 import {
   Clipboard,
   Settings,
@@ -43,6 +44,7 @@ const AdminLayout = ({ children }) => {
   const [tablesOpen, setTablesOpen] = useState(false);
   const [moduleOpen, setModuleOpen] = useState(false);
   const [fillialeOpen, setFillialeOpen] = useState({});
+  const [searchText, setSearchText] = useState(""); // État pour la recherche
   const [mode, setMode] = useState("light");
   const isMobile = useMediaQuery("(max-width:600px)");
   const dispatch = useDispatch();
@@ -90,6 +92,11 @@ const AdminLayout = ({ children }) => {
   const toggleThemeMode = () =>
     setMode((prevMode) => (prevMode === "light" ? "dark" : "light"));
 
+  // Filtrer les liens en fonction de la recherche
+  const filteredFilliales = filliales?.filter((filliale) =>
+    filliale.acronyme.toLowerCase().includes(searchText.toLowerCase())
+  );
+
   const drawerContent = (
     <Box
       sx={{
@@ -101,6 +108,15 @@ const AdminLayout = ({ children }) => {
         fontSize: "0.875rem",
       }}
     >
+      <Box sx={{ padding: "8px 12px", display: "flex", alignItems: "center" }}>
+        <SearchIcon sx={{ marginRight: "8px" }} />
+        <InputBase
+          placeholder="Rechercher..."
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+          sx={{ width: "100%" }}
+        />
+      </Box>
       <List>
         <ListItem
           button
@@ -174,7 +190,7 @@ const AdminLayout = ({ children }) => {
                 <ListItemText primary="Chargement..." />
               </ListItem>
             ) : (
-              filliales?.map((filliale) => (
+              filteredFilliales?.map((filliale) => (
                 <React.Fragment key={filliale._id}>
                   <ListItem
                     button
@@ -209,30 +225,6 @@ const AdminLayout = ({ children }) => {
                         sx={{ padding: "6px 36px" }}
                       >
                         <ListItemText primary="Fournisseurs" />
-                      </ListItem>
-                      <ListItem
-                        button
-                        component={Link}
-                        to={`/admin/tables/${filliale.acronyme}/proformats`}
-                        sx={{ padding: "6px 36px" }}
-                      >
-                        <ListItemText primary="Proformats" />
-                      </ListItem>
-                      <ListItem
-                        button
-                        component={Link}
-                        to={`/admin/tables/${filliale.acronyme}/facturation-details`}
-                        sx={{ padding: "6px 36px" }}
-                      >
-                        <ListItemText primary="Details" />
-                      </ListItem>
-                      <ListItem
-                        button
-                        component={Link}
-                        to={`/admin/tables/${filliale.acronyme}/tiers`}
-                        sx={{ padding: "6px 36px" }}
-                      >
-                        <ListItemText primary="Tiers" />
                       </ListItem>
                     </List>
                   </Collapse>
