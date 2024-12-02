@@ -138,18 +138,7 @@ const AdminLayout = ({ children }) => {
             >
               <ListItemText primary="Access" />
             </ListItem>
-            <ListItem
-              button
-              component={Link}
-              to="/admin/rapports/global"
-              sx={{
-                padding: "6px 24px",
-                fontSize: "0.75rem",
-                "&:hover": { backgroundColor: theme.palette.action.hover },
-              }}
-            >
-              <ListItemText primary="Global" />
-            </ListItem>
+
             <ListItem
               button
               component={Link}

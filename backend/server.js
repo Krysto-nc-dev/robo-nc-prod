@@ -14,6 +14,8 @@ import zoneRoutes from "./routes/zoneRoutes.js";
 import agentRoutes from "./routes/agentRoutes.js";
 import inventoryRoutes from "./routes/inventoryRoutes.js";
 import articleRoutes from "./routes/articleRoutes.js";
+import accessAppRoutes from "./routes/accessAppRoutes.js";
+import masterRepportRoutes from "./routes/masterRepportRoutes.js";
 
 import filialeRoutes from "./routes/fillialeRoutes.js";
 
@@ -84,6 +86,8 @@ app.use("/agents", agentRoutes);
 app.use("/inventories", inventoryRoutes);
 app.use("/filiales", filialeRoutes);
 app.use("/articles", articleRoutes);
+app.use("/access-apps", accessAppRoutes);
+app.use("/master-repports", masterRepportRoutes);
 
 // Middleware pour gérer les erreurs 404
 app.use((req, res, next) => {

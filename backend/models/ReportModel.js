@@ -9,24 +9,13 @@ const RepportSchema = new mongoose.Schema(
       maxlength: [50, "Le nom ne peut pas dépasser 50 caractères"],
       trim: true,
     },
-    path: {
-      type: String,
-      trim: true,
-      
-    },
     description: {
       type: String,
       trim: true,
     },
+    
     frequence: {
       type: String,
-      trim: true,
-    },
-
-    filliales: {
-      type: String,
-      required: [true, "Veuillez fournir le prénom de l'agent"],
-      maxlength: [50, "Le prénom ne peut pas dépasser 50 caractères"],
       trim: true,
     },
   },

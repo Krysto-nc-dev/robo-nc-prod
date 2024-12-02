@@ -38,6 +38,8 @@ import AdminRepportsAccess from "./screens/admin/AdminRepportsAccess.jsx";
 import AdminRepportsGlobal from "./screens/admin/AdminRepportsGlobal.jsx";
 import AdminRepportsMaster from "./screens/admin/AdminRepportsMaster.jsx";
 import AdminfillialeDetails from "./screens/admin/AdminfillialeDetails.jsx";
+import AdminRepportsAccessDetails from "./screens/admin/AdminRepportsAccessDetails.jsx";
+import AdminMasterRepportDetails from "./screens/admin/AdminMasterRepportDetails.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -54,8 +56,10 @@ const router = createBrowserRouter(
         <Route path="filliales" element={<AdminFilliales />} />
         <Route path="filliales/:id" element={<AdminfillialeDetails/>} />
         <Route path="rapports/access" element={<AdminRepportsAccess/>} />
+        <Route path="access-apps/:id" element={<AdminRepportsAccessDetails/>} />
         <Route path="rapports/global" element={<AdminRepportsGlobal/>} />
         <Route path="rapports/master" element={<AdminRepportsMaster/>} />
+        <Route path="master-repports/:id" element={<AdminMasterRepportDetails/>} />
 
         <Route path="rapports" element={<AdminRepports />} />
         <Route path="users/:id" element={<AdminUserDetails />} />
