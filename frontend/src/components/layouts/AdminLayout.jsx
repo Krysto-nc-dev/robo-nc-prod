@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import { useGetFillialesQuery } from "../../slices/fillialesApiSlice";
 import { logout } from "../../slices/authSlice";
 import {
   AppBar,
@@ -14,7 +15,6 @@ import {
   ListItemText,
   CssBaseline,
   Box,
-  InputBase,
   Menu,
   MenuItem,
   Avatar,
@@ -25,29 +25,31 @@ import {
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Brightness4, Brightness7 } from "@mui/icons-material";
-import {
-  Menu as MenuIcon,
-  Close as CloseIcon,
-  Search as SearchIcon,
-} from "@mui/icons-material";
+import { Menu as MenuIcon } from "@mui/icons-material";
 import {
   Clipboard,
   Settings,
   ScanBarcode,
   Users,
   ChartColumnDecreasing,
+  Database,
   Package,
 } from "lucide-react";
 
 const AdminLayout = ({ children }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [rapportOpen, setRapportOpen] = useState(false);
+  const [tablesOpen, setTablesOpen] = useState(false);
   const [moduleOpen, setModuleOpen] = useState(false);
-  const [rapportOpen, setRapportOpen] = useState(false); // État pour le menu déroulant "Rapports"
+  const [fillialeOpen, setFillialeOpen] = useState({});
   const [mode, setMode] = useState("light");
   const isMobile = useMediaQuery("(max-width:600px)");
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const { data: filliales, isLoading: fillialesLoading } =
+    useGetFillialesQuery();
 
   const theme = createTheme({
     palette: {
@@ -69,6 +71,16 @@ const AdminLayout = ({ children }) => {
   });
 
   const toggleDrawer = () => setDrawerOpen(!drawerOpen);
+  const toggleRapportOpen = () => setRapportOpen(!rapportOpen);
+  const toggleTablesOpen = () => setTablesOpen(!tablesOpen);
+  const toggleModuleOpen = () => setModuleOpen(!moduleOpen);
+  const toggleFillialeOpen = (acronyme) => {
+    setFillialeOpen((prevState) => ({
+      ...prevState,
+      [acronyme]: !prevState[acronyme],
+    }));
+  };
+
   const handleMenuOpen = (event) => setAnchorEl(event.currentTarget);
   const handleMenuClose = () => setAnchorEl(null);
   const handleLogout = () => {
@@ -77,30 +89,24 @@ const AdminLayout = ({ children }) => {
   };
   const toggleThemeMode = () =>
     setMode((prevMode) => (prevMode === "light" ? "dark" : "light"));
-  const toggleModuleOpen = () => setModuleOpen(!moduleOpen);
-  const toggleRapportOpen = () => setRapportOpen(!rapportOpen); // Fonction pour ouvrir/fermer le menu "Rapports"
 
   const drawerContent = (
     <Box
       sx={{
-        width: 180, // Réduction de la largeur de la Sidebar
-        backgroundColor: theme.palette.background.paper,
+        width: 180,
+        marginTop: "64px",
         height: "100%",
         display: "flex",
         flexDirection: "column",
-        borderRight: `1px solid ${theme.palette.divider}`,
+        fontSize: "0.875rem",
       }}
     >
-      <List sx={{ padding: 0 }}>
+      <List>
         <ListItem
           button
           component={Link}
           to="/admin/articles"
-          sx={{
-            padding: "8px 12px",
-            fontSize: "0.8rem",
-            "&:hover": { backgroundColor: theme.palette.action.hover },
-          }}
+          sx={{ padding: "8px 12px" }}
         >
           <ListItemIcon sx={{ minWidth: 28 }}>
             <ScanBarcode />
@@ -108,15 +114,11 @@ const AdminLayout = ({ children }) => {
           <ListItemText primary="Articles" />
         </ListItem>
 
-        {/* Menu déroulant Rapports */}
+        {/* Rapports */}
         <ListItem
           button
           onClick={toggleRapportOpen}
-          sx={{
-            padding: "8px 12px",
-            fontSize: "0.8rem",
-            "&:hover": { backgroundColor: theme.palette.action.hover },
-          }}
+          sx={{ padding: "8px 12px" }}
         >
           <ListItemIcon sx={{ minWidth: 28 }}>
             <ChartColumnDecreasing />
@@ -130,39 +132,121 @@ const AdminLayout = ({ children }) => {
               button
               component={Link}
               to="/admin/rapports/access"
-              sx={{
-                padding: "6px 24px",
-                fontSize: "0.75rem",
-                "&:hover": { backgroundColor: theme.palette.action.hover },
-              }}
+              sx={{ padding: "6px 24px" }}
             >
               <ListItemText primary="Access" />
             </ListItem>
-
+            <ListItem
+              button
+              component={Link}
+              to="/admin/rapports/global"
+              sx={{ padding: "6px 24px" }}
+            >
+              <ListItemText primary="Global" />
+            </ListItem>
             <ListItem
               button
               component={Link}
               to="/admin/rapports/master"
-              sx={{
-                padding: "6px 24px",
-                fontSize: "0.75rem",
-                "&:hover": { backgroundColor: theme.palette.action.hover },
-              }}
+              sx={{ padding: "6px 24px" }}
             >
               <ListItemText primary="Master" />
             </ListItem>
           </List>
         </Collapse>
 
-        {/* Menu déroulant Modules */}
+        {/* Tables */}
+        <ListItem
+          button
+          onClick={toggleTablesOpen}
+          sx={{ padding: "8px 12px" }}
+        >
+          <ListItemIcon sx={{ minWidth: 28 }}>
+            <Database />
+          </ListItemIcon>
+          <ListItemText primary="Tables" />
+          {tablesOpen ? <ExpandLess /> : <ExpandMore />}
+        </ListItem>
+        <Collapse in={tablesOpen} timeout="auto" unmountOnExit>
+          <List component="div" disablePadding>
+            {fillialesLoading ? (
+              <ListItem>
+                <ListItemText primary="Chargement..." />
+              </ListItem>
+            ) : (
+              filliales?.map((filliale) => (
+                <React.Fragment key={filliale._id}>
+                  <ListItem
+                    button
+                    onClick={() => toggleFillialeOpen(filliale.acronyme)}
+                    sx={{ padding: "6px 24px" }}
+                  >
+                    <ListItemText primary={`${filliale.acronyme}`} />
+                    {fillialeOpen[filliale.acronyme] ? (
+                      <ExpandLess />
+                    ) : (
+                      <ExpandMore />
+                    )}
+                  </ListItem>
+                  <Collapse
+                    in={fillialeOpen[filliale.acronyme]}
+                    timeout="auto"
+                    unmountOnExit
+                  >
+                    <List component="div" disablePadding>
+                      <ListItem
+                        button
+                        component={Link}
+                        to={`/admin/tables/${filliale.acronyme}/articles`}
+                        sx={{ padding: "6px 36px" }}
+                      >
+                        <ListItemText primary="Articles" />
+                      </ListItem>
+                      <ListItem
+                        button
+                        component={Link}
+                        to={`/admin/tables/${filliale.acronyme}/fournisseurs`}
+                        sx={{ padding: "6px 36px" }}
+                      >
+                        <ListItemText primary="Fournisseurs" />
+                      </ListItem>
+                      <ListItem
+                        button
+                        component={Link}
+                        to={`/admin/tables/${filliale.acronyme}/proformats`}
+                        sx={{ padding: "6px 36px" }}
+                      >
+                        <ListItemText primary="Proformats" />
+                      </ListItem>
+                      <ListItem
+                        button
+                        component={Link}
+                        to={`/admin/tables/${filliale.acronyme}/facturation-details`}
+                        sx={{ padding: "6px 36px" }}
+                      >
+                        <ListItemText primary="Details" />
+                      </ListItem>
+                      <ListItem
+                        button
+                        component={Link}
+                        to={`/admin/tables/${filliale.acronyme}/tiers`}
+                        sx={{ padding: "6px 36px" }}
+                      >
+                        <ListItemText primary="Tiers" />
+                      </ListItem>
+                    </List>
+                  </Collapse>
+                </React.Fragment>
+              ))
+            )}
+          </List>
+        </Collapse>
+
+        {/* Modules */}
         <ListItem
           button
           onClick={toggleModuleOpen}
-          sx={{
-            padding: "8px 12px",
-            fontSize: "0.8rem",
-            "&:hover": { backgroundColor: theme.palette.action.hover },
-          }}
+          sx={{ padding: "8px 12px" }}
         >
           <ListItemIcon sx={{ minWidth: 28 }}>
             <Package />
@@ -176,15 +260,8 @@ const AdminLayout = ({ children }) => {
               button
               component={Link}
               to="/admin/inventories"
-              sx={{
-                padding: "6px 24px",
-                fontSize: "0.75rem",
-                "&:hover": { backgroundColor: theme.palette.action.hover },
-              }}
+              sx={{ padding: "6px 24px" }}
             >
-              <ListItemIcon sx={{ minWidth: 28 }}>
-                <Clipboard />
-              </ListItemIcon>
               <ListItemText primary="Inventaires" />
             </ListItem>
           </List>
@@ -193,27 +270,8 @@ const AdminLayout = ({ children }) => {
         <ListItem
           button
           component={Link}
-          to="/admin/users"
-          sx={{
-            padding: "8px 12px",
-            fontSize: "0.8rem",
-            "&:hover": { backgroundColor: theme.palette.action.hover },
-          }}
-        >
-          <ListItemIcon sx={{ minWidth: 28 }}>
-            <Users />
-          </ListItemIcon>
-          <ListItemText primary="Utilisateurs" />
-        </ListItem>
-        <ListItem
-          button
-          component={Link}
           to="/admin/settings"
-          sx={{
-            padding: "8px 12px",
-            fontSize: "0.8rem",
-            "&:hover": { backgroundColor: theme.palette.action.hover },
-          }}
+          sx={{ padding: "8px 12px" }}
         >
           <ListItemIcon sx={{ minWidth: 28 }}>
             <Settings />
@@ -228,22 +286,13 @@ const AdminLayout = ({ children }) => {
     <ThemeProvider theme={theme}>
       <Box sx={{ display: "flex" }}>
         <CssBaseline />
-
-        {/* AppBar */}
         <AppBar
           position="fixed"
-          elevation={1}
           sx={{
-            backgroundColor: theme.palette.background.paper,
-            color: theme.palette.text.primary,
-            borderBottom: `1px solid ${theme.palette.divider}`,
-            height: 56,
-            justifyContent: "center",
+            zIndex: (theme) => theme.zIndex.drawer + 1,
           }}
         >
-          <Toolbar
-            sx={{ minHeight: 56, display: "flex", alignItems: "center" }}
-          >
+          <Toolbar>
             {isMobile && (
               <IconButton
                 color="inherit"
@@ -254,46 +303,12 @@ const AdminLayout = ({ children }) => {
                 <MenuIcon />
               </IconButton>
             )}
-            <Typography
-              variant="h6"
-              sx={{ flexGrow: 1, fontSize: "1rem", fontWeight: 500 }}
-            >
+            <Typography variant="h6" sx={{ flexGrow: 1 }}>
               QC Administration
             </Typography>
-
-            {/* Barre de recherche */}
-            <Box
-              sx={{
-                display: { xs: "none", sm: "flex" },
-                alignItems: "center",
-                backgroundColor: theme.palette.action.hover,
-                borderRadius: "20px",
-                padding: "0 10px",
-                marginRight: "20px",
-              }}
-            >
-              <SearchIcon sx={{ color: theme.palette.text.secondary }} />
-              <InputBase
-                placeholder="Rechercher…"
-                sx={{
-                  ml: 1,
-                  color: "inherit",
-                  fontSize: "0.875rem",
-                }}
-              />
-            </Box>
-
-            {/* Icône de changement de thème */}
-            <IconButton
-              edge="end"
-              color="inherit"
-              onClick={toggleThemeMode}
-              sx={{ ml: 1 }}
-            >
+            <IconButton edge="end" color="inherit" onClick={toggleThemeMode}>
               {mode === "dark" ? <Brightness7 /> : <Brightness4 />}
             </IconButton>
-
-            {/* Icône de profil utilisateur */}
             <IconButton
               edge="end"
               color="inherit"
@@ -302,19 +317,12 @@ const AdminLayout = ({ children }) => {
             >
               <Avatar alt="User Avatar" />
             </IconButton>
-
-            {/* Menu déroulant du profil utilisateur */}
             <Menu
               anchorEl={anchorEl}
               open={Boolean(anchorEl)}
               onClose={handleMenuClose}
-              sx={{ mt: 3 }}
             >
-              <MenuItem
-                component={Link}
-                to="/admin/profile"
-                onClick={handleMenuClose}
-              >
+              <MenuItem component={Link} to="/admin/profile">
                 Profil
               </MenuItem>
               <Divider />
@@ -322,8 +330,6 @@ const AdminLayout = ({ children }) => {
             </Menu>
           </Toolbar>
         </AppBar>
-
-        {/* Sidebar Drawer */}
         <Drawer
           variant={isMobile ? "temporary" : "permanent"}
           open={isMobile ? drawerOpen : true}
@@ -331,34 +337,20 @@ const AdminLayout = ({ children }) => {
           ModalProps={{
             keepMounted: true,
           }}
-          sx={{
-            "& .MuiDrawer-paper": {
-              width: 180,
-              boxSizing: "border-box",
-            },
-          }}
+          sx={{ "& .MuiDrawer-paper": { width: 180 } }}
         >
-          {isMobile && (
-            <IconButton onClick={toggleDrawer} sx={{ margin: "10px" }}>
-              <CloseIcon />
-            </IconButton>
-          )}
           {drawerContent}
         </Drawer>
-
-        {/* Main Content Area */}
         <Box
           component="main"
           sx={{
             flexGrow: 1,
             p: 3,
-            width: { sm: `calc(100% - 180px)` },
-            ml: { sm: "180px" },
-            mt: { xs: 7, sm: 0 },
+            width: "100%",
           }}
         >
           <Toolbar />
-          {children}
+          <div className="sm:pl-[180px]">{children}</div>
         </Box>
       </Box>
     </ThemeProvider>
