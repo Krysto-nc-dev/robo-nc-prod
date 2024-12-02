@@ -13,6 +13,7 @@ import  userRoutes from "./routes/userRoutes.js";
 import zoneRoutes from "./routes/zoneRoutes.js";
 import agentRoutes from "./routes/agentRoutes.js";
 import inventoryRoutes from "./routes/inventoryRoutes.js";
+import articleRoutes from "./routes/articleRoutes.js";
 
 import filialeRoutes from "./routes/fillialeRoutes.js";
 
@@ -82,6 +83,7 @@ app.use("/zones", zoneRoutes);
 app.use("/agents", agentRoutes);
 app.use("/inventories", inventoryRoutes);
 app.use("/filiales", filialeRoutes);
+app.use("/articles", articleRoutes);
 
 // Middleware pour gérer les erreurs 404
 app.use((req, res, next) => {

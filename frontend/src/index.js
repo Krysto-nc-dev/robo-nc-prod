@@ -37,6 +37,7 @@ import AdminProfileScreen from "./screens/admin/AdminProfileScreen.jsx";
 import AdminRepportsAccess from "./screens/admin/AdminRepportsAccess.jsx";
 import AdminRepportsGlobal from "./screens/admin/AdminRepportsGlobal.jsx";
 import AdminRepportsMaster from "./screens/admin/AdminRepportsMaster.jsx";
+import AdminfillialeDetails from "./screens/admin/AdminfillialeDetails.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -51,6 +52,7 @@ const router = createBrowserRouter(
         <Route path="inventories" element={<AdminInventories />} />
         <Route path="users" element={<AdminUsers />} />
         <Route path="filliales" element={<AdminFilliales />} />
+        <Route path="filliales/:id" element={<AdminfillialeDetails/>} />
         <Route path="rapports/access" element={<AdminRepportsAccess/>} />
         <Route path="rapports/global" element={<AdminRepportsGlobal/>} />
         <Route path="rapports/master" element={<AdminRepportsMaster/>} />

@@ -19,6 +19,16 @@ const filliales = [
       debutAnneeFiscale: 4,   // Avril
       finAnneeFiscale: 3,     // Mars (de l'année suivante)
     },
+    {
+      _id: "5f1a514b5d2c12c7449de003",
+      nom: "FMB",
+      acronyme: "FMB",
+      website: "https://www.fmb.nc/",
+      adresse: "BP 512 - 98845 - Nouméa Cedex",
+      logo: "sitec_icone.jpg",
+      debutAnneeFiscale: 4,   // Avril
+      finAnneeFiscale: 3,     // Mars (de l'année suivante)
+    },
   ];
   
   export default filliales;

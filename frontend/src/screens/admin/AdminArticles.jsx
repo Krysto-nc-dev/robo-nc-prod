@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -10,10 +10,15 @@ import {
   TableCell,
   TableBody,
   Paper,
+  CircularProgress,
 } from "@mui/material";
+import { useImportArticlesMutation } from "../../slices/articleApiSlice";
+import { toast } from "react-toastify";
 
 const AdminArticles = () => {
   const inputRef = useRef();
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [importArticles, { isLoading: isImporting }] = useImportArticlesMutation();
 
   useEffect(() => {
     // Donne le focus au champ d'entrée au chargement du composant
@@ -51,6 +56,28 @@ const AdminArticles = () => {
     document.body.removeChild(link);
   };
 
+  const handleFileChange = (e) => {
+    setSelectedFile(e.target.files[0]);
+  };
+
+  const handleImportArticles = async () => {
+    if (!selectedFile) {
+      toast.error("Veuillez sélectionner un fichier CSV !");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+
+    try {
+      await importArticles(formData).unwrap();
+      toast.success("Articles importés avec succès !");
+      setSelectedFile(null);
+    } catch (err) {
+      toast.error("Erreur lors de l'importation des articles.");
+    }
+  };
+
   return (
     <Box>
       <Typography variant="h5" fontWeight="bold" color="text.primary" mb={2}>
@@ -72,6 +99,37 @@ const AdminArticles = () => {
         />
       </Box>
 
+      {/* Importer des articles en CSV */}
+      <Box mb={4}>
+        <Typography variant="h6" color="text.primary" mb={2}>
+          Importer des articles en masse
+        </Typography>
+        <Box display="flex" alignItems="center" gap={2}>
+          <input
+            type="file"
+            accept=".csv"
+            onChange={handleFileChange}
+            style={{
+              border: "1px solid #cbd5e0",
+              borderRadius: "8px",
+              padding: "8px",
+            }}
+          />
+          <Button
+            onClick={handleImportArticles}
+            variant="contained"
+            color="primary"
+            disabled={isImporting}
+          >
+            {isImporting ? (
+              <CircularProgress size={20} color="inherit" />
+            ) : (
+              "Importer Articles"
+            )}
+          </Button>
+        </Box>
+      </Box>
+
       {/* Tableau des articles */}
       <Paper>
         <Table>
@@ -85,11 +143,11 @@ const AdminArticles = () => {
           </TableHead>
           <TableBody>
             {articles.map((article) => (
-              <TableRow key={article.id}>
-                <TableCell>{article.id}</TableCell>
-                <TableCell>{article.name}</TableCell>
-                <TableCell>{article.description}</TableCell>
-                <TableCell>{article.price}</TableCell>
+              <TableRow key={article._id}>
+                <TableCell>{article.nart}</TableCell>
+                <TableCell>{article.design}</TableCell>
+                <TableCell>{article.deprec}</TableCell>
+            
               </TableRow>
             ))}
           </TableBody>

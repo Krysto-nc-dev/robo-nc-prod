@@ -7,6 +7,8 @@ export const ZONES_URL = `${BASE_URL}/zones`;
 export const AGENTS_URL = `${BASE_URL}/agents`;
 export const INVENTORIES_URL = `${BASE_URL}/inventories`;
 export const RECORDS_URL = `${BASE_URL}/records`;
+export const FILLIALES_URL = `${BASE_URL}/filiales`;
+export const  ARTICLES_URL = `${BASE_URL}/articles`;
 
 export const DOLIBAR_URL = 'https://krystotest-erp.square.nc/api/index.php';
 export const DOLIBARR_API_KEY = 'eqhTZrONIar69OQ16r3I0861z3BtOsRe';

@@ -7,6 +7,7 @@ import User from "./models/userModel.js";
 import Agent from "./models/agentModel.js";
 import Zone from "./models/zoneModel.js";
 import Inventory from "./models/inventoryModel.js";
+import Article from "./models/articleModel.js";
 
 import Filiale from "./models/filialeModel.js";
 
@@ -16,6 +17,7 @@ import agents from "./_data/agents.js";
 import zones from "./_data/zones.js";
 import inventories from "./_data/inventories.js";
 import filiales from "./_data/filiales.js";
+import articles from "./_data/articles.js";
 
 
 
@@ -27,18 +29,20 @@ const importData = async () => {
   try {
     // Suppression des données existantes
     await User.deleteMany();
-    await Agent.deleteMany();
-    await Zone.deleteMany();
-    await Inventory.deleteMany();
-    await Filiale.deleteMany();
+    // await Agent.deleteMany();
+    // await Zone.deleteMany();
+    // await Inventory.deleteMany();
+    // await Filiale.deleteMany();
+     await Article.deleteMany();
 
 
     // Insertion des utilisateurs
     await User.insertMany(users);
-    await Agent.insertMany(agents);
-    await Zone.insertMany(zones);
-    await Inventory.insertMany(inventories);
-    await Filiale.insertMany(filiales);
+    // await Article.insertMany(articles);
+    // await Agent.insertMany(agents);
+    // await Zone.insertMany(zones);
+    // await Inventory.insertMany(inventories);
+    // await Filiale.insertMany(filiales);
 
 
     console.log("Data Imported!".green.inverse);
