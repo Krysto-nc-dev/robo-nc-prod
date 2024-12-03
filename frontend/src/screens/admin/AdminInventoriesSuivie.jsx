@@ -176,7 +176,8 @@ const AdminInventoriesSuivie = () => {
       </div>
 
       {/* Zones */}
-      <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-8 gap-2">
+ {/* Zones */}
+<div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-8 gap-2">
   {inventory?.zones.map((zone) => (
     <div
       key={zone._id}
@@ -184,7 +185,7 @@ const AdminInventoriesSuivie = () => {
         zone
       )}`}
     >
-      <h3 className="text-xs font-bold text-gray-700 text-center mb-1">
+      <h3 className="text-[0.6rem] font-bold text-gray-700 text-center mb-1 truncate">
         {zone.nom}
       </h3>
       <div className="flex justify-center gap-1 flex-wrap">
@@ -203,6 +204,7 @@ const AdminInventoriesSuivie = () => {
     </div>
   ))}
 </div>
+
 
 
       {/* Modal */}
