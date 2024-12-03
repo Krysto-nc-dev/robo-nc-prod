@@ -45,25 +45,37 @@ const createLog = asyncHandler(async (req, res) => {
 // @route   GET /api/logs
 // @access  Public
 const getLogs = asyncHandler(async (req, res) => {
-  const { user, action, category, target, startDate, endDate } = req.query;
-
-  // Création d'un filtre dynamique basé sur les paramètres
-  const filter = {};
-  if (user) filter.user = user;
-  if (action) filter.action = action;
-  if (category) filter.category = category;
-  if (target) filter.target = target;
-
-  if (startDate || endDate) {
-    filter.timestamp = {};
-    if (startDate) filter.timestamp.$gte = new Date(startDate);
-    if (endDate) filter.timestamp.$lte = new Date(endDate);
-  }
-
-  const logs = await Log.find(filter).sort({ timestamp: -1 }); // Tri du plus récent au plus ancien
-  res.status(200).json(logs);
-});
-
+    const { user, action, category, target, startDate, endDate } = req.query;
+  
+    // Création d'un filtre dynamique basé sur les paramètres
+    const filter = {};
+  
+    // Ajout de filtres dynamiques
+    if (user) filter.user = user;
+    if (action) filter.action = action;
+    if (category) filter.category = category;
+    if (target) filter.target = target;
+  
+    // Ajout de la plage de dates
+    if (startDate || endDate) {
+      filter.timestamp = {};
+      if (startDate) filter.timestamp.$gte = new Date(startDate); // >= startDate
+      if (endDate) filter.timestamp.$lte = new Date(endDate); // <= endDate
+    }
+  
+    try {
+      // Recherche des logs avec le filtre et ajout du `populate` pour inclure les informations utilisateur
+      const logs = await Log.find(filter)
+        .populate("user", "name email") // Récupère uniquement le `name` et `email` de l'utilisateur
+        .sort({ timestamp: -1 }); // Tri du plus récent au plus ancien
+  
+      res.status(200).json(logs);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des logs :", error);
+      res.status(500).json({ message: "Erreur lors de la récupération des logs" });
+    }
+  });
+  
 // @desc    Récupérer un log par ID
 // @route   GET /api/logs/:id
 // @access  Public

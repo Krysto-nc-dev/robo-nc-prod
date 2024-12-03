@@ -24,6 +24,12 @@ const AdminSettings = () => {
         >
           Gestion des Filiales
         </Link>
+        <Link
+          to="/admin/logs"
+          className="flex items-center justify-center p-4 bg-green-500 text-white rounded-lg shadow hover:bg-green-600 transition-colors"
+        >
+          Voir les logs
+        </Link>
       </div>
     </div>
   );
