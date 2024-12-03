@@ -30,16 +30,12 @@ import AdminInventoryDocumentation from "./screens/admin/AdminInventoryDocumenta
 import AdminUsers from "./screens/admin/AdminUsers";
 import AdminUserDetails from "./screens/admin/AdminUserDetails";
 import AdminSettings from "./screens/admin/AdminSettings";
-import AdminArticles from "./screens/admin/AdminArticles";
-import AdminRepports from "./screens/admin/AdminRepports";
+
 import AdminFilliales from "./screens/admin/AdminFilliales";
 import AdminProfileScreen from "./screens/admin/AdminProfileScreen.jsx";
-import AdminRepportsAccess from "./screens/admin/AdminRepportsAccess.jsx";
-import AdminRepportsGlobal from "./screens/admin/AdminRepportsGlobal.jsx";
-import AdminRepportsMaster from "./screens/admin/AdminRepportsMaster.jsx";
+
 import AdminfillialeDetails from "./screens/admin/AdminfillialeDetails.jsx";
-import AdminRepportsAccessDetails from "./screens/admin/AdminRepportsAccessDetails.jsx";
-import AdminMasterRepportDetails from "./screens/admin/AdminMasterRepportDetails.jsx";
+
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -55,16 +51,9 @@ const router = createBrowserRouter(
         <Route path="users" element={<AdminUsers />} />
         <Route path="filliales" element={<AdminFilliales />} />
         <Route path="filliales/:id" element={<AdminfillialeDetails/>} />
-        <Route path="rapports/access" element={<AdminRepportsAccess/>} />
-        <Route path="access-apps/:id" element={<AdminRepportsAccessDetails/>} />
-        <Route path="rapports/global" element={<AdminRepportsGlobal/>} />
-        <Route path="rapports/master" element={<AdminRepportsMaster/>} />
-        <Route path="master-repports/:id" element={<AdminMasterRepportDetails/>} />
 
-        <Route path="rapports" element={<AdminRepports />} />
         <Route path="users/:id" element={<AdminUserDetails />} />
         <Route path="inventories/documentation" element={<AdminInventoryDocumentation />} />
-        <Route path="articles" element={<AdminArticles />} />
         <Route path="inventories/:id" element={<AdminInventoryDetails />} />
         <Route path="inventories-suivie/:id" element={<AdminInventoriesSuivie />} />
         <Route path="zones/:id" element={<AdminZoneDetails />} />

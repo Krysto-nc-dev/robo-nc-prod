@@ -5,7 +5,7 @@ import {
   useUpdateZoneMutation,
 } from "../../slices/zoneSlice";
 import Barcode from "react-barcode";
-import { useCreateRecordMutation } from "../../slices/recordSlice";
+
 
 const AdminZoneDetails = () => {
   const { id: zoneId } = useParams();
@@ -20,7 +20,7 @@ const AdminZoneDetails = () => {
     isLoading: zoneLoading,
   } = useGetZoneByIdQuery(zoneId);
   const [updateZone] = useUpdateZoneMutation();
-  const [createRecord] = useCreateRecordMutation();
+
   console.log("====================================");
   console.log("zone:", zone);
   console.log("====================================");
@@ -68,13 +68,7 @@ const AdminZoneDetails = () => {
           "et partie:",
           selectedPart
         );
-        // Ajouter un enregistrement pour l'historique
-        await createRecord({
-          zone: zoneId,
-          typeAction: selectedPart.type,
-          agent,
-          codeBarre: selectedPart.codeBarre,
-        }).unwrap();
+
 
         // Mettre à jour le statut de la partie
         const updatedParties = zone.parties.map((p) =>

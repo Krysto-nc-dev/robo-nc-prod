@@ -18,10 +18,7 @@ import agents from "./_data/agents.js";
 import zones from "./_data/zones.js";
 import inventories from "./_data/inventories.js";
 import filiales from "./_data/filiales.js";
-import articles from "./_data/articles.js";
-import accessApps from "./_data/accessApps.js";
-import MasterRepport from "./models/MasterRepportModel.js";
-import masterRepports from "./_data/masterRepports.js";
+
 
 
 
@@ -37,16 +34,15 @@ const importData = async () => {
     // await Zone.deleteMany();
     // await Inventory.deleteMany();
     // await Filiale.deleteMany();
-     await AccessApp.deleteMany();
-     await MasterRepport.deleteMany();
+
      await Article.deleteMany();
 
 
     // Insertion des utilisateurs
     await User.insertMany(users);
-    await MasterRepport.insertMany(masterRepports);
-    // await Article.insertMany(articles);
-     await AccessApp.insertMany(accessApps);
+
+
+
     // await Agent.insertMany(agents);
     // await Zone.insertMany(zones);
     // await Inventory.insertMany(inventories);

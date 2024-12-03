@@ -22,6 +22,7 @@ export const fillialesApiSlice = apiSlice.injectEndpoints({
         url: `${FILLIALES_URL}`,
         method: 'POST',
         body: data,
+        
         credentials: 'include',
       }),
       invalidatesTags: ['Filliale'],

@@ -25,7 +25,7 @@ const createFilliale = asyncHandler(async (req, res) => {
 
   if (!debutAnneeFiscale || !finAnneeFiscale) {
     res.status(400);
-    throw new Error('Veuillez fournir les mois de début et de fin de l\'année fiscale');
+    throw new Error("Veuillez fournir les mois de début et de fin de l'année fiscale");
   }
 
   const filliale = new Filliale({
@@ -39,8 +39,12 @@ const createFilliale = asyncHandler(async (req, res) => {
   });
 
   const createdFilliale = await filliale.save();
+
+
+
   res.status(201).json(createdFilliale);
 });
+
 
 // @desc    Get filliale by ID
 // @route   GET /api/filliales/:id
