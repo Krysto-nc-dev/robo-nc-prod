@@ -17,7 +17,7 @@ const AdminInventoriesSuivie = () => {
 
   useEffect(() => {
     if (barcodeInputRef.current) {
-      barcodeInputRef.current.focus(); // Focus sur le champ de scanner
+      barcodeInputRef.current.focus(); // Focus sur l'input
     }
   }, [isModalOpen]);
 
@@ -60,8 +60,21 @@ const AdminInventoriesSuivie = () => {
       setIsModalOpen(false);
       setBarcodeInput("");
       refetch(); // Rafraîchit les données après mise à jour
+
+      // Focus sur l'input
+      if (barcodeInputRef.current) {
+        barcodeInputRef.current.focus();
+      }
     } catch (error) {
       console.error("Erreur lors de la mise à jour de la partie :", error);
+    }
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setBarcodeInput(""); // Vide l'input
+    if (barcodeInputRef.current) {
+      barcodeInputRef.current.focus(); // Focus sur l'input
     }
   };
 
@@ -79,6 +92,10 @@ const AdminInventoriesSuivie = () => {
     ).length /
       (inventory?.zones?.length || 1) *
       100;
+
+  const zonesInProgressCount = inventory?.zones?.filter((zone) =>
+    zone.parties.some((part) => part.status !== "À faire" && part.status !== "Terminé")
+  ).length || 0;
 
   if (isLoading) {
     return (
@@ -114,6 +131,35 @@ const AdminInventoriesSuivie = () => {
         </p>
       </div>
 
+      {/* Nombre de zones en cours */}
+      <div className="mb-6">
+        <p className="text-sm font-semibold text-gray-600">
+          Zones en cours : {zonesInProgressCount}
+        </p>
+      </div>
+
+      {/* Dernière zone scannée */}
+      {selectedPart && (
+        <div className="mb-6 p-4 bg-gray-50 border rounded shadow">
+          <h3 className="text-sm font-bold text-gray-800 mb-2">
+            Dernière zone scannée
+          </h3>
+          <p className="text-sm text-gray-600">
+            <strong>Nom de la zone :</strong>{" "}
+            {inventory?.zones.find((zone) => zone._id === selectedPart.zoneId)?.nom}
+          </p>
+          <p className="text-sm text-gray-600">
+            <strong>Type :</strong> {selectedPart.type}
+          </p>
+          <p className="text-sm text-gray-600">
+            <strong>Code-barres :</strong> {selectedPart.codeBarre}
+          </p>
+          <p className="text-sm text-gray-600">
+            <strong>Statut :</strong> {selectedPart.status}
+          </p>
+        </div>
+      )}
+
       {/* Scanner */}
       <div className="mb-6">
         <label className="block text-sm font-medium text-gray-600 mb-2">
@@ -130,33 +176,34 @@ const AdminInventoriesSuivie = () => {
       </div>
 
       {/* Zones */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-        {inventory?.zones.map((zone) => (
+      <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-8 gap-2">
+  {inventory?.zones.map((zone) => (
+    <div
+      key={zone._id}
+      className={`p-2 bg-gray-50 rounded shadow border ${getZoneBorderColor(
+        zone
+      )}`}
+    >
+      <h3 className="text-xs font-bold text-gray-700 text-center mb-1">
+        {zone.nom}
+      </h3>
+      <div className="flex justify-center gap-1 flex-wrap">
+        {zone.parties.map((partie) => (
           <div
-            key={zone._id}
-            className={`p-3 bg-gray-50 rounded-lg shadow-md border ${getZoneBorderColor(
-              zone
-            )}`}
+            key={partie.codeBarre}
+            className={`w-4 h-4 text-[0.65rem] flex justify-center items-center rounded-full cursor-pointer transition-transform transform hover:scale-105 ${
+              partie.status === "Terminé" ? "bg-green-500" : "bg-red-500"
+            }`}
+            title={partie.type}
           >
-            <h3 className="text-sm font-bold text-gray-800 text-center mb-3">
-              {zone.nom}
-            </h3>
-            <div className="flex justify-center gap-1 flex-wrap">
-              {zone.parties.map((partie) => (
-                <div
-                  key={partie.codeBarre}
-                  className={`w-6 h-6 text-xs flex justify-center items-center rounded-full cursor-pointer transition-transform transform hover:scale-110 ${
-                    partie.status === "Terminé" ? "bg-green-500" : "bg-red-500"
-                  }`}
-                  title={partie.type}
-                >
-                  {partie.type.charAt(0)}
-                </div>
-              ))}
-            </div>
+            {partie.type.charAt(0)}
           </div>
         ))}
       </div>
+    </div>
+  ))}
+</div>
+
 
       {/* Modal */}
       {isModalOpen && (
@@ -184,7 +231,7 @@ const AdminInventoriesSuivie = () => {
             <div className="flex justify-end gap-3 mt-4">
               <button
                 className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-                onClick={() => setIsModalOpen(false)}
+                onClick={handleModalClose}
               >
                 Annuler
               </button>
