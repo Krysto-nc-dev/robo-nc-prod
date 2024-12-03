@@ -11,7 +11,7 @@ const router = express.Router();
 
 // Routes principales
 router.route('/')
-  .get(getAgents) // Récupérer tous les agents
+  .get( getAgents) // Récupérer tous les agents
   .post(createAgent); // Créer un nouvel agent
 
 // Routes pour un agent spécifique
