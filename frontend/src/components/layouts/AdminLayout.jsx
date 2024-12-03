@@ -23,7 +23,7 @@ import {
   Collapse,
   useMediaQuery,
 } from "@mui/material";
-import { ExpandLess, ExpandMore } from "@mui/icons-material";
+import { Dashboard, ExpandLess, ExpandMore } from "@mui/icons-material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Brightness4, Brightness7 } from "@mui/icons-material";
 import { Menu as MenuIcon, Search as SearchIcon } from "@mui/icons-material";
@@ -127,6 +127,17 @@ const AdminLayout = ({ children }) => {
           </ListItemIcon>
           <ListItemText primary="Articles" />
         </ListItem> */}
+        <ListItem
+          button
+          component={Link}
+          to="/admin/dashboard"
+          sx={{ padding: "8px 12px" }}
+        >
+          <ListItemIcon sx={{ minWidth: 28 }}>
+            <Dashboard />
+          </ListItemIcon>
+          <ListItemText primary="Tableaux de bord" />
+        </ListItem>
 
         {/* Rapports */}
         <ListItem
