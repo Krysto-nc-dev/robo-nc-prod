@@ -14,6 +14,7 @@ import zoneRoutes from "./routes/zoneRoutes.js";
 import agentRoutes from "./routes/agentRoutes.js";
 import inventoryRoutes from "./routes/inventoryRoutes.js";
 import documentRoutes from "./routes/documentRoutes.js";
+import repportGeneratorRoutes from "./routes/repportGeneratorRoutes.js";
 
 
 import filialeRoutes from "./routes/fillialeRoutes.js";
@@ -85,6 +86,7 @@ app.use("/agents", agentRoutes);
 app.use("/inventories", inventoryRoutes);
 app.use("/filiales", filialeRoutes);
 app.use('/documents', documentRoutes);
+app.use('/repports-generator', repportGeneratorRoutes);
 
 
 // Middleware pour gérer les erreurs 404

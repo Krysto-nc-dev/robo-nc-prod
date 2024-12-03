@@ -40,6 +40,12 @@ const RepportGeneratorSchema = new mongoose.Schema(
         ref: "Ticket", // Référence au modèle Ticket
       },
     ],
+    documents: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Document", // Référence au modèle Document
+      },
+    ],  // Ajout de documents comme un tableau de références
   },
   { timestamps: true }
 );
