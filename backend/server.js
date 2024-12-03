@@ -17,6 +17,7 @@ import inventoryRoutes from "./routes/inventoryRoutes.js";
 import documentRoutes from "./routes/documentRoutes.js";
 import repportGeneratorRoutes from "./routes/repportGeneratorRoutes.js";
 import filialeRoutes from "./routes/fillialeRoutes.js";
+import ticketRoutes from "./routes/ticketRoutes.js";
 import logRoutes from "./routes/logRoutes.js";
 
 // Configuration des variables d'environnement
@@ -89,6 +90,7 @@ app.use("/inventories", inventoryRoutes);
 app.use("/filiales", filialeRoutes);
 app.use("/documents", documentRoutes);
 app.use("/repports-generator", repportGeneratorRoutes);
+app.use("/tickets", ticketRoutes);
 app.use("/logs", logRoutes);
 
 // Middleware pour gérer les erreurs 404

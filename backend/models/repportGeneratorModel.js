@@ -4,15 +4,16 @@ const RepportGeneratorSchema = new mongoose.Schema(
   {
     nom: {
       type: String,
-      required: [true, "Veuillez fournir le nom du rapport"],
-      maxlength: [50, "Le nom ne peut pas dépasser 50 caractères"],
-      trim: true,
-    },
-    note: {
-      type: String,
+      required: [true, "Veuillez fournir le nom du générateur de rapport"],
+      maxlength: [100, "Le nom ne peut pas dépasser 100 caractères"],
       trim: true,
     },
     description: {
+      type: String,
+      maxlength: [500, "La description ne peut pas dépasser 500 caractères"],
+      trim: true,
+    },
+    note: {
       type: String,
       trim: true,
     },
@@ -20,9 +21,14 @@ const RepportGeneratorSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    version: {
+      type: String,
+      trim: true,
+      default: "1.0.0", // Version par défaut
+    },
     status: {
       type: String,
-      enum: ["Actif", "Inactif"],
+      enum: ["Actif", "Inactif", "En Maintenance"],
       default: "Actif",
     },
     multisociete: {
@@ -31,7 +37,7 @@ const RepportGeneratorSchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      enum: ["Access", "Script", "autre"],
+      enum: ["Access", "Script", "Python", "Excel", "PowerBI", "Autre"],
       default: "Access",
     },
     tickets: [
@@ -45,9 +51,28 @@ const RepportGeneratorSchema = new mongoose.Schema(
         type: mongoose.Schema.Types.ObjectId,
         ref: "Document", // Référence au modèle Document
       },
-    ],  // Ajout de documents comme un tableau de références
+    ],
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User", // Référence à l'utilisateur qui a créé l'outil
+      required: [true, "Le créateur du générateur doit être défini"],
+    },
+    maintainedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User", // Référence à l'utilisateur ou équipe en charge de la maintenance
+    },
+    lastExecution: {
+      type: Date,
+      default: null, // Date de dernière exécution du générateur
+    },
+    linkedReports: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Report", // Référence à des rapports générés
+      },
+    ],
   },
-  { timestamps: true }
+  { timestamps: true } // Ajout de `createdAt` et `updatedAt`
 );
 
 export default mongoose.model("RepportGenerator", RepportGeneratorSchema);

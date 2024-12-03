@@ -116,7 +116,7 @@ const AdminLayout = ({ children }) => {
         />
       </Box>
       <List>
-        <ListItem
+        {/* <ListItem
           button
           component={Link}
           to="/admin/articles"
@@ -126,7 +126,7 @@ const AdminLayout = ({ children }) => {
             <ScanBarcode />
           </ListItemIcon>
           <ListItemText primary="Articles" />
-        </ListItem>
+        </ListItem> */}
 
         {/* Rapports */}
         <ListItem
@@ -145,26 +145,18 @@ const AdminLayout = ({ children }) => {
             <ListItem
               button
               component={Link}
-              to="/admin/rapports/access"
+              to="/admin/generator"
               sx={{ padding: "6px 24px" }}
             >
-              <ListItemText primary="Access" />
+              <ListItemText primary="App et generateur" />
             </ListItem>
             <ListItem
               button
               component={Link}
-              to="/admin/rapports/global"
+              to="/admin/repports"
               sx={{ padding: "6px 24px" }}
             >
-              <ListItemText primary="Global" />
-            </ListItem>
-            <ListItem
-              button
-              component={Link}
-              to="/admin/rapports/master"
-              sx={{ padding: "6px 24px" }}
-            >
-              <ListItemText primary="Master" />
+              <ListItemText primary="Rapports" />
             </ListItem>
           </List>
         </Collapse>

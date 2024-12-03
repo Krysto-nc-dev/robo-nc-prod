@@ -3,7 +3,8 @@ import {
   useGetLogsQuery,
   useGetLogAnalyticsQuery,
 } from "../../slices/logApiSlice";
-import formatIpAddress from "../../utils/formatIpAddress"; // Import de l'utilitaire
+import { useGetUsersQuery } from "../../slices/userApiSlice"; // Import pour récupérer les utilisateurs
+import formatIpAddress from "../../utils/formatIpAddress";
 
 const AdminLogs = () => {
   const [filters, setFilters] = useState({
@@ -23,6 +24,9 @@ const AdminLogs = () => {
       startDate: filters.startDate,
       endDate: filters.endDate,
     });
+
+  // Récupérer la liste des utilisateurs
+  const { data: users, isLoading: isUsersLoading } = useGetUsersQuery();
 
   // Gestion des filtres
   const handleFilterChange = (e) => {
@@ -52,14 +56,20 @@ const AdminLogs = () => {
         onSubmit={handleFilterSubmit}
         className="mb-6 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4"
       >
-        <input
-          type="text"
+        <select
           name="user"
           value={filters.user}
           onChange={handleFilterChange}
-          placeholder="Utilisateur (ID)"
           className="border border-gray-400 rounded px-4 py-2"
-        />
+          disabled={isUsersLoading} // Désactive si la liste des utilisateurs est en cours de chargement
+        >
+          <option value="">-- Utilisateur --</option>
+          {users?.map((user) => (
+            <option key={user._id} value={user._id}>
+              {user.name || "Utilisateur inconnu"}
+            </option>
+          ))}
+        </select>
         <select
           name="action"
           value={filters.action}
@@ -125,14 +135,12 @@ const AdminLogs = () => {
             <tbody>
               {logs?.map((log) => (
                 <tr key={log._id} className="border-b">
-                  {/* Affichage du nom de l'utilisateur */}
                   <td className="px-4 py-2">
                     {log.user?.name || "Utilisateur inconnu"}
                   </td>
                   <td className="px-4 py-2">{log.action}</td>
                   <td className="px-4 py-2">{log.category}</td>
                   <td className="px-4 py-2">{log.target}</td>
-                  {/* Utilisation de l'utilitaire pour l'adresse IP */}
                   <td className="px-4 py-2">
                     {formatIpAddress(log.ipAddress)}
                   </td>

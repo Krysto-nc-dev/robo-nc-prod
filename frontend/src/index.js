@@ -36,6 +36,9 @@ import AdminProfileScreen from "./screens/admin/AdminProfileScreen.jsx";
 
 import AdminfillialeDetails from "./screens/admin/AdminfillialeDetails.jsx";
 import AdminLogs from "./screens/admin/AdminLogs.jsx";
+import AdminGenerator from "./screens/admin/AdminGenerator.jsx";
+import AdminAppGeneratorDetails from "./screens/admin/AdminAppGeneratorDetails.jsx";
+
 
 
 const router = createBrowserRouter(
@@ -61,6 +64,9 @@ const router = createBrowserRouter(
         <Route path="settings" element={<AdminSettings />} />
         <Route path="logs" element={<AdminLogs/>} />
         <Route path="profile" element={<AdminProfileScreen />} />
+        <Route path="generator" element={<AdminGenerator/>} />
+        <Route path="generator/:id" element={<AdminAppGeneratorDetails/>} />
+    
       </Route>
       <Route path="user" element={<UserRoutes />}>
         <Route path="profile" element={<h2>User Profile</h2>} />

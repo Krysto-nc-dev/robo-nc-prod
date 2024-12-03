@@ -1,27 +1,29 @@
 import asyncHandler from '../middlewares/async.js';
 import RepportGenerator from '../models/repportGeneratorModel.js';
-import Document from '../models/documentModel.js'; // Pour ajouter des documents
+import Document from '../models/documentModel.js';
+import PDFDocument from 'pdfkit';
 import fs from 'fs';
 
-// @desc    Get all reports
+// @desc    Get all report generators
 // @route   GET /api/repportgenerators
 // @access  Public
 const getRepportGenerators = asyncHandler(async (req, res) => {
   const reports = await RepportGenerator.find()
-    // .populate('documents') // Pour récupérer les documents associés
-    // .populate('tickets');  // Pour récupérer les tickets associés
+    .populate('documents', 'name fileType') // Inclure les noms des documents associés
+    .populate('tickets', 'title status'); // Inclure les tickets associés
   res.status(200).json(reports);
 });
 
-// @desc    Create a new report
+// @desc    Create a new report generator
 // @route   POST /api/repportgenerators
 // @access  Public
 const createRepportGenerator = asyncHandler(async (req, res) => {
   const { nom, note, description, path, status, multisociete, type, tickets } = req.body;
 
-  if (!nom) {
+  // Validation des champs obligatoires
+  if (!nom || !type) {
     res.status(400);
-    throw new Error('Veuillez fournir le nom du rapport.');
+    throw new Error('Veuillez fournir les champs requis : nom, type.');
   }
 
   const report = new RepportGenerator({
@@ -33,97 +35,84 @@ const createRepportGenerator = asyncHandler(async (req, res) => {
     multisociete,
     type,
     tickets,
+    createdBy: req.user?._id || null, // Utilisateur connecté
   });
 
   const createdReport = await report.save();
   res.status(201).json(createdReport);
 });
 
-// @desc    Get report by ID
+// @desc    Get report generator by ID
 // @route   GET /api/repportgenerators/:id
 // @access  Public
 const getRepportGeneratorById = asyncHandler(async (req, res) => {
   const report = await RepportGenerator.findById(req.params.id)
-    // .populate('documents') // Inclure les documents associés
-    // .populate('tickets');  // Inclure les tickets associés
+    .populate('documents', 'name fileType filePath') // Inclure les documents associés
+    .populate('tickets', 'title status'); // Inclure les tickets associés
 
-  if (report) {
-    res.status(200).json(report);
-  } else {
+  if (!report) {
     res.status(404);
-    throw new Error("Rapport introuvable.");
+    throw new Error('Rapport introuvable.');
   }
+
+  res.status(200).json(report);
 });
 
-// @desc    Update report
+// @desc    Update report generator
 // @route   PUT /api/repportgenerators/:id
 // @access  Public
 const updateRepportGenerator = asyncHandler(async (req, res) => {
-  const reportId = req.params.id;
+  const { id } = req.params;
 
-  // Vérification de l'ID
-  if (!reportId) {
-    res.status(400);
-    throw new Error("L'ID du rapport est requis.");
+  const updatedReport = await RepportGenerator.findByIdAndUpdate(
+    id,
+    { ...req.body },
+    { new: true, runValidators: true }
+  );
+
+  if (!updatedReport) {
+    res.status(404);
+    throw new Error('Rapport introuvable.');
   }
 
-  try {
-    const updatedReport = await RepportGenerator.findByIdAndUpdate(
-      reportId,
-      { ...req.body },
-      { new: true }
-    );
-
-    if (!updatedReport) {
-      res.status(404);
-      throw new Error("Rapport introuvable.");
-    }
-
-    res.status(200).json(updatedReport);
-  } catch (error) {
-    console.error("Erreur lors de la mise à jour :", error);
-    res.status(500).json({ message: "Erreur interne du serveur." });
-  }
+  res.status(200).json(updatedReport);
 });
 
-// @desc    Delete report
+// @desc    Delete report generator
 // @route   DELETE /api/repportgenerators/:id
 // @access  Public
 const deleteRepportGenerator = asyncHandler(async (req, res) => {
   const report = await RepportGenerator.findById(req.params.id);
 
-  if (report) {
-    await report.deleteOne(); // Supprimer le rapport
-    res.status(200).json({ message: "Rapport supprimé avec succès." });
-  } else {
+  if (!report) {
     res.status(404);
-    throw new Error("Rapport introuvable.");
+    throw new Error('Rapport introuvable.');
   }
+
+  await report.deleteOne();
+  res.status(200).json({ message: 'Rapport supprimé avec succès.' });
 });
 
-// @desc    Upload and add document to report
+// @desc    Upload and add document to report generator
 // @route   POST /api/repportgenerators/:id/upload-document
 // @access  Public
 const uploadDocumentToReport = asyncHandler(async (req, res) => {
-  const { id } = req.params;  // ID du rapport à mettre à jour
-  const { file } = req;       // Le fichier téléchargé
+  const { id } = req.params;
+  const file = req.file;
 
   if (!file) {
     res.status(400);
     throw new Error('Aucun fichier téléchargé.');
   }
 
-  // Créer un document à partir des informations du fichier
   const document = new Document({
     name: file.originalname,
-    fileType: file.mimetype.split('/')[1], // Prendre l'extension de type MIME
+    fileType: file.mimetype.split('/')[1],
     filePath: file.path,
   });
 
-  // Sauvegarder le document dans la base de données
   await document.save();
 
-  // Trouver le rapport par ID
   const report = await RepportGenerator.findById(id);
 
   if (!report) {
@@ -131,46 +120,55 @@ const uploadDocumentToReport = asyncHandler(async (req, res) => {
     throw new Error('Rapport introuvable.');
   }
 
-  // Ajouter le document au tableau de documents du rapport
   report.documents.push(document._id);
-
-  // Sauvegarder le rapport mis à jour
   await report.save();
 
   res.status(200).json({ message: 'Fichier ajouté avec succès.', report });
 });
 
-// @desc    Generate PDF for report
+// @desc    Generate PDF for a report generator
 // @route   GET /api/repportgenerators/:id/generate-pdf
 // @access  Public
 const generatePDFReport = asyncHandler(async (req, res) => {
   const report = await RepportGenerator.findById(req.params.id)
-    .populate('documents') // Inclure les documents associés
-    .populate('tickets');  // Inclure les tickets associés
+    .populate('documents', 'name filePath fileType')
+    .populate('tickets', 'title description status');
 
   if (!report) {
     res.status(404);
     throw new Error('Rapport introuvable.');
   }
 
-  // Création du document PDF
   const doc = new PDFDocument({ size: 'A4', margin: 20 });
+
   res.setHeader('Content-Type', 'application/pdf');
-  res.setHeader('Content-Disposition', `attachment; filename=report-${report._id}.pdf`);
+  res.setHeader('Content-Disposition', `attachment; filename=report-${report.nom}.pdf`);
   doc.pipe(res);
 
   doc.fontSize(20).text(`Rapport : ${report.nom}`, { align: 'center', underline: true });
-  doc.moveDown(0.5);
-  doc.fontSize(14).text(`Description : ${report.description}`).moveDown(1);
-  doc.fontSize(14).text(`Statut : ${report.status}`);
+  doc.moveDown();
+  doc.fontSize(14).text(`Description : ${report.description || 'Aucune'}`);
+  doc.moveDown();
+  doc.text(`Statut : ${report.status}`);
+  doc.text(`Multisociété : ${report.multisociete ? 'Oui' : 'Non'}`);
+  doc.moveDown();
 
-  // Ajouter les documents associés au PDF
   if (report.documents.length > 0) {
     doc.addPage();
     doc.fontSize(16).text('Documents associés :', { underline: true });
-    report.documents.forEach((doc, index) => {
-      doc.fontSize(12).text(`${index + 1}. ${doc.name} (${doc.fileType})`);
-      doc.text(`Path: ${doc.filePath}`).moveDown(0.5);
+    report.documents.forEach((docItem, index) => {
+      doc.fontSize(12).text(`${index + 1}. ${docItem.name} (${docItem.fileType})`);
+      doc.text(`Path: ${docItem.filePath}`);
+    });
+  }
+
+  if (report.tickets.length > 0) {
+    doc.addPage();
+    doc.fontSize(16).text('Tickets associés :', { underline: true });
+    report.tickets.forEach((ticket, index) => {
+      doc.fontSize(12).text(`${index + 1}. ${ticket.title}`);
+      doc.text(`Description: ${ticket.description}`);
+      doc.text(`Statut: ${ticket.status}`);
     });
   }
 
