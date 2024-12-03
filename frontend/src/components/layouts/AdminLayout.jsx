@@ -28,10 +28,8 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Brightness4, Brightness7 } from "@mui/icons-material";
 import { Menu as MenuIcon, Search as SearchIcon } from "@mui/icons-material";
 import {
-  Clipboard,
   Settings,
   ScanBarcode,
-  Users,
   ChartColumnDecreasing,
   Database,
   Package,

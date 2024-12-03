@@ -10,14 +10,14 @@ import Inventory from "./models/inventoryModel.js";
 import Article from "./models/articleModel.js";
 
 import Filiale from "./models/filialeModel.js";
-import AccessApp from "./models/AccessApp.js";
+
 
 //  ============= DATA =============
 import users from "./_data/users.js";
 import agents from "./_data/agents.js";
 import zones from "./_data/zones.js";
 import inventories from "./_data/inventories.js";
-import filiales from "./_data/filiales.js";
+
 
 
 
@@ -35,7 +35,6 @@ const importData = async () => {
     // await Inventory.deleteMany();
     // await Filiale.deleteMany();
 
-     await Article.deleteMany();
 
 
     // Insertion des utilisateurs

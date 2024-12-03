@@ -39,7 +39,7 @@ router
 router
   .route('/:id')
   .delete(deleteUser) // Supprimer un utilisateur (admin requis)
-  .get(protect, admin, getUserById) // Obtenir les informations d'un utilisateur spécifique (admin requis)
+  .get(getUserById) // Obtenir les informations d'un utilisateur spécifique (admin requis)
   .put(protect, admin, updateUser); // Modifier les informations d'un utilisateur spécifique (admin requis)
 
 export default router;

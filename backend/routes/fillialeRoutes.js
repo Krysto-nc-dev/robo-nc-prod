@@ -14,20 +14,7 @@ const router = express.Router();
 router
   .route('/')
   .get(getFilliales) // Accessible publiquement
-  .post(
-     // Middleware pour vérifier l'utilisateur authentifié
-    (req, res, next) => {
-      // Vérification des champs fiscaux
-      const { debutAnneeFiscale, finAnneeFiscale } = req.body;
-      if (!debutAnneeFiscale || !finAnneeFiscale) {
-        return res
-          .status(400)
-          .json({ message: "Veuillez fournir le début et la fin de l'année fiscale." });
-      }
-      next();
-    },
-    createFilliale
-  );
+  .post( protect, createFilliale );
 
 // Route pour obtenir, mettre à jour ou supprimer une filiale par son ID
 router
