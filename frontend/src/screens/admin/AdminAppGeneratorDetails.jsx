@@ -26,8 +26,12 @@ import {
   MenuItem,
   Chip,
   Backdrop,
+  Tooltip
 } from "@mui/material";
-import { PlusCircle, AlertCircle, CheckCircle } from "lucide-react";
+
+import { CheckCircle, Cancel, Info, Folder, Notes, Verified } from "@mui/icons-material";
+
+import { PlusCircle, AlertCircle } from "lucide-react";
 
 const AdminGeneratorDetails = () => {
   const { id } = useParams();
@@ -99,41 +103,140 @@ const AdminGeneratorDetails = () => {
 
   return (
     <>
-      <Typography variant="h4" fontWeight="bold" marginBottom={4}>
-        Détails du Générateur : {generator.nom}
+      <Typography variant="h6" fontWeight="bold" marginBottom={4}>
+        {generator.nom}
       </Typography>
 
       {/* Informations Générales */}
-      <Card variant="outlined" marginBottom={4}>
-        <CardContent>
-          <Typography variant="h6" gutterBottom>
-            Informations Générales
-          </Typography>
-          <Divider />
-          <Typography>
-            <strong>Description :</strong>{" "}
-            {generator.description || "Aucune description disponible."}
-          </Typography>
-          <Typography>
-            <strong>Note :</strong>{" "}
-            {generator.note || "Aucune note disponible."}
-          </Typography>
-          <Typography>
-            <strong>Chemin :</strong> {generator.path || "Non spécifié."}
-          </Typography>
-          <Typography>
-            <strong>Version :</strong> {generator.version}
-          </Typography>
-          <Typography>
-            <strong>Statut :</strong> {generator.status}
-          </Typography>
-          <Typography>
-            <strong>Multi-société :</strong>{" "}
-            {generator.multisociete ? "Oui" : "Non"}
-          </Typography>
-        </CardContent>
-      </Card>
+      <Card variant="outlined" sx={{ mb: 4, borderRadius: 2, boxShadow: 2 }}>
+      <CardContent>
+        <Typography variant="h6" gutterBottom sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+          <Info sx={{ mr: 1, color: "primary.main" }} />
+          Informations Générales
+        </Typography>
+          {/* Description */}
+          <Box
+            display="flex"
+            alignItems="center"
+            marginBottom="10px"
+            gap={1}
+            sx={{ flex: "2 1 40%", minWidth: "40%" }}
+          >
+            <Notes color="secondary" />
+            <Typography variant="body1" sx={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis"  }}>
+              <strong>Description :</strong>{" "}
+              {generator.description || (
+                <Tooltip title="Aucune description disponible">
+                  <span style={{ color: "#9e9e9e", fontStyle: "italic" }}>
+                    Non spécifié
+                  </span>
+                </Tooltip>
+              )}
+            </Typography>
+          </Box>
+        <Divider sx={{ mb: 3 }} />
 
+        {/* Informations sur une seule ligne */}
+        <Box
+          display="flex"
+          flexWrap="wrap"
+          alignItems="center"
+          gap={2}
+          sx={{ justifyContent: "space-between" }}
+        >
+        
+
+          {/* Note */}
+          <Box
+            display="flex"
+            alignItems="center"
+            gap={1}
+            sx={{ flex: "1 1 15%", minWidth: "15%" }}
+          >
+            <Verified color="success" />
+            <Typography variant="body1">
+              <strong>Note :</strong>{" "}
+              {generator.note || (
+                <Tooltip title="Aucune note disponible">
+                  <span style={{ color: "#9e9e9e", fontStyle: "italic" }}>
+                    Non spécifié
+                  </span>
+                </Tooltip>
+              )}
+            </Typography>
+          </Box>
+
+          {/* Chemin */}
+          <Box
+            display="flex"
+            alignItems="center"
+            gap={1}
+            sx={{ flex: "1 1 20%", minWidth: "20%" }}
+          >
+            <Folder color="primary" />
+            <Typography variant="body1">
+              <strong>Chemin :</strong>{" "}
+              {generator.path || (
+                <Tooltip title="Non spécifié">
+                  <span style={{ color: "#9e9e9e", fontStyle: "italic" }}>
+                    Non spécifié
+                  </span>
+                </Tooltip>
+              )}
+            </Typography>
+          </Box>
+
+          {/* Version */}
+          <Box
+            display="flex"
+            alignItems="center"
+            gap={1}
+            sx={{ flex: "1 1 10%", minWidth: "10%" }}
+          >
+            <Verified color="info" />
+            <Typography variant="body1">
+              <strong>Version :</strong> {generator.version || "Non spécifiée"}
+            </Typography>
+          </Box>
+
+          {/* Statut */}
+          <Box
+            display="flex"
+            alignItems="center"
+            gap={1}
+            sx={{ flex: "1 1 10%", minWidth: "10%" }}
+          >
+            <CheckCircle color={generator.status === "Actif" ? "success" : "error"} />
+            <Typography variant="body1">
+              <strong>Statut :</strong>{" "}
+              <Chip
+                label={generator.status}
+                color={generator.status === "Actif" ? "success" : "error"}
+                size="small"
+              />
+            </Typography>
+          </Box>
+
+          {/* Multi-société */}
+          <Box
+            display="flex"
+            alignItems="center"
+            gap={1}
+            sx={{ flex: "1 1 10%", minWidth: "10%" }}
+          >
+            <CheckCircle color={generator.multisociete ? "success" : "error"} />
+            <Typography variant="body1">
+              <strong>Multi-société :</strong>{" "}
+              {generator.multisociete ? (
+                <Chip label="Oui" color="success" size="small" />
+              ) : (
+                <Chip label="Non" color="error" size="small" />
+              )}
+            </Typography>
+          </Box>
+        </Box>
+      </CardContent>
+    </Card>
       {/* Tickets Associés */}
       <Card variant="outlined" marginBottom={4}>
         <CardContent>

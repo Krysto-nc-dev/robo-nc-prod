@@ -3,12 +3,15 @@ import { Link } from "react-router-dom";
 import {
   useGetRepportGeneratorsQuery,
   useCreateRepportGeneratorMutation,
+  useDeleteRepportGeneratorMutation,
+  useUpdateRepportGeneratorMutation,
 } from "../../slices/repportGeneratorsApiSlice";
 import { useGetUsersQuery } from "../../slices/userApiSlice";
 
 const AdminGenerator = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState(""); // Pour la recherche
+  const [searchTerm, setSearchTerm] = useState("");
+
   const [formData, setFormData] = useState({
     nom: "",
     description: "",
@@ -31,6 +34,12 @@ const AdminGenerator = () => {
   // Hook pour créer un générateur
   const [createRepportGenerator, { isLoading }] =
     useCreateRepportGeneratorMutation();
+
+  // Hook pour supprimer un générateur
+  const [deleteRepportGenerator] = useDeleteRepportGeneratorMutation();
+
+  // Hook pour mettre à jour un générateur
+  const [updateRepportGenerator] = useUpdateRepportGeneratorMutation();
 
   // Récupérer les utilisateurs pour le champ `maintainedBy`
   const { data: users } = useGetUsersQuery();
@@ -69,6 +78,28 @@ const AdminGenerator = () => {
     }
   };
 
+  const handleDelete = async (id) => {
+    if (window.confirm("Êtes-vous sûr de vouloir supprimer ce générateur ?")) {
+      try {
+        await deleteRepportGenerator(id).unwrap();
+        alert("Générateur supprimé avec succès !");
+      } catch (error) {
+        console.error("Erreur lors de la suppression :", error);
+        alert("Une erreur est survenue lors de la suppression.");
+      }
+    }
+  };
+
+  const handleStatusChange = async (id, newStatus) => {
+    try {
+      await updateRepportGenerator({ id, status: newStatus }).unwrap();
+      alert(`Statut mis à jour en "${newStatus}"`);
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour du statut :", error);
+      alert("Une erreur est survenue lors de la mise à jour.");
+    }
+  };
+
   // Filtrer les générateurs par le terme recherché
   const filteredGenerators = generators?.filter((generator) =>
     generator.nom.toLowerCase().includes(searchTerm.toLowerCase())
@@ -76,9 +107,7 @@ const AdminGenerator = () => {
 
   return (
     <div className="p-4">
-      <h1 className="text-xl font-bold mb-4">
-        Gestion des Générateurs de Rapport
-      </h1>
+      <h1 className="text-xl font-bold mb-4">Gestion des Générateurs de Rapport</h1>
 
       {/* Barre de recherche */}
       <div className="mb-4">
@@ -105,9 +134,7 @@ const AdminGenerator = () => {
         {isLoadingGenerators ? (
           <div>Chargement des générateurs...</div>
         ) : error ? (
-          <div className="text-red-600">
-            Erreur lors du chargement des générateurs.
-          </div>
+          <div className="text-red-600">Erreur lors du chargement des générateurs.</div>
         ) : (
           <table className="min-w-full bg-white border border-gray-200 rounded shadow">
             <thead>
@@ -117,6 +144,7 @@ const AdminGenerator = () => {
                 <th className="px-4 py-2 text-left">Statut</th>
                 <th className="px-4 py-2 text-left">Version</th>
                 <th className="px-4 py-2 text-left">Multi-société</th>
+                <th className="px-4 py-2 text-left">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -136,6 +164,23 @@ const AdminGenerator = () => {
                   <td className="px-4 py-2">
                     {generator.multisociete ? "Oui" : "Non"}
                   </td>
+                  <td className="px-4 py-2 flex gap-2 items-center">
+                    <button
+                      onClick={() => handleDelete(generator._id)}
+                      className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+                    >
+                      Supprimer
+                    </button>
+                    <select
+                      value={generator.status}
+                      onChange={(e) => handleStatusChange(generator._id, e.target.value)}
+                      className="px-2 py-1 border rounded"
+                    >
+                      <option value="Actif">Actif</option>
+                      <option value="Inactif">Inactif</option>
+                      <option value="En Maintenance">En Maintenance</option>
+                    </select>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -146,13 +191,11 @@ const AdminGenerator = () => {
       {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-[500px]">
             <h2 className="text-lg font-bold mb-4">Ajouter un Générateur</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-600">
-                  Nom
-                </label>
+                <label className="block text-sm font-medium text-gray-600">Nom</label>
                 <input
                   type="text"
                   name="nom"
@@ -163,9 +206,7 @@ const AdminGenerator = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-600">
-                  Description
-                </label>
+                <label className="block text-sm font-medium text-gray-600">Description</label>
                 <textarea
                   name="description"
                   value={formData.description}
@@ -174,9 +215,7 @@ const AdminGenerator = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-600">
-                  Note
-                </label>
+                <label className="block text-sm font-medium text-gray-600">Note</label>
                 <textarea
                   name="note"
                   value={formData.note}
@@ -196,63 +235,57 @@ const AdminGenerator = () => {
                   className="w-full px-4 py-2 border rounded"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-600">
-                  Version
-                </label>
-                <input
-                  type="text"
-                  name="version"
-                  value={formData.version}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 border rounded"
-                />
+              <div className="flex gap-4">
+                <div className="flex-1">
+                  <label className="block text-sm font-medium text-gray-600">Version</label>
+                  <input
+                    type="text"
+                    name="version"
+                    value={formData.version}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2 border rounded"
+                  />
+                </div>
+                <div className="flex-1">
+                  <label className="block text-sm font-medium text-gray-600">Statut</label>
+                  <select
+                    name="status"
+                    value={formData.status}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2 border rounded"
+                  >
+                    <option value="Actif">Actif</option>
+                    <option value="Inactif">Inactif</option>
+                    <option value="En Maintenance">En Maintenance</option>
+                  </select>
+                </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-600">
-                  Statut
-                </label>
-                <select
-                  name="status"
-                  value={formData.status}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 border rounded"
-                >
-                  <option value="Actif">Actif</option>
-                  <option value="Inactif">Inactif</option>
-                  <option value="En Maintenance">En Maintenance</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-600">
-                  Type
-                </label>
-                <select
-                  name="type"
-                  value={formData.type}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 border rounded"
-                >
-                  <option value="Access">Access</option>
-                  <option value="Script">Script</option>
-                  <option value="Python">Python</option>
-                  <option value="Excel">Excel</option>
-                  <option value="PowerBI">PowerBI</option>
-                  <option value="Autre">Autre</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-600">
-                  Multi-société
-                </label>
-                <input
-                  type="checkbox"
-                  name="multisociete"
-                  checked={formData.multisociete}
-                  onChange={handleInputChange}
-                  className="mr-2"
-                />
-                <span>Oui</span>
+              <div className="flex gap-4">
+                <div className="flex-1">
+                  <label className="block text-sm font-medium text-gray-600">Type</label>
+                  <select
+                    name="type"
+                    value={formData.type}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2 border rounded"
+                  >
+                    <option value="Access">Access</option>
+                    <option value="Script">Script</option>
+                    <option value="Python">Python</option>
+                    <option value="Excel">Excel</option>
+                    <option value="PowerBI">PowerBI</option>
+                    <option value="Autre">Autre</option>
+                  </select>
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    name="multisociete"
+                    checked={formData.multisociete}
+                    onChange={handleInputChange}
+                  />
+                  <label className="text-sm font-medium text-gray-600">Multi-société</label>
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-600">
