@@ -3,14 +3,15 @@ import { useParams } from "react-router-dom";
 import { useGetInventoryByIdQuery } from "../../slices/inventorySlice";
 
 const UserInventorieBoard = () => {
-
-  const [inventoryId , setInventoryId ] = useState('674d29e9cf4c6c7c0f130367')
+  // const [inventoryId, setInventoryId] = useState("674d29e9cf4c6c7c0f130367");
+  const [inventoryId, setInventoryId] = useState("6f3b514b5d2c12c7449be100");
   const [selectedLieu, setSelectedLieu] = useState("Tous");
 
-  const { data: inventory, error, isLoading } = useGetInventoryByIdQuery(
-    "674d29e9cf4c6c7c0f130367",
-   
-  );
+  const {
+    data: inventory,
+    error,
+    isLoading,
+  } = useGetInventoryByIdQuery("6f3b514b5d2c12c7449be100");
 
   const getZoneBorderColor = (zone) => {
     const allDone = zone.parties.every((part) => part.status === "Terminé");
@@ -21,15 +22,18 @@ const UserInventorieBoard = () => {
   };
 
   const progressPercentage =
-    inventory?.zones?.filter((zone) =>
+    (inventory?.zones?.filter((zone) =>
       zone.parties.every((part) => part.status === "Terminé")
     ).length /
-      (inventory?.zones?.length || 1) *
-      100;
+      (inventory?.zones?.length || 1)) *
+    100;
 
-  const zonesInProgressCount = inventory?.zones?.filter((zone) =>
-    zone.parties.some((part) => part.status !== "À faire" && part.status !== "Terminé")
-  ).length || 0;
+  const zonesInProgressCount =
+    inventory?.zones?.filter((zone) =>
+      zone.parties.some(
+        (part) => part.status !== "À faire" && part.status !== "Terminé"
+      )
+    ).length || 0;
 
   const lieux = [
     "Tous",
@@ -72,10 +76,10 @@ const UserInventorieBoard = () => {
   }
 
   return (
-    <div className="p-4 bg-gray-200 h-screen">
+    <div className="p-4 bg-gray-100 h-full min-h-screen">
       {/* Barre de progression */}
       <div className="mb-6">
-        <h2 className="text-sm font-semibold text-gray-600 mb-2">
+        <h2 className="text-sm font-semibold text-gray-400 mb-2">
           Progression de l'Inventaire
         </h2>
         <div className="relative bg-gray-300 rounded-full h-2">
