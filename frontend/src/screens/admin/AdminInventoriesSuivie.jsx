@@ -260,34 +260,60 @@ const AdminInventoriesSuivie = () => {
 
       {/* Modal pour les détails de la zone */}
       {isZoneModalOpen && selectedZone && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-            <h2 className="text-lg font-bold mb-4">{selectedZone.nom}</h2>
-            <p className="text-sm text-gray-600 mb-2">
-              <strong>ID :</strong> {selectedZone._id}
-            </p>
-            <p className="text-sm text-gray-600 mb-2">
-              <strong>Parties :</strong> {selectedZone.parties.length}
-            </p>
-            <div className="text-sm text-gray-600">
-              <strong>Détails des parties :</strong>
-              <ul className="list-disc pl-5">
-                {selectedZone.parties.map((part, index) => (
-                  <li key={index}>
-                    {part.type} - {part.status}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <button
-              className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-              onClick={handleZoneModalClose}
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+    <div className="bg-white p-6 rounded-lg shadow-lg w-96 border">
+      {/* Titre de la zone avec un code couleur */}
+      <h2
+        className={`text-lg font-bold mb-4 text-center ${
+          selectedZone.parties.every((part) => part.status === "Terminé")
+            ? "text-green-600 border-b-4 border-green-500"
+            : selectedZone.parties.every((part) => part.status === "À faire")
+            ? "text-red-600 border-b-4 border-red-500"
+            : "text-orange-600 border-b-4 border-orange-500"
+        }`}
+      >
+        {selectedZone.nom}
+      </h2>
+
+      {/* Détails des parties */}
+      <p className="text-sm text-gray-700 mb-4">
+        <strong>Nombre de parties :</strong> {selectedZone.parties.length}
+      </p>
+
+      <div className="text-sm">
+        <strong className="text-gray-800 mb-2 block">Détails des parties :</strong>
+        <ul className="pl-5 space-y-2">
+          {selectedZone.parties.map((part, index) => (
+            <li
+              key={index}
+              className={`flex items-center gap-2 p-2 rounded ${
+                part.status === "Terminé"
+                  ? "bg-green-100 border border-green-400 text-green-700"
+                  : part.status === "À faire"
+                  ? "bg-red-100 border border-red-400 text-red-700"
+                  : "bg-orange-100 border border-orange-400 text-orange-700"
+              }`}
             >
-              Fermer
-            </button>
-          </div>
-        </div>
-      )}
+              <span className="font-semibold">{part.type}</span>
+              <span className="text-sm italic">({part.status})</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* Bouton Fermer */}
+      <div className="mt-6 flex justify-end">
+        <button
+          className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+          onClick={handleZoneModalClose}
+        >
+          Fermer
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
 };
