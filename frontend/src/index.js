@@ -38,6 +38,7 @@ import AdminfillialeDetails from "./screens/admin/AdminfillialeDetails.jsx";
 import AdminLogs from "./screens/admin/AdminLogs.jsx";
 import AdminGenerator from "./screens/admin/AdminGenerator.jsx";
 import AdminAppGeneratorDetails from "./screens/admin/AdminAppGeneratorDetails.jsx";
+import UserInventorieBoard from "./screens/user/UserInventorieBoard.jsx";
 
 
 
@@ -69,7 +70,7 @@ const router = createBrowserRouter(
     
       </Route>
       <Route path="user" element={<UserRoutes />}>
-        <Route path="profile" element={<h2>User Profile</h2>} />
+        <Route path="/user/dashboard" element={<UserInventorieBoard/>} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Route>
