@@ -3,15 +3,15 @@ import { useParams } from "react-router-dom";
 import { useGetInventoryByIdQuery } from "../../slices/inventorySlice";
 
 const UserInventorieBoard = () => {
-  // const [inventoryId, setInventoryId] = useState("674d29e9cf4c6c7c0f130367");
-  const [inventoryId, setInventoryId] = useState("6f3b514b5d2c12c7449be100");
+  const [inventoryId, setInventoryId] = useState("674d29e9cf4c6c7c0f130367");
+
   const [selectedLieu, setSelectedLieu] = useState("Tous");
 
   const {
     data: inventory,
     error,
     isLoading,
-  } = useGetInventoryByIdQuery("6f3b514b5d2c12c7449be100");
+  } = useGetInventoryByIdQuery("674d29e9cf4c6c7c0f130367");
 
   const getZoneBorderColor = (zone) => {
     const allDone = zone.parties.every((part) => part.status === "Terminé");
