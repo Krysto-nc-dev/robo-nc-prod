@@ -6,7 +6,9 @@ import { useScanZonePartMutation } from "../../slices/zoneSlice";
 const AdminInventoriesSuivie = () => {
   const { id: inventoryId } = useParams();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isZoneModalOpen, setIsZoneModalOpen] = useState(false); // Modal pour les détails de la zone
   const [selectedPart, setSelectedPart] = useState(null);
+  const [selectedZone, setSelectedZone] = useState(null); // Zone sélectionnée
   const [selectedAgent, setSelectedAgent] = useState("");
   const [barcodeInput, setBarcodeInput] = useState("");
   const barcodeInputRef = useRef(null);
@@ -19,7 +21,7 @@ const AdminInventoriesSuivie = () => {
     if (barcodeInputRef.current) {
       barcodeInputRef.current.focus(); // Focus sur l'input
     }
-  }, [isModalOpen]);
+  }, [isModalOpen, isZoneModalOpen]);
 
   const handleBarcodeInputChange = (e) => {
     const value = e.target.value.trim();
@@ -38,6 +40,11 @@ const AdminInventoriesSuivie = () => {
     } else {
       console.error("Code-barres non trouvé dans l'inventaire.");
     }
+  };
+
+  const handleZoneClick = (zone) => {
+    setSelectedZone(zone);
+    setIsZoneModalOpen(true);
   };
 
   const handleScanSubmit = async () => {
@@ -61,7 +68,6 @@ const AdminInventoriesSuivie = () => {
       setBarcodeInput("");
       refetch(); // Rafraîchit les données après mise à jour
 
-      // Focus sur l'input
       if (barcodeInputRef.current) {
         barcodeInputRef.current.focus();
       }
@@ -74,8 +80,13 @@ const AdminInventoriesSuivie = () => {
     setIsModalOpen(false);
     setBarcodeInput(""); // Vide l'input
     if (barcodeInputRef.current) {
-      barcodeInputRef.current.focus(); // Focus sur l'input
+      barcodeInputRef.current.focus();
     }
+  };
+
+  const handleZoneModalClose = () => {
+    setIsZoneModalOpen(false);
+    setSelectedZone(null);
   };
 
   const getZoneBorderColor = (zone) => {
@@ -176,38 +187,36 @@ const AdminInventoriesSuivie = () => {
       </div>
 
       {/* Zones */}
- {/* Zones */}
-<div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-8 gap-2">
-  {inventory?.zones.map((zone) => (
-    <div
-      key={zone._id}
-      className={`p-2 bg-gray-50 rounded shadow border ${getZoneBorderColor(
-        zone
-      )}`}
-    >
-      <h3 className="text-[0.6rem] font-bold text-gray-700 text-center mb-1 truncate">
-        {zone.nom}
-      </h3>
-      <div className="flex justify-center gap-1 flex-wrap">
-        {zone.parties.map((partie) => (
+      <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-8 gap-2">
+        {inventory?.zones.map((zone) => (
           <div
-            key={partie.codeBarre}
-            className={`w-4 h-4 text-[0.65rem] flex justify-center items-center rounded-full cursor-pointer transition-transform transform hover:scale-105 ${
-              partie.status === "Terminé" ? "bg-green-500" : "bg-red-500"
-            }`}
-            title={partie.type}
+            key={zone._id}
+            className={`p-2 bg-gray-50 rounded shadow border cursor-pointer ${getZoneBorderColor(
+              zone
+            )}`}
+            onClick={() => handleZoneClick(zone)}
           >
-            {partie.type.charAt(0)}
+            <h3 className="text-[0.6rem] font-bold text-gray-700 text-center mb-1 truncate">
+              {zone.nom}
+            </h3>
+            <div className="flex justify-center gap-1 flex-wrap">
+              {zone.parties.map((partie) => (
+                <div
+                  key={partie.codeBarre}
+                  className={`w-4 h-4 text-[0.65rem] flex justify-center items-center rounded-full cursor-pointer transition-transform transform hover:scale-105 ${
+                    partie.status === "Terminé" ? "bg-green-500" : "bg-red-500"
+                  }`}
+                  title={partie.type}
+                >
+                  {partie.type.charAt(0)}
+                </div>
+              ))}
+            </div>
           </div>
         ))}
       </div>
-    </div>
-  ))}
-</div>
 
-
-
-      {/* Modal */}
+      {/* Modal pour le bipage */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-80">
@@ -245,6 +254,37 @@ const AdminInventoriesSuivie = () => {
                 {isScanning ? "Mise à jour..." : "Confirmer"}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal pour les détails de la zone */}
+      {isZoneModalOpen && selectedZone && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+            <h2 className="text-lg font-bold mb-4">{selectedZone.nom}</h2>
+            <p className="text-sm text-gray-600 mb-2">
+              <strong>ID :</strong> {selectedZone._id}
+            </p>
+            <p className="text-sm text-gray-600 mb-2">
+              <strong>Parties :</strong> {selectedZone.parties.length}
+            </p>
+            <div className="text-sm text-gray-600">
+              <strong>Détails des parties :</strong>
+              <ul className="list-disc pl-5">
+                {selectedZone.parties.map((part, index) => (
+                  <li key={index}>
+                    {part.type} - {part.status}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <button
+              className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+              onClick={handleZoneModalClose}
+            >
+              Fermer
+            </button>
           </div>
         </div>
       )}
