@@ -6,11 +6,12 @@ import { useScanZonePartMutation } from "../../slices/zoneSlice";
 const AdminInventoriesSuivie = () => {
   const { id: inventoryId } = useParams();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isZoneModalOpen, setIsZoneModalOpen] = useState(false); // Modal pour les détails de la zone
+  const [isZoneModalOpen, setIsZoneModalOpen] = useState(false);
   const [selectedPart, setSelectedPart] = useState(null);
-  const [selectedZone, setSelectedZone] = useState(null); // Zone sélectionnée
+  const [selectedZone, setSelectedZone] = useState(null);
   const [selectedAgent, setSelectedAgent] = useState("");
   const [barcodeInput, setBarcodeInput] = useState("");
+  const [selectedLieu, setSelectedLieu] = useState("Tous"); // Filtre par lieu
   const barcodeInputRef = useRef(null);
 
   const { data: inventory, error, isLoading, refetch } =
@@ -19,7 +20,7 @@ const AdminInventoriesSuivie = () => {
 
   useEffect(() => {
     if (barcodeInputRef.current) {
-      barcodeInputRef.current.focus(); // Focus sur l'input
+      barcodeInputRef.current.focus();
     }
   }, [isModalOpen, isZoneModalOpen]);
 
@@ -66,7 +67,7 @@ const AdminInventoriesSuivie = () => {
 
       setIsModalOpen(false);
       setBarcodeInput("");
-      refetch(); // Rafraîchit les données après mise à jour
+      refetch();
 
       if (barcodeInputRef.current) {
         barcodeInputRef.current.focus();
@@ -78,7 +79,7 @@ const AdminInventoriesSuivie = () => {
 
   const handleModalClose = () => {
     setIsModalOpen(false);
-    setBarcodeInput(""); // Vide l'input
+    setBarcodeInput("");
     if (barcodeInputRef.current) {
       barcodeInputRef.current.focus();
     }
@@ -107,6 +108,16 @@ const AdminInventoriesSuivie = () => {
   const zonesInProgressCount = inventory?.zones?.filter((zone) =>
     zone.parties.some((part) => part.status !== "À faire" && part.status !== "Terminé")
   ).length || 0;
+
+  const lieux = [
+    "Tous",
+    ...new Set(inventory?.zones.map((zone) => zone.lieu || "Non spécifié")),
+  ]; // Extraire les lieux uniques
+
+  const filteredZones =
+    selectedLieu === "Tous"
+      ? inventory?.zones
+      : inventory?.zones.filter((zone) => zone.lieu === selectedLieu);
 
   if (isLoading) {
     return (
@@ -150,26 +161,53 @@ const AdminInventoriesSuivie = () => {
       </div>
 
       {/* Dernière zone scannée */}
-      {selectedPart && (
-        <div className="mb-6 p-4 bg-gray-50 border rounded shadow">
-          <h3 className="text-sm font-bold text-gray-800 mb-2">
-            Dernière zone scannée
-          </h3>
-          <p className="text-sm text-gray-600">
-            <strong>Nom de la zone :</strong>{" "}
-            {inventory?.zones.find((zone) => zone._id === selectedPart.zoneId)?.nom}
-          </p>
-          <p className="text-sm text-gray-600">
-            <strong>Type :</strong> {selectedPart.type}
-          </p>
-          <p className="text-sm text-gray-600">
-            <strong>Code-barres :</strong> {selectedPart.codeBarre}
-          </p>
-          <p className="text-sm text-gray-600">
-            <strong>Statut :</strong> {selectedPart.status}
-          </p>
-        </div>
-      )}
+    {/* Dernière zone scannée */}
+{selectedPart && (
+  <div
+    className={`mb-6 p-4 rounded shadow border ${
+      selectedPart.status === "Terminé"
+        ? "bg-green-100 border-green-400 text-green-800"
+        : selectedPart.status === "À faire"
+        ? "bg-red-100 border-red-400 text-red-800"
+        : "bg-orange-100 border-orange-400 text-orange-800"
+    }`}
+  >
+    <h3 className="text-sm font-bold mb-2">
+      Dernière zone scannée
+    </h3>
+    <p className="text-sm">
+      <strong>Nom de la zone :</strong>{" "}
+      {inventory?.zones.find((zone) => zone._id === selectedPart.zoneId)?.nom}
+    </p>
+    <p className="text-sm">
+      <strong>Type :</strong> {selectedPart.type}
+    </p>
+    <p className="text-sm">
+      <strong>Code-barres :</strong> {selectedPart.codeBarre}
+    </p>
+    <p className="text-sm">
+      <strong>Statut :</strong> {selectedPart.status}
+    </p>
+  </div>
+)}
+
+      {/* Filtre par lieu */}
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-600 mb-2">
+          Filtrer par lieu
+        </label>
+        <select
+          value={selectedLieu}
+          onChange={(e) => setSelectedLieu(e.target.value)}
+          className="border border-gray-400 rounded px-4 py-2 w-full"
+        >
+          {lieux.map((lieu, index) => (
+            <option key={index} value={lieu}>
+              {lieu}
+            </option>
+          ))}
+        </select>
+      </div>
 
       {/* Scanner */}
       <div className="mb-6">
@@ -188,7 +226,7 @@ const AdminInventoriesSuivie = () => {
 
       {/* Zones */}
       <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-8 gap-2">
-        {inventory?.zones.map((zone) => (
+        {filteredZones?.map((zone) => (
           <div
             key={zone._id}
             className={`p-2 bg-gray-50 rounded shadow border cursor-pointer ${getZoneBorderColor(
@@ -258,58 +296,40 @@ const AdminInventoriesSuivie = () => {
         </div>
       )}
 
-      {/* Modal pour les détails de la zone */}
-      {isZoneModalOpen && selectedZone && (
+      
+   {/* Modal pour les détails de la zone */}
+{isZoneModalOpen && selectedZone && (
   <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
     <div className="bg-white p-6 rounded-lg shadow-lg w-96 border">
-      {/* Titre de la zone avec un code couleur */}
-      <h2
-        className={`text-lg font-bold mb-4 text-center ${
-          selectedZone.parties.every((part) => part.status === "Terminé")
-            ? "text-green-600 border-b-4 border-green-500"
-            : selectedZone.parties.every((part) => part.status === "À faire")
-            ? "text-red-600 border-b-4 border-red-500"
-            : "text-orange-600 border-b-4 border-orange-500"
-        }`}
-      >
-        {selectedZone.nom}
-      </h2>
-
-      {/* Détails des parties */}
+      <h2 className="text-lg font-bold mb-4 text-center">{selectedZone.nom}</h2>
       <p className="text-sm text-gray-700 mb-4">
         <strong>Nombre de parties :</strong> {selectedZone.parties.length}
       </p>
+      
+      <ul className="pl-5 space-y-2">
+        {selectedZone.parties.map((part, index) => (
+          <li
+            key={index}
+            className={`flex items-center gap-3 p-2 rounded border ${
+              part.status === "Terminé"
+                ? "bg-green-100 text-green-800 border-green-300"
+                : part.status === "À faire"
+                ? "bg-red-100 text-red-800 border-red-300"
+                : "bg-orange-100 text-orange-800 border-orange-300"
+            }`}
+          >
+            <span className="font-semibold">{part.type}</span>
+            <span className="italic text-sm">{part.status}</span>
+          </li>
+        ))}
+      </ul>
 
-      <div className="text-sm">
-        <strong className="text-gray-800 mb-2 block">Détails des parties :</strong>
-        <ul className="pl-5 space-y-2">
-          {selectedZone.parties.map((part, index) => (
-            <li
-              key={index}
-              className={`flex items-center gap-2 p-2 rounded ${
-                part.status === "Terminé"
-                  ? "bg-green-100 border border-green-400 text-green-700"
-                  : part.status === "À faire"
-                  ? "bg-red-100 border border-red-400 text-red-700"
-                  : "bg-orange-100 border border-orange-400 text-orange-700"
-              }`}
-            >
-              <span className="font-semibold">{part.type}</span>
-              <span className="text-sm italic">({part.status})</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      {/* Bouton Fermer */}
-      <div className="mt-6 flex justify-end">
-        <button
-          className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-          onClick={handleZoneModalClose}
-        >
-          Fermer
-        </button>
-      </div>
+      <button
+        className="mt-6 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+        onClick={handleZoneModalClose}
+      >
+        Fermer
+      </button>
     </div>
   </div>
 )}
