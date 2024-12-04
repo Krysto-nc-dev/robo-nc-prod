@@ -19,6 +19,7 @@ import repportGeneratorRoutes from "./routes/repportGeneratorRoutes.js";
 import filialeRoutes from "./routes/fillialeRoutes.js";
 import ticketRoutes from "./routes/ticketRoutes.js";
 import logRoutes from "./routes/logRoutes.js";
+import reportRoutes from "./routes/reportRoutes.js";
 
 // Configuration des variables d'environnement
 dotenv.config();
@@ -92,6 +93,7 @@ app.use("/documents", documentRoutes);
 app.use("/repports-generator", repportGeneratorRoutes);
 app.use("/tickets", ticketRoutes);
 app.use("/logs", logRoutes);
+app.use("/reports", reportRoutes);
 
 // Middleware pour gérer les erreurs 404
 app.use((req, res, next) => {

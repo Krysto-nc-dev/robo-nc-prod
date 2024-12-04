@@ -3,14 +3,16 @@ import { useParams } from "react-router-dom";
 import { useGetInventoryByIdQuery } from "../../slices/inventorySlice";
 
 const UserInventorieBoard = () => {
-
-  const [inventoryId , setInventoryId ] = useState('674d29e9cf4c6c7c0f130367')
+  const [inventoryId, setInventoryId] = useState("674d29e9cf4c6c7c0f130367");
   const [selectedLieu, setSelectedLieu] = useState("Tous");
+  const [selectedZone, setSelectedZone] = useState(null); // État pour la zone sélectionnée
+  const [isModalOpen, setIsModalOpen] = useState(false); // État pour la modal
 
-  const { data: inventory, error, isLoading } = useGetInventoryByIdQuery(
-    "674d29e9cf4c6c7c0f130367",
-   
-  );
+  const {
+    data: inventory,
+    error,
+    isLoading,
+  } = useGetInventoryByIdQuery("674d29e9cf4c6c7c0f130367");
 
   const getZoneBorderColor = (zone) => {
     const allDone = zone.parties.every((part) => part.status === "Terminé");
@@ -21,15 +23,18 @@ const UserInventorieBoard = () => {
   };
 
   const progressPercentage =
-    inventory?.zones?.filter((zone) =>
+    (inventory?.zones?.filter((zone) =>
       zone.parties.every((part) => part.status === "Terminé")
     ).length /
-      (inventory?.zones?.length || 1) *
-      100;
+      (inventory?.zones?.length || 1)) *
+    100;
 
-  const zonesInProgressCount = inventory?.zones?.filter((zone) =>
-    zone.parties.some((part) => part.status !== "À faire" && part.status !== "Terminé")
-  ).length || 0;
+  const zonesInProgressCount =
+    inventory?.zones?.filter((zone) =>
+      zone.parties.some(
+        (part) => part.status !== "À faire" && part.status !== "Terminé"
+      )
+    ).length || 0;
 
   const lieux = [
     "Tous",
@@ -46,6 +51,16 @@ const UserInventorieBoard = () => {
       console.error("L'identifiant de l'inventaire est manquant.");
     }
   }, [inventoryId]);
+
+  const handleZoneClick = (zone) => {
+    setSelectedZone(zone); // Stocke la zone sélectionnée
+    setIsModalOpen(true); // Ouvre la modal
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false); // Ferme la modal
+    setSelectedZone(null); // Réinitialise la zone sélectionnée
+  };
 
   if (isLoading) {
     return (
@@ -72,10 +87,10 @@ const UserInventorieBoard = () => {
   }
 
   return (
-    <div className="p-4 bg-gray-200 h-screen">
+    <div className="p-4 bg-gray-100 h-full min-h-screen">
       {/* Barre de progression */}
       <div className="mb-6">
-        <h2 className="text-sm font-semibold text-gray-600 mb-2">
+        <h2 className="text-sm font-semibold text-gray-400 mb-2">
           Progression de l'Inventaire
         </h2>
         <div className="relative bg-gray-300 rounded-full h-2">
@@ -122,6 +137,7 @@ const UserInventorieBoard = () => {
             className={`p-2 bg-gray-50 rounded shadow border cursor-pointer ${getZoneBorderColor(
               zone
             )}`}
+            onClick={() => handleZoneClick(zone)} // Ajout du clic sur la carte
           >
             <h3 className="text-[0.6rem] font-bold text-gray-700 text-center mb-1 truncate">
               {zone.nom}
@@ -142,6 +158,33 @@ const UserInventorieBoard = () => {
           </div>
         ))}
       </div>
+
+      {/* Modal */}
+      {isModalOpen && selectedZone && (
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-4 rounded shadow-lg max-w-md w-full">
+            <h3 className="text-lg font-semibold mb-2 text-gray-800">
+              {selectedZone.nom}
+            </h3>
+            <p className="text-sm text-gray-600">
+              Lieu : {selectedZone.lieu || "Non spécifié"}
+            </p>
+            <ul className="mt-4 space-y-2">
+              {selectedZone.parties.map((partie) => (
+                <li key={partie.codeBarre} className="text-sm text-gray-700">
+                  {partie.type} - {partie.status}
+                </li>
+              ))}
+            </ul>
+            <button
+              onClick={closeModal}
+              className="mt-4 px-4 py-2 bg-red-500 text-white rounded"
+            >
+              Fermer
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

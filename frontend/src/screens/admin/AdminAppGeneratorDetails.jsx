@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { useParams } from "react-router-dom";
-import { useGetRepportGeneratorByIdQuery } from "../../slices/repportGeneratorsApiSlice";
+import { useNavigate, useParams } from "react-router-dom";
 import {
-  useGetTicketsQuery,
-  useCreateTicketMutation,
-} from "../../slices/ticketApiSlice";
+  useGetRepportGeneratorByIdQuery,
+  useDeleteRepportGeneratorMutation,
+  useUploadDocumentToReportGeneratorMutation,
+  useGeneratePDFReportQuery,
+} from "../../slices/repportGeneratorsApiSlice";
 import {
   Box,
   Button,
@@ -22,21 +23,16 @@ import {
   ListItemText,
   Typography,
   TextField,
-  Select,
-  MenuItem,
   Chip,
   Backdrop,
-  Tooltip
+  Tooltip,
 } from "@mui/material";
-
-import { CheckCircle, Cancel, Info, Folder, Notes, Verified } from "@mui/icons-material";
-
-import { PlusCircle, AlertCircle } from "lucide-react";
+import { PlusCircle, AlertCircle, CheckCircle, Upload, FileText } from "lucide-react";
 
 const AdminGeneratorDetails = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
 
-  // Fetch generator and tickets
   const {
     data: generator,
     isLoading: isGeneratorLoading,
@@ -44,44 +40,110 @@ const AdminGeneratorDetails = () => {
     refetch: refetchGenerator,
   } = useGetRepportGeneratorByIdQuery(id);
 
-  const {
-    data: tickets,
-    isLoading: isTicketsLoading,
-    refetch: refetchTickets,
-  } = useGetTicketsQuery();
+  const [deleteGenerator] = useDeleteRepportGeneratorMutation();
+  const [uploadDocument] = useUploadDocumentToReportGeneratorMutation();
+  const { refetch: fetchPDF } = useGeneratePDFReportQuery(id, { skip: true });
 
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
   const [ticketData, setTicketData] = useState({
     titre: "",
     description: "",
-    priorite: "Moyenne",
+  });
+  const [feedback, setFeedback] = useState({
+    open: false,
+    message: "",
+    severity: "",
   });
 
-  const [createTicket] = useCreateTicketMutation();
+  const handleFileChange = (e) => setSelectedFile(e.target.files[0]);
 
-  const handleTicketInputChange = (e) => {
-    const { name, value } = e.target;
-    setTicketData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleTicketSubmit = async (e) => {
-    e.preventDefault();
+  const handleUploadSubmit = async () => {
+    if (!selectedFile) {
+      setFeedback({
+        open: true,
+        message: "Veuillez sélectionner un fichier.",
+        severity: "warning",
+      });
+      return;
+    }
+    const formData = new FormData();
+    formData.append("file", selectedFile);
     try {
-      await createTicket({
-        ...ticketData,
-        parentModel: "RepportGenerator",
-        parentId: id,
-      }).unwrap();
-      alert("Ticket créé avec succès !");
-      setIsTicketModalOpen(false);
-      refetchTickets(); // Recharger les tickets
-      refetchGenerator(); // Recharger les détails du générateur
+      await uploadDocument({ id, formData }).unwrap();
+      setFeedback({
+        open: true,
+        message: "Document ajouté avec succès.",
+        severity: "success",
+      });
+      setIsUploadModalOpen(false);
+      refetchGenerator();
     } catch (error) {
-      console.error("Erreur lors de la création du ticket :", error);
+      setFeedback({
+        open: true,
+        message: "Erreur lors du téléchargement.",
+        severity: "error",
+      });
     }
   };
 
-  if (isGeneratorLoading || isTicketsLoading) {
+  const handleDeleteGenerator = async () => {
+    setIsDeleting(true);
+    try {
+      await deleteGenerator(id).unwrap();
+      setFeedback({
+        open: true,
+        message: "Générateur supprimé avec succès.",
+        severity: "success",
+      });
+      setTimeout(() => navigate("/admin/generator"), 500);
+    } catch (error) {
+      setFeedback({
+        open: true,
+        message: "Erreur lors de la suppression.",
+        severity: "error",
+      });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleDownloadPDF = async () => {
+    try {
+      const pdfBlob = await fetchPDF();
+      const url = window.URL.createObjectURL(new Blob([pdfBlob]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `report-${generator?.nom || "document"}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setFeedback({
+        open: true,
+        message: "PDF téléchargé avec succès.",
+        severity: "success",
+      });
+    } catch (error) {
+      setFeedback({
+        open: true,
+        message: "Erreur lors du téléchargement du PDF.",
+        severity: "error",
+      });
+    }
+  };
+
+  const handleTicketSubmit = () => {
+    setIsTicketModalOpen(false);
+    setFeedback({
+      open: true,
+      message: "Ticket créé avec succès.",
+      severity: "success",
+    });
+  };
+
+  if (isGeneratorLoading) {
     return (
       <Backdrop open>
         <CircularProgress color="inherit" />
@@ -89,253 +151,74 @@ const AdminGeneratorDetails = () => {
     );
   }
 
-  if (generatorError) {
+  if (generatorError && !isDeleting) {
     return (
       <Box textAlign="center" color="red">
-        <Typography variant="h6">
-          Erreur lors du chargement du générateur.
-        </Typography>
+        <Typography variant="h6">Erreur lors du chargement du générateur.</Typography>
       </Box>
     );
   }
 
-  const filteredTickets = tickets?.filter((ticket) => ticket.parentId === id);
-
   return (
-    <>
-      <Typography variant="h6" fontWeight="bold" marginBottom={4}>
-        {generator.nom}
+    <Box>
+      <Typography variant="h4" fontWeight="bold" marginBottom={4}>
+        Détails du Générateur : {generator?.nom || "Inconnu"}
       </Typography>
 
       {/* Informations Générales */}
-      <Card variant="outlined" sx={{ mb: 4, borderRadius: 2, boxShadow: 2 }}>
-      <CardContent>
-        <Typography variant="h6" gutterBottom sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-          <Info sx={{ mr: 1, color: "primary.main" }} />
-          Informations Générales
-        </Typography>
-          {/* Description */}
-          <Box
-            display="flex"
-            alignItems="center"
-            marginBottom="10px"
-            gap={1}
-            sx={{ flex: "2 1 40%", minWidth: "40%" }}
-          >
-            <Notes color="secondary" />
-            <Typography variant="body1" sx={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis"  }}>
-              <strong>Description :</strong>{" "}
-              {generator.description || (
-                <Tooltip title="Aucune description disponible">
-                  <span style={{ color: "#9e9e9e", fontStyle: "italic" }}>
-                    Non spécifié
-                  </span>
-                </Tooltip>
-              )}
-            </Typography>
-          </Box>
-        <Divider sx={{ mb: 3 }} />
-
-        {/* Informations sur une seule ligne */}
-        <Box
-          display="flex"
-          flexWrap="wrap"
-          alignItems="center"
-          gap={2}
-          sx={{ justifyContent: "space-between" }}
-        >
-        
-
-          {/* Note */}
-          <Box
-            display="flex"
-            alignItems="center"
-            gap={1}
-            sx={{ flex: "1 1 15%", minWidth: "15%" }}
-          >
-            <Verified color="success" />
-            <Typography variant="body1">
-              <strong>Note :</strong>{" "}
-              {generator.note || (
-                <Tooltip title="Aucune note disponible">
-                  <span style={{ color: "#9e9e9e", fontStyle: "italic" }}>
-                    Non spécifié
-                  </span>
-                </Tooltip>
-              )}
-            </Typography>
-          </Box>
-
-          {/* Chemin */}
-          <Box
-            display="flex"
-            alignItems="center"
-            gap={1}
-            sx={{ flex: "1 1 20%", minWidth: "20%" }}
-          >
-            <Folder color="primary" />
-            <Typography variant="body1">
-              <strong>Chemin :</strong>{" "}
-              {generator.path || (
-                <Tooltip title="Non spécifié">
-                  <span style={{ color: "#9e9e9e", fontStyle: "italic" }}>
-                    Non spécifié
-                  </span>
-                </Tooltip>
-              )}
-            </Typography>
-          </Box>
-
-          {/* Version */}
-          <Box
-            display="flex"
-            alignItems="center"
-            gap={1}
-            sx={{ flex: "1 1 10%", minWidth: "10%" }}
-          >
-            <Verified color="info" />
-            <Typography variant="body1">
-              <strong>Version :</strong> {generator.version || "Non spécifiée"}
-            </Typography>
-          </Box>
-
-          {/* Statut */}
-          <Box
-            display="flex"
-            alignItems="center"
-            gap={1}
-            sx={{ flex: "1 1 10%", minWidth: "10%" }}
-          >
-            <CheckCircle color={generator.status === "Actif" ? "success" : "error"} />
-            <Typography variant="body1">
-              <strong>Statut :</strong>{" "}
-              <Chip
-                label={generator.status}
-                color={generator.status === "Actif" ? "success" : "error"}
-                size="small"
-              />
-            </Typography>
-          </Box>
-
-          {/* Multi-société */}
-          <Box
-            display="flex"
-            alignItems="center"
-            gap={1}
-            sx={{ flex: "1 1 10%", minWidth: "10%" }}
-          >
-            <CheckCircle color={generator.multisociete ? "success" : "error"} />
-            <Typography variant="body1">
-              <strong>Multi-société :</strong>{" "}
-              {generator.multisociete ? (
-                <Chip label="Oui" color="success" size="small" />
-              ) : (
-                <Chip label="Non" color="error" size="small" />
-              )}
-            </Typography>
-          </Box>
-        </Box>
-      </CardContent>
-    </Card>
-      {/* Tickets Associés */}
-      <Card variant="outlined" marginBottom={4}>
+      <Card variant="outlined" sx={{ marginBottom: 4 }}>
         <CardContent>
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-            marginBottom={2}
-          >
+          <Typography variant="h6" gutterBottom>
+            Informations Générales
+          </Typography>
+          <Divider />
+          <Typography>
+            <strong>Description :</strong> {generator?.description || "Aucune description disponible."}
+          </Typography>
+          <Typography>
+            <strong>Note :</strong> {generator?.note || "Aucune note disponible."}
+          </Typography>
+          <Typography>
+            <strong>Chemin :</strong> {generator?.path || "Non spécifié."}
+          </Typography>
+          <Typography>
+            <strong>Version :</strong> {generator?.version || "Inconnu"}
+          </Typography>
+          <Typography>
+            <strong>Statut :</strong> {generator?.status || "Inconnu"}
+          </Typography>
+          <Typography>
+            <strong>Multi-société :</strong> {generator?.multisociete ? "Oui" : "Non"}
+          </Typography>
+        </CardContent>
+      </Card>
+
+      {/* Tickets Associés */}
+      <Card variant="outlined" sx={{ marginBottom: 4 }}>
+        <CardContent>
+          <Box display="flex" justifyContent="space-between" alignItems="center" marginBottom={2}>
             <Typography variant="h6">Tickets Associés</Typography>
-            <IconButton
-              color="primary"
-              onClick={() => setIsTicketModalOpen(true)}
-            >
+            <IconButton color="primary" onClick={() => setIsTicketModalOpen(true)}>
               <PlusCircle />
             </IconButton>
           </Box>
           <Divider />
-          {filteredTickets && filteredTickets.length > 0 ? (
+          {generator?.tickets?.length > 0 ? (
             <List>
-              {filteredTickets.map((ticket) => (
+              {generator.tickets.map((ticket) => (
                 <ListItem key={ticket._id}>
-                  <ListItemText
-                    primary={ticket.titre}
-                    secondary={`Statut : ${ticket.status}`}
-                  />
-                  <Chip
-                    label={ticket.status}
-                    color={
-                      ticket.status === "En cours"
-                        ? "warning"
-                        : ticket.status === "Résolu"
-                        ? "success"
-                        : "default"
-                    }
-                    icon={
-                      ticket.status === "En cours" ? (
-                        <AlertCircle />
-                      ) : ticket.status === "Résolu" ? (
-                        <CheckCircle />
-                      ) : null
-                    }
-                  />
+                  <ListItemText primary={ticket.titre} secondary={`Statut : ${ticket.status}`} />
+                  <Chip label={ticket.status} />
                 </ListItem>
               ))}
             </List>
           ) : (
-            <Typography color="error">Aucun ticket associé.</Typography>
+            <Typography color="textSecondary">Aucun ticket associé.</Typography>
           )}
         </CardContent>
       </Card>
-
-      {/* Modal pour Ajouter un Ticket */}
-      <Dialog
-        open={isTicketModalOpen}
-        onClose={() => setIsTicketModalOpen(false)} // Fermer la modal en cliquant à l'extérieur
-      >
-        <DialogTitle>Ajouter un Ticket</DialogTitle>
-        <DialogContent>
-          <TextField
-            label="Titre"
-            name="titre"
-            value={ticketData.titre}
-            onChange={handleTicketInputChange}
-            fullWidth
-            margin="dense"
-          />
-          <TextField
-            label="Description"
-            name="description"
-            value={ticketData.description}
-            onChange={handleTicketInputChange}
-            fullWidth
-            margin="dense"
-            multiline
-            rows={4}
-          />
-          <Select
-            name="priorite"
-            value={ticketData.priorite}
-            onChange={handleTicketInputChange}
-            fullWidth
-            margin="dense"
-          >
-            <MenuItem value="Basse">Basse</MenuItem>
-            <MenuItem value="Moyenne">Moyenne</MenuItem>
-            <MenuItem value="Haute">Haute</MenuItem>
-          </Select>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setIsTicketModalOpen(false)} color="secondary">
-            Annuler
-          </Button>
-          <Button onClick={handleTicketSubmit} color="primary">
-            Ajouter
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </>
+      {/* Ajout des autres sections */}
+    </Box>
   );
 };
 
