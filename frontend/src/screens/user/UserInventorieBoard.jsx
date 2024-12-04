@@ -163,7 +163,9 @@ const UserInventorieBoard = () => {
       {isModalOpen && selectedZone && (
         <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white p-4 rounded shadow-lg max-w-md w-full">
-            <h3 className="text-lg font-semibold mb-2">{selectedZone.nom}</h3>
+            <h3 className="text-lg font-semibold mb-2 text-gray-800">
+              {selectedZone.nom}
+            </h3>
             <p className="text-sm text-gray-600">
               Lieu : {selectedZone.lieu || "Non spécifié"}
             </p>
