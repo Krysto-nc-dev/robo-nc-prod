@@ -7,7 +7,7 @@ import {
   useUpdateRepportGeneratorMutation,
 } from "../../slices/repportGeneratorsApiSlice";
 import { useGetUsersQuery } from "../../slices/userApiSlice";
-import { PlusCircle, TicketCheckIcon, Trash } from "lucide-react";
+import { PlusCircle,  Trash } from "lucide-react";
 
 const AdminGenerator = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -118,7 +118,7 @@ const AdminGenerator = () => {
           type="text"
           value={searchTerm}
           onChange={handleSearchChange}
-          placeholder="Rechercher un générateur par nom..."
+          placeholder="Rechercher par nom..."
           className="w-full px-4 py-2 border rounded"
         />
       </div>
@@ -126,7 +126,7 @@ const AdminGenerator = () => {
       {/* Bouton pour ouvrir la modal */}
       <button
         onClick={() => setIsModalOpen(true)}
-        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 flex gap-2"
+        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 flex items-center gap-2 text-[13px]"
       >
         <PlusCircle /> Ajouter un Générateur
       </button>
@@ -155,7 +155,7 @@ const AdminGenerator = () => {
             <tbody>
               {filteredGenerators?.map((generator) => (
                 <tr key={generator._id} className="border-b">
-                  <td className="px-4 py-2">
+                  <td className="px-4 py-2 text-[13px]">
                     <Link
                       to={`/admin/generator/${generator._id}`}
                       className="text-blue-600 hover:underline"
@@ -163,8 +163,8 @@ const AdminGenerator = () => {
                       {generator.nom}
                     </Link>
                   </td>
-                  <td className="px-4 py-2">{generator.type}</td>
-                  <td className="px-4 py-2">
+                  <td className="px-4 py-2 text-[13px]">{generator.type}</td>
+                  <td className="px-4 py-2 text-[13px]">
   {generator.status === "Actif" ? (
     <span className="flex items-center text-green-500">
       <svg
@@ -184,7 +184,7 @@ const AdminGenerator = () => {
       Actif
     </span>
   ) : (
-    <span className="flex items-center text-red-500">
+    <span className="flex items-center text-red-500 ">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         className="h-5 w-5 mr-2"
@@ -204,10 +204,10 @@ const AdminGenerator = () => {
   )}
 </td>
 
-                  <td className="px-4 py-2">{generator.version}</td>
-                  <td className="px-4 py-2">
+                  <td className="px-4 py-2 text-[13px]">{generator.version}</td>
+                  <td className="px-4 py-2 text-[13px]">
                     {generator.multisociete ? (
-                      <span className="text-green-500">
+                      <span className="text-green-500 text-[13px]">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           fill="currentColor"
@@ -230,7 +230,7 @@ const AdminGenerator = () => {
                       </span>
                     )}
                   </td>
-                  <td className="px-4 py-2 flex gap-2 items-center">
+                  <td className="px-4 py-2 flex gap-2 items-center text-[13px]">
                     <select
                       value={generator.status}
                       onChange={(e) =>
@@ -245,7 +245,7 @@ const AdminGenerator = () => {
 
                     <button
                       onClick={() => handleDelete(generator._id)}
-                      className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+                      className="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700"
                     >
                       <Trash />
                     </button>
