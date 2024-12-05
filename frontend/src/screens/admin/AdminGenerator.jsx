@@ -7,6 +7,7 @@ import {
   useUpdateRepportGeneratorMutation,
 } from "../../slices/repportGeneratorsApiSlice";
 import { useGetUsersQuery } from "../../slices/userApiSlice";
+import { PlusCircle, TicketCheckIcon, Trash } from "lucide-react";
 
 const AdminGenerator = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -107,7 +108,9 @@ const AdminGenerator = () => {
 
   return (
     <div className="p-4">
-      <h1 className="text-xl font-bold mb-4">Gestion des Générateurs de Rapport</h1>
+      <h1 className="text-xl font-bold mb-4">
+        Gestion des Générateurs de Rapport
+      </h1>
 
       {/* Barre de recherche */}
       <div className="mb-4">
@@ -123,9 +126,9 @@ const AdminGenerator = () => {
       {/* Bouton pour ouvrir la modal */}
       <button
         onClick={() => setIsModalOpen(true)}
-        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 flex gap-2"
       >
-        Ajouter un Générateur
+        <PlusCircle /> Ajouter un Générateur
       </button>
 
       {/* Liste des générateurs */}
@@ -134,7 +137,9 @@ const AdminGenerator = () => {
         {isLoadingGenerators ? (
           <div>Chargement des générateurs...</div>
         ) : error ? (
-          <div className="text-red-600">Erreur lors du chargement des générateurs.</div>
+          <div className="text-red-600">
+            Erreur lors du chargement des générateurs.
+          </div>
         ) : (
           <table className="min-w-full bg-white border border-gray-200 rounded shadow">
             <thead>
@@ -159,27 +164,91 @@ const AdminGenerator = () => {
                     </Link>
                   </td>
                   <td className="px-4 py-2">{generator.type}</td>
-                  <td className="px-4 py-2">{generator.status}</td>
+                  <td className="px-4 py-2">
+  {generator.status === "Actif" ? (
+    <span className="flex items-center text-green-500">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="h-5 w-5 mr-2"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth={2}
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M5 13l4 4L19 7"
+        />
+      </svg>
+      Actif
+    </span>
+  ) : (
+    <span className="flex items-center text-red-500">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="h-5 w-5 mr-2"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth={2}
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M6 18L18 6M6 6l12 12"
+        />
+      </svg>
+      Inactif
+    </span>
+  )}
+</td>
+
                   <td className="px-4 py-2">{generator.version}</td>
                   <td className="px-4 py-2">
-                    {generator.multisociete ? "Oui" : "Non"}
+                    {generator.multisociete ? (
+                      <span className="text-green-500">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="currentColor"
+                          className="w-6 h-6 inline-block"
+                          viewBox="0 0 24 24"
+                        >
+                          <path d="M20.285 6.709a1 1 0 0 0-1.415 0L9 16.579l-3.871-3.871a1 1 0 0 0-1.414 1.414l4.579 4.579a1 1 0 0 0 1.414 0l10.579-10.579a1 1 0 0 0 0-1.414z" />
+                        </svg>
+                      </span>
+                    ) : (
+                      <span className="text-red-500">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="currentColor"
+                          className="w-6 h-6 inline-block"
+                          viewBox="0 0 24 24"
+                        >
+                          <path d="M18.364 5.636a1 1 0 0 0-1.414 0L12 10.586 7.05 5.636a1 1 0 1 0-1.414 1.414L10.586 12l-4.95 4.95a1 1 0 1 0 1.414 1.414L12 13.414l4.95 4.95a1 1 0 0 0 1.414-1.414L13.414 12l4.95-4.95a1 1 0 0 0 0-1.414z" />
+                        </svg>
+                      </span>
+                    )}
                   </td>
                   <td className="px-4 py-2 flex gap-2 items-center">
+                    <select
+                      value={generator.status}
+                      onChange={(e) =>
+                        handleStatusChange(generator._id, e.target.value)
+                      }
+                      className="px-2 py-1 border rounded"
+                    >
+                      <option value="Actif"> Actif</option>
+                      <option value="Inactif">Inactif</option>
+                      <option value="En Maintenance">En Maintenance</option>
+                    </select>
+
                     <button
                       onClick={() => handleDelete(generator._id)}
                       className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
                     >
-                      Supprimer
+                      <Trash />
                     </button>
-                    <select
-                      value={generator.status}
-                      onChange={(e) => handleStatusChange(generator._id, e.target.value)}
-                      className="px-2 py-1 border rounded"
-                    >
-                      <option value="Actif">Actif</option>
-                      <option value="Inactif">Inactif</option>
-                      <option value="En Maintenance">En Maintenance</option>
-                    </select>
                   </td>
                 </tr>
               ))}
@@ -195,7 +264,9 @@ const AdminGenerator = () => {
             <h2 className="text-lg font-bold mb-4">Ajouter un Générateur</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-600">Nom</label>
+                <label className="block text-sm font-medium text-gray-600">
+                  Nom
+                </label>
                 <input
                   type="text"
                   name="nom"
@@ -206,7 +277,9 @@ const AdminGenerator = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-600">Description</label>
+                <label className="block text-sm font-medium text-gray-600">
+                  Description
+                </label>
                 <textarea
                   name="description"
                   value={formData.description}
@@ -215,7 +288,9 @@ const AdminGenerator = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-600">Note</label>
+                <label className="block text-sm font-medium text-gray-600">
+                  Note
+                </label>
                 <textarea
                   name="note"
                   value={formData.note}
@@ -237,7 +312,9 @@ const AdminGenerator = () => {
               </div>
               <div className="flex gap-4">
                 <div className="flex-1">
-                  <label className="block text-sm font-medium text-gray-600">Version</label>
+                  <label className="block text-sm font-medium text-gray-600">
+                    Version
+                  </label>
                   <input
                     type="text"
                     name="version"
@@ -247,7 +324,9 @@ const AdminGenerator = () => {
                   />
                 </div>
                 <div className="flex-1">
-                  <label className="block text-sm font-medium text-gray-600">Statut</label>
+                  <label className="block text-sm font-medium text-gray-600">
+                    Statut
+                  </label>
                   <select
                     name="status"
                     value={formData.status}
@@ -262,7 +341,9 @@ const AdminGenerator = () => {
               </div>
               <div className="flex gap-4">
                 <div className="flex-1">
-                  <label className="block text-sm font-medium text-gray-600">Type</label>
+                  <label className="block text-sm font-medium text-gray-600">
+                    Type
+                  </label>
                   <select
                     name="type"
                     value={formData.type}
@@ -284,7 +365,9 @@ const AdminGenerator = () => {
                     checked={formData.multisociete}
                     onChange={handleInputChange}
                   />
-                  <label className="text-sm font-medium text-gray-600">Multi-société</label>
+                  <label className="text-sm font-medium text-gray-600">
+                    Multi-société
+                  </label>
                 </div>
               </div>
               <div>
