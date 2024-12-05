@@ -11,7 +11,7 @@ export const LOGS_URL = `${BASE_URL}/logs`;
 export const REPPORTGENERATORS_URL = `${BASE_URL}/repports-generator`;
 export const TICKETS_URL = `${BASE_URL}/tickets`;
 export const DOCUMENTS_URL = `${BASE_URL}/documents`;
-export const REPORTS_URL = `${BASE_URL}/reports`;
+export const REPPORTS_URL = `${BASE_URL}/reports`;
 
 
 

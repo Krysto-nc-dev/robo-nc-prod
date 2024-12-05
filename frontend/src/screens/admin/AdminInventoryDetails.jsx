@@ -202,30 +202,30 @@ const AdminInventoryDetails = () => {
             </Box>
 
             <Box display="flex" gap={2}>
-  <Button
-    variant="contained"
-    color="primary"
-    onClick={handleGeneratePDF}
-    startIcon={<PictureAsPdf />}
-  >
-    Générer PDF
-  </Button>
-  <Button
-    variant="contained"
-    color="primary"
-    onClick={() => setIsZoneModalOpen(true)}
-  >
-    Ajouter Zone
-  </Button>
-  <Link
-  to={`/admin/inventories-suivie/${inventoryId}`}
-  style={{ textDecoration: 'none' }}
->
-  <Button variant="outlined" color="secondary">
-    Aller à l'Inventaire
-  </Button>
-</Link>
-</Box>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleGeneratePDF}
+                startIcon={<PictureAsPdf />}
+              >
+                Générer PDF
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => setIsZoneModalOpen(true)}
+              >
+                Ajouter Zone
+              </Button>
+              <Link
+                to={`/admin/inventories-suivie/${inventoryId}`}
+                style={{ textDecoration: 'none' }}
+              >
+                <Button variant="outlined" color="secondary">
+                  Aller à l'Inventaire
+                </Button>
+              </Link>
+            </Box>
 
           </Box>
 

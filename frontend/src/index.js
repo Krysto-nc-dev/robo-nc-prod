@@ -34,11 +34,13 @@ import AdminSettings from "./screens/admin/AdminSettings";
 import AdminFilliales from "./screens/admin/AdminFilliales";
 import AdminProfileScreen from "./screens/admin/AdminProfileScreen.jsx";
 
+import AdminReports from "./screens/admin/AdminReports";
 import AdminfillialeDetails from "./screens/admin/AdminfillialeDetails.jsx";
 import AdminLogs from "./screens/admin/AdminLogs.jsx";
 import AdminGenerator from "./screens/admin/AdminGenerator.jsx";
 import AdminAppGeneratorDetails from "./screens/admin/AdminAppGeneratorDetails.jsx";
 import UserInventorieBoard from "./screens/user/UserInventorieBoard.jsx";
+import AdminReportDetails from "./screens/admin/AdminReportDetails.jsx";
 
 
 
@@ -56,6 +58,8 @@ const router = createBrowserRouter(
         <Route path="users" element={<AdminUsers />} />
         <Route path="filliales" element={<AdminFilliales />} />
         <Route path="filliales/:id" element={<AdminfillialeDetails/>} />
+        <Route path="repports" element={<AdminReports/>} />
+        <Route path="reports/:id" element={<AdminReportDetails/>} />
 
         <Route path="users/:id" element={<AdminUserDetails />} />
         <Route path="inventories/documentation" element={<AdminInventoryDocumentation />} />
