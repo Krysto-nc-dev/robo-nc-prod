@@ -28,16 +28,26 @@ import {
   useGetInventoryByIdQuery,
   useUpdateInventoryMutation,
 } from "../../slices/inventorySlice";
-import { useCreateAgentMutation } from "../../slices/agentSlice";
-import { Save, Edit, PictureAsPdf, Delete } from "@mui/icons-material";
+import {
+  useCreateZoneMutation,
+  useGetZonesQuery,
+} from "../../slices/zoneSlice";
+import { Save, Edit, PictureAsPdf } from "@mui/icons-material";
 
 const AdminInventoryDetails = () => {
   const { id: inventoryId } = useParams();
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isZoneModalOpen, setIsZoneModalOpen] = useState(false);
+  const [zoneData, setZoneData] = useState({
+    nom: "",
+    designation: "",
+    observation: "",
+    lieu: "",
+  });
+
   const [editMode, setEditMode] = useState(false);
   const [updatedName, setUpdatedName] = useState("");
-  const [formData, setFormData] = useState({ nom: "", prenom: "" });
-  const [createAgent, { isLoading: isCreating }] = useCreateAgentMutation();
+
+  const [createZone, { isLoading: isCreatingZone }] = useCreateZoneMutation();
   const [updateInventory] = useUpdateInventoryMutation();
 
   const {
@@ -47,11 +57,13 @@ const AdminInventoryDetails = () => {
     refetch,
   } = useGetInventoryByIdQuery(inventoryId);
 
-  const completedZonesCount = inventory?.zones.filter((zone) =>
+  const { data: zones, refetch: refetchZones } = useGetZonesQuery();
+
+  const completedZonesCount = zones?.filter((zone) =>
     zone.parties.every((part) => part.status === "Terminé")
   ).length;
 
-  const totalZonesCount = inventory?.zones.length || 0;
+  const totalZonesCount = zones?.length || 0;
 
   const progressPercentage =
     totalZonesCount > 0
@@ -92,34 +104,27 @@ const AdminInventoryDetails = () => {
     }
   };
 
-  const handleChange = (e) => {
+  const handleZoneChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value.trim() }));
+    setZoneData((prev) => ({ ...prev, [name]: value.trim() }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!formData.nom || !formData.prenom) {
-      console.error("Nom et prénom sont obligatoires.");
-      return;
-    }
-
-    if (!inventoryId) {
-      console.error("L'ID de l'inventaire est manquant.");
+  const handleAddZone = async () => {
+    if (!zoneData.nom || !zoneData.designation || !zoneData.lieu) {
+      console.error("Tous les champs obligatoires doivent être remplis.");
       return;
     }
 
     try {
-      await createAgent({
-        nom: formData.nom,
-        prenom: formData.prenom,
+      await createZone({
+        ...zoneData,
         inventaire: inventoryId,
       }).unwrap();
-      setFormData({ nom: "", prenom: "" });
-      setIsModalOpen(false);
-      await refetch();
+      setZoneData({ nom: "", designation: "", observation: "", lieu: "" });
+      setIsZoneModalOpen(false);
+      await refetchZones();
     } catch (error) {
-      console.error("Erreur lors de l'ajout de l'agent :", error);
+      console.error("Erreur lors de la création de la zone :", error);
     }
   };
 
@@ -140,12 +145,7 @@ const AdminInventoryDetails = () => {
 
   if (inventoryLoading) {
     return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        height="100vh"
-      >
+      <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
         <Typography variant="body1">Chargement...</Typography>
       </Box>
     );
@@ -153,12 +153,7 @@ const AdminInventoryDetails = () => {
 
   if (inventoryError) {
     return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        height="100vh"
-      >
+      <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
         <Typography color="error" variant="body1">
           Erreur lors du chargement des données.
         </Typography>
@@ -171,12 +166,7 @@ const AdminInventoryDetails = () => {
       {inventory && (
         <Box>
           {/* Header */}
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-            mb={3}
-          >
+          <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
             <Box>
               {editMode ? (
                 <Box display="flex" alignItems="center" gap={2}>
@@ -195,11 +185,7 @@ const AdminInventoryDetails = () => {
                   >
                     Enregistrer
                   </Button>
-                  <Button
-                    variant="outlined"
-                    color="error"
-                    onClick={() => setEditMode(false)}
-                  >
+                  <Button variant="outlined" color="error" onClick={() => setEditMode(false)}>
                     Annuler
                   </Button>
                 </Box>
@@ -216,31 +202,34 @@ const AdminInventoryDetails = () => {
             </Box>
 
             <Box display="flex" gap={2}>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleGeneratePDF}
-                startIcon={<PictureAsPdf />}
-              >
-                Générer PDF
-              </Button>
-              <Button
-                variant="contained"
-                color="success"
-                onClick={() => setIsModalOpen(true)}
-              >
-                Ajouter Agent
-              </Button>
-              <Link
-                to={`/admin/inventories-suivie/${inventoryId}`}
-                className="py-2 px-4 text-sm font-semibold text-white rounded bg-gray-700 hover:bg-gray-800 shadow-md"
-              >
-                Commencer
-              </Link>
-            </Box>
+  <Button
+    variant="contained"
+    color="primary"
+    onClick={handleGeneratePDF}
+    startIcon={<PictureAsPdf />}
+  >
+    Générer PDF
+  </Button>
+  <Button
+    variant="contained"
+    color="primary"
+    onClick={() => setIsZoneModalOpen(true)}
+  >
+    Ajouter Zone
+  </Button>
+  <Link
+  to={`/admin/inventories-suivie/${inventoryId}`}
+  style={{ textDecoration: 'none' }}
+>
+  <Button variant="outlined" color="secondary">
+    Aller à l'Inventaire
+  </Button>
+</Link>
+</Box>
+
           </Box>
 
-          {/* Statistics */}
+          {/* Zones */}
           <Grid container spacing={2} mb={4}>
             <Grid item xs={12} sm={4}>
               <Card>
@@ -275,26 +264,26 @@ const AdminInventoryDetails = () => {
             </Grid>
           </Grid>
 
-          {/* Agents Table */}
+          {/* Zones Table */}
           <Box mt={4}>
             <Typography variant="h6" gutterBottom>
-              Liste des Agents Associés
+              Liste des Zones
             </Typography>
             <TableContainer component={Paper}>
               <Table>
                 <TableHead>
                   <TableRow>
                     <TableCell>Nom</TableCell>
-                    <TableCell>Prénom</TableCell>
-                    <TableCell>ID</TableCell>
+                    <TableCell>Designation</TableCell>
+                    <TableCell>Lieu</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {inventory.agents.map((agent) => (
-                    <TableRow key={agent._id}>
-                      <TableCell>{agent.nom}</TableCell>
-                      <TableCell>{agent.prenom}</TableCell>
-                      <TableCell>{agent._id}</TableCell>
+                  {zones?.map((zone) => (
+                    <TableRow key={zone._id}>
+                      <TableCell>{zone.nom}</TableCell>
+                      <TableCell>{zone.designation}</TableCell>
+                      <TableCell>{zone.lieu}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -302,38 +291,55 @@ const AdminInventoryDetails = () => {
             </TableContainer>
           </Box>
 
-          {/* Modal */}
-          <Dialog open={isModalOpen} onClose={() => setIsModalOpen(false)}>
-            <DialogTitle>Ajouter un Agent</DialogTitle>
+          {/* Add Zone Dialog */}
+          <Dialog open={isZoneModalOpen} onClose={() => setIsZoneModalOpen(false)}>
+            <DialogTitle>Ajouter une Zone</DialogTitle>
             <DialogContent>
               <TextField
                 fullWidth
                 label="Nom"
                 name="nom"
-                value={formData.nom}
-                onChange={handleChange}
+                value={zoneData.nom}
+                onChange={handleZoneChange}
                 margin="dense"
                 required
               />
               <TextField
                 fullWidth
-                label="Prénom"
-                name="prenom"
-                value={formData.prenom}
-                onChange={handleChange}
+                label="Designation"
+                name="designation"
+                value={zoneData.designation}
+                onChange={handleZoneChange}
                 margin="dense"
                 required
               />
+              <TextField
+                fullWidth
+                label="Lieu"
+                name="lieu"
+                value={zoneData.lieu}
+                onChange={handleZoneChange}
+                margin="dense"
+                required
+              />
+              <TextField
+                fullWidth
+                label="Observation"
+                name="observation"
+                value={zoneData.observation}
+                onChange={handleZoneChange}
+                margin="dense"
+              />
             </DialogContent>
             <DialogActions>
-              <Button onClick={() => setIsModalOpen(false)} color="secondary">
+              <Button onClick={() => setIsZoneModalOpen(false)} color="secondary">
                 Annuler
               </Button>
               <Button
-                onClick={handleSubmit}
+                onClick={handleAddZone}
                 variant="contained"
                 color="primary"
-                disabled={isCreating}
+                disabled={isCreatingZone}
               >
                 Ajouter
               </Button>

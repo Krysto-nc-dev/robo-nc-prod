@@ -1,6 +1,9 @@
 import asyncHandler from '../middlewares/async.js';
 import Zone from '../models/zoneModel.js';
 import { v4 as uuidv4 } from 'uuid';
+import Inventory from '../models/inventoryModel.js';
+import { generateBarcode } from '../utils/barcode.js'; // Fonction pour générer un code-barres unique
+
 
 // Fonction pour générer un code-barre unique
 const generateCodeBarre = () => uuidv4().slice(0, 8);
@@ -16,32 +19,81 @@ const getZones = asyncHandler(async (req, res) => {
 // @desc    Create a new zone
 // @route   POST /api/zones
 // @access  Public
+// const createZone = asyncHandler(async (req, res) => {
+//   const { nom, designation, lieu, observation, inventaire } = req.body;
+
+//   if (!nom || !designation || !lieu) {
+//     res.status(400);
+//     throw new Error('Veuillez fournir le nom, la désignation et le lieu.');
+//   }
+
+//   const parties = [
+//     { type: 'COMPTAGE', codeBarre: generateCodeBarre(), status: 'À faire' },
+//     { type: 'BIPAGE', codeBarre: generateCodeBarre(), status: 'À faire' },
+//     { type: 'CONTROLE', codeBarre: generateCodeBarre(), status: 'À faire' },
+//   ];
+
+//   const zone = new Zone({
+//     nom,
+//     designation,
+//     observation,
+//     lieu,
+//     parties,
+//     inventaire,
+//   });
+
+//   const createdZone = await zone.save();
+//   res.status(201).json(createdZone);
+// });
+// @desc    Ajouter une nouvelle zone
+// @route   POST /api/zones
+// @access  Public
 const createZone = asyncHandler(async (req, res) => {
   const { nom, designation, lieu, observation, inventaire } = req.body;
 
-  if (!nom || !designation || !lieu) {
+  // Validation des champs obligatoires
+  if (!nom || !designation || !lieu || !inventaire) {
     res.status(400);
-    throw new Error('Veuillez fournir le nom, la désignation et le lieu.');
+    throw new Error('Veuillez fournir un nom, une désignation, un lieu, et un inventaire associé.');
   }
 
+  // Vérification que l'inventaire existe
+  const existingInventory = await Inventory.findById(inventaire);
+  if (!existingInventory) {
+    res.status(404);
+    throw new Error("Inventaire associé introuvable.");
+  }
+
+  // Génération des parties avec codes-barres
   const parties = [
-    { type: 'COMPTAGE', codeBarre: generateCodeBarre(), status: 'À faire' },
-    { type: 'BIPAGE', codeBarre: generateCodeBarre(), status: 'À faire' },
-    { type: 'CONTROLE', codeBarre: generateCodeBarre(), status: 'À faire' },
+    { type: 'COMPTAGE', codeBarre: generateBarcode(), status: 'À faire' },
+    { type: 'BIPAGE', codeBarre: generateBarcode(), status: 'À faire' },
+    { type: 'CONTROLE', codeBarre: generateBarcode(), status: 'À faire' },
   ];
 
-  const zone = new Zone({
+  // Création de la zone
+  const newZone = new Zone({
     nom,
     designation,
-    observation,
     lieu,
+    observation,
     parties,
     inventaire,
   });
 
-  const createdZone = await zone.save();
-  res.status(201).json(createdZone);
+  // Sauvegarde de la zone
+  const createdZone = await newZone.save();
+
+  // Ajout de la zone à l'inventaire associé
+  existingInventory.zones.push(createdZone._id);
+  await existingInventory.save();
+
+  res.status(201).json({
+    message: 'Zone créée avec succès.',
+    zone: createdZone,
+  });
 });
+
 
 // @desc    Get zone by ID
 // @route   GET /api/zones/:id
