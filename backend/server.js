@@ -4,7 +4,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import cors from "cors";
 import connectDB from "./config/db.js";
-import cookieParser from "cookie-parser"; // Ajout du middleware pour gérer les cookies
+import cookieParser from "cookie-parser"; // Middleware pour gérer les cookies
 import morgan from "morgan";
 import colors from "colors";
 import errorHandler from "./middlewares/error.js";
@@ -94,6 +94,13 @@ app.use("/repports-generator", repportGeneratorRoutes);
 app.use("/tickets", ticketRoutes);
 app.use("/logs", logRoutes);
 app.use("/reports", reportRoutes);
+
+// Middleware pour vérifier l'autorisation et déboguer
+app.use((req, res, next) => {
+  console.log("Authorization Header:", req.headers.authorization);
+  console.log("Cookies:", req.cookies);
+  next();
+});
 
 // Middleware pour gérer les erreurs 404
 app.use((req, res, next) => {
