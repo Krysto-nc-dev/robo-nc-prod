@@ -19,11 +19,22 @@ const getReports = asyncHandler(async (req, res) => {
 // @route   POST /api/reports
 // @access  Public
 const createReport = asyncHandler(async (req, res) => {
-  const { nom, description, note, status, type, tickets, documents, maintainedBy } = req.body;
+  const {
+    nom,
+    description,
+    note,
+    status,
+    type,
+    category,
+    tickets,
+    documents,
+    maintainedBy,
+    frequence,
+  } = req.body;
 
-  if (!nom || !type) {
+  if (!nom || !type || !frequence?.type || !category) {
     res.status(400);
-    throw new Error('Veuillez fournir les champs requis : nom, type.');
+    throw new Error('Veuillez fournir les champs requis : nom, type, frequence.type, category.');
   }
 
   const report = new Repport({
@@ -32,9 +43,11 @@ const createReport = asyncHandler(async (req, res) => {
     note,
     status,
     type,
+    category,
     tickets,
     documents,
     maintainedBy,
+    frequence,
   });
 
   const createdReport = await report.save();
@@ -46,7 +59,7 @@ const createReport = asyncHandler(async (req, res) => {
     category: 'Rapport',
     target: 'Rapport',
     targetId: createdReport._id,
-    details: { nom: createdReport.nom, type: createdReport.type },
+    details: { nom: createdReport.nom, type: createdReport.type, category: createdReport.category },
     result: 'Succès',
     ipAddress: req.ip,
     location: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
@@ -125,7 +138,7 @@ const deleteReport = asyncHandler(async (req, res) => {
     category: 'Rapport',
     target: 'Rapport',
     targetId: req.params.id,
-    details: { nom: report.nom },
+    details: { nom: report.nom, category: report.category },
     result: 'Succès',
     ipAddress: req.ip,
     location: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
@@ -171,7 +184,7 @@ const addDocumentToReport = asyncHandler(async (req, res) => {
     category: 'Rapport',
     target: 'Rapport',
     targetId: id,
-    details: { documentName: document.name },
+    details: { documentName: document.name, category: report.category },
     result: 'Succès',
     ipAddress: req.ip,
     location: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
@@ -207,7 +220,10 @@ const generatePDFReport = asyncHandler(async (req, res) => {
   doc.fontSize(14).text(`Description : ${report.description || 'Aucune'}`);
   doc.moveDown();
   doc.text(`Statut : ${report.status}`);
+  doc.text(`Catégorie : ${report.category}`);
   doc.text(`Dernière exécution : ${report.lastExecution || 'Jamais'}`);
+  doc.text(`Fréquence : ${report.frequence?.type || 'Non spécifiée'}`);
+  doc.text(`Détails Fréquence : ${report.frequence?.details || 'Aucun'}`);
   doc.moveDown();
 
   if (report.documents.length > 0) {
@@ -230,11 +246,11 @@ const generatePDFReport = asyncHandler(async (req, res) => {
 });
 
 export {
-    getReports,
-    createReport,
-    getReportById,
-    updateReport,
-    deleteReport,
-    addDocumentToReport,
-    generatePDFReport,
-  };
+  getReports,
+  createReport,
+  getReportById,
+  updateReport,
+  deleteReport,
+  addDocumentToReport,
+  generatePDFReport,
+};

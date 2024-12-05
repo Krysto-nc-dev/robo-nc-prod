@@ -1,21 +1,36 @@
 import React, { useState } from 'react';
-import { useGetReportsQuery, useCreateReportMutation } from '../../slices/reportApiSlice';
-import { useNavigate } from 'react-router-dom'; // Utilisé pour rediriger vers la page des détails
+import {
+  useGetReportsQuery,
+  useCreateReportMutation,
+  useDeleteReportMutation,
+} from '../../slices/reportApiSlice';
+import { useGetUsersQuery } from '../../slices/userApiSlice'; // Hook pour récupérer les utilisateurs
+import { useNavigate } from 'react-router-dom';
+import { Eye, PlusCircle, Trash } from 'lucide-react';
 
 const AdminReports = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [filter, setFilter] = useState(''); // État pour le filtre
+  const [filter, setFilter] = useState('');
+  const [typeFilter, setTypeFilter] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('');
+
   const [newReportData, setNewReportData] = useState({
     nom: '',
     description: '',
     note: '',
     status: 'Actif',
     type: 'Access',
+    category: 'Codeve',
+    maintainedBy: '',
+    frequence: { type: 'Mensuel', details: '' },
   });
 
+  // Récupération des données depuis les slices
   const { data: reports, isLoading, isError } = useGetReportsQuery();
+  const { data: users, isLoading: isLoadingUsers } = useGetUsersQuery();
   const [createReport, { isLoading: isCreating }] = useCreateReportMutation();
-  const navigate = useNavigate(); // Hook pour la navigation
+  const [deleteReport] = useDeleteReportMutation();
+  const navigate = useNavigate();
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => {
@@ -26,6 +41,9 @@ const AdminReports = () => {
       note: '',
       status: 'Actif',
       type: 'Access',
+      category: 'Codeve',
+      maintainedBy: '',
+      frequence: { type: 'Mensuel', details: '' },
     });
   };
 
@@ -39,31 +57,76 @@ const AdminReports = () => {
     }
   };
 
-  const filteredReports = reports?.filter((report) =>
-    report.nom.toLowerCase().includes(filter.toLowerCase())
-  );
+  const handleDeleteReport = async (id) => {
+    if (window.confirm('Voulez-vous vraiment supprimer ce rapport ?')) {
+      try {
+        await deleteReport(id).unwrap();
+        alert('Rapport supprimé avec succès.');
+      } catch (error) {
+        console.error('Erreur lors de la suppression du rapport :', error);
+      }
+    }
+  };
 
-  if (isLoading) return <p>Chargement des rapports...</p>;
+  const filteredReports = reports?.filter((report) => {
+    return (
+      report.nom.toLowerCase().includes(filter.toLowerCase()) &&
+      (typeFilter ? report.type === typeFilter : true) &&
+      (categoryFilter ? report.category === categoryFilter : true)
+    );
+  });
+
+  if (isLoading || isLoadingUsers) return <p>Chargement...</p>;
   if (isError) return <p>Erreur lors du chargement des rapports.</p>;
 
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Rapports</h1>
-      <button
-        onClick={openModal}
-        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 mb-4"
-      >
-        Ajouter un rapport
-      </button>
+      <div className="flex justify-between items-center mb-4">
+        <button
+          onClick={openModal}
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center justify-center"
+        >
+          <PlusCircle className="mr-2"/> Ajouter un rapport
+        </button>
 
-      {/* Champ de recherche */}
-      <input
-        type="text"
-        placeholder="Rechercher par nom"
-        value={filter}
-        onChange={(e) => setFilter(e.target.value)}
-        className="w-full px-3 py-2 border rounded mb-4"
-      />
+        <input
+          type="text"
+          placeholder="Rechercher par nom"
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          className="px-3 py-2 border rounded"
+        />
+      </div>
+
+      {/* Filtres */}
+      <div className="flex gap-4 mb-4">
+        <select
+          value={typeFilter}
+          onChange={(e) => setTypeFilter(e.target.value)}
+          className="px-3 py-2 border rounded"
+        >
+          <option value="">Tous les types</option>
+          <option value="Access">Access</option>
+          <option value="Script">Script</option>
+          <option value="Python">Python</option>
+          <option value="Excel">Excel</option>
+          <option value="PowerBI">PowerBI</option>
+          <option value="Autre">Autre</option>
+        </select>
+
+        <select
+          value={categoryFilter}
+          onChange={(e) => setCategoryFilter(e.target.value)}
+          className="px-3 py-2 border rounded"
+        >
+          <option value="">Toutes les catégories</option>
+          <option value="Codeve">Codeve</option>
+          <option value="Global">Global</option>
+          <option value="Master">Master</option>
+          <option value="Autre">Autre</option>
+        </select>
+      </div>
 
       {/* Tableau des rapports */}
       <div className="overflow-x-auto">
@@ -74,33 +137,45 @@ const AdminReports = () => {
               <th className="border border-gray-300 px-4 py-2">Description</th>
               <th className="border border-gray-300 px-4 py-2">Statut</th>
               <th className="border border-gray-300 px-4 py-2">Type</th>
+              <th className="border border-gray-300 px-4 py-2">Catégorie</th>
+              <th className="border border-gray-300 px-4 py-2">Maintenu par</th>
+              <th className="border border-gray-300 px-4 py-2">Actions</th>
             </tr>
           </thead>
           <tbody>
             {filteredReports?.length > 0 ? (
               filteredReports.map((report) => (
-                <tr key={report.id} className="hover:bg-gray-100">
-                  <td
-                    className="border border-gray-300 px-4 py-2 text-blue-500 cursor-pointer"
-                    onClick={() => navigate(`/admin/reports/${report._id}`)}
-                  >
-                    {report.nom}
-                  </td>
+                <tr key={report._id} className="hover:bg-gray-100">
+                  <td className="border border-gray-300 px-4 py-2">{report.nom}</td>
                   <td className="border border-gray-300 px-4 py-2">
                     {report.description || '-'}
                   </td>
+                  <td className="border border-gray-300 px-4 py-2">{report.status}</td>
+                  <td className="border border-gray-300 px-4 py-2">{report.type}</td>
+                  <td className="border border-gray-300 px-4 py-2">{report.category}</td>
                   <td className="border border-gray-300 px-4 py-2">
-                    {report.status}
+                    {report.maintainedBy?.name || 'Non attribué'}
                   </td>
-                  <td className="border border-gray-300 px-4 py-2">
-                    {report.type}
+                  <td className="border border-gray-300 px-4 py-2 flex gap-2">
+                    <button
+                      onClick={() => navigate(`/admin/reports/${report._id}`)}
+                      className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
+                    >
+                      <Eye/>
+                    </button>
+                    <button
+                      onClick={() => handleDeleteReport(report._id)}
+                      className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                    >
+                      <Trash/>
+                    </button>
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
                 <td
-                  colSpan="4"
+                  colSpan="7"
                   className="text-center border border-gray-300 px-4 py-2"
                 >
                   Aucun rapport trouvé.
@@ -137,32 +212,22 @@ const AdminReports = () => {
                     setNewReportData({ ...newReportData, description: e.target.value })
                   }
                   className="w-full px-3 py-2 border rounded"
-                  rows="4"
+                  rows="3"
                 />
               </div>
               <div className="mb-4">
-                <label className="block font-semibold mb-2">Note</label>
-                <textarea
-                  value={newReportData.note}
-                  onChange={(e) =>
-                    setNewReportData({ ...newReportData, note: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border rounded"
-                  rows="2"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block font-semibold mb-2">Statut</label>
+                <label className="block font-semibold mb-2">Catégorie</label>
                 <select
-                  value={newReportData.status}
+                  value={newReportData.category}
                   onChange={(e) =>
-                    setNewReportData({ ...newReportData, status: e.target.value })
+                    setNewReportData({ ...newReportData, category: e.target.value })
                   }
                   className="w-full px-3 py-2 border rounded"
                 >
-                  <option value="Actif">Actif</option>
-                  <option value="Inactif">Inactif</option>
-                  <option value="En Maintenance">En Maintenance</option>
+                  <option value="Codeve">Codeve</option>
+                  <option value="Global">Global</option>
+                  <option value="Master">Master</option>
+                  <option value="Autre">Autre</option>
                 </select>
               </div>
               <div className="mb-4">
@@ -181,6 +246,58 @@ const AdminReports = () => {
                   <option value="PowerBI">PowerBI</option>
                   <option value="Autre">Autre</option>
                 </select>
+              </div>
+              <div className="mb-4">
+                <label className="block font-semibold mb-2">Maintenu par</label>
+                <select
+                  value={newReportData.maintainedBy}
+                  onChange={(e) =>
+                    setNewReportData({ ...newReportData, maintainedBy: e.target.value })
+                  }
+                  className="w-full px-3 py-2 border rounded"
+                  required
+                >
+                  <option value="">-- Sélectionner --</option>
+                  {users?.map((user) => (
+                    <option key={user._id} value={user._id}>
+                      {user.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="mb-4">
+                <label className="block font-semibold mb-2">Fréquence</label>
+                <select
+                  value={newReportData.frequence.type}
+                  onChange={(e) =>
+                    setNewReportData({
+                      ...newReportData,
+                      frequence: { ...newReportData.frequence, type: e.target.value },
+                    })
+                  }
+                  className="w-full px-3 py-2 border rounded"
+                >
+                  <option value="Journalier">Journalier</option>
+                  <option value="Hebdomadaire">Hebdomadaire</option>
+                  <option value="Mensuel">Mensuel</option>
+                  <option value="Bi-Mensuel">Bi-Mensuel</option>
+                  <option value="Trimestriel">Trimestriel</option>
+                  <option value="Annuel">Annuel</option>
+                </select>
+              </div>
+              <div className="mb-4">
+                <label className="block font-semibold mb-2">Détails de la fréquence</label>
+                <textarea
+                  value={newReportData.frequence.details}
+                  onChange={(e) =>
+                    setNewReportData({
+                      ...newReportData,
+                      frequence: { ...newReportData.frequence, details: e.target.value },
+                    })
+                  }
+                  className="w-full px-3 py-2 border rounded"
+                  rows="2"
+                />
               </div>
               <div className="flex justify-end">
                 <button

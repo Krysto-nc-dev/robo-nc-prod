@@ -21,7 +21,18 @@ export const repportApiSlice = apiSlice.injectEndpoints({
       query: (data) => ({
         url: `${REPPORTS_URL}`,
         method: 'POST',
-        body: data,
+        body: {
+          nom: data.nom,
+          description: data.description,
+          note: data.note,
+          status: data.status,
+          type: data.type,
+          category: data.category, // Ajout de category
+          tickets: data.tickets,
+          documents: data.documents,
+          maintainedBy: data.maintainedBy,
+          frequence: data.frequence, // Ajout de frequence
+        },
         credentials: 'include',
       }),
       invalidatesTags: ['Repport'],
@@ -43,7 +54,18 @@ export const repportApiSlice = apiSlice.injectEndpoints({
       query: (data) => ({
         url: `${REPPORTS_URL}/${data.id}`,
         method: 'PUT',
-        body: data,
+        body: {
+          nom: data.nom,
+          description: data.description,
+          note: data.note,
+          status: data.status,
+          type: data.type,
+          category: data.category, // Ajout de category
+          tickets: data.tickets,
+          documents: data.documents,
+          maintainedBy: data.maintainedBy,
+          frequence: data.frequence, // Ajout de frequence
+        },
         credentials: 'include',
       }),
       invalidatesTags: ['Repport'],

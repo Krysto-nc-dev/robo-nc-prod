@@ -17,13 +17,11 @@ const RepportSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
-
     status: {
       type: String,
       enum: ["Actif", "Inactif", "En Maintenance"],
       default: "Actif",
     },
-
     type: {
       type: String,
       enum: ["Access", "Script", "Python", "Excel", "PowerBI", "Autre"],
@@ -41,7 +39,11 @@ const RepportSchema = new mongoose.Schema(
         ref: "Document", // Référence au modèle Document
       },
     ],
-
+    category: {
+      type: String,
+      enum: ["Codeve", "Global", "Master", "Autre"],
+      default: "Access",
+    },
     maintainedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User", // Référence à l'utilisateur ou équipe en charge de la maintenance
@@ -50,7 +52,19 @@ const RepportSchema = new mongoose.Schema(
       type: Date,
       default: null, // Date de dernière exécution du générateur
     },
-
+    frequence: {
+      type: {
+        type: String,
+        enum: ["Journalier", "Hebdomadaire", "Mensuel", "Bi-Mensuel", "Trimestriel", "Annuel"],
+        required: true,
+        default: "Mensuel",
+      },
+      details: {
+        type: String,
+        trim: true,
+        maxlength: [500, "Les détails de la fréquence ne peuvent pas dépasser 500 caractères"],
+      },
+    },
   },
   { timestamps: true } // Ajout de `createdAt` et `updatedAt`
 );
