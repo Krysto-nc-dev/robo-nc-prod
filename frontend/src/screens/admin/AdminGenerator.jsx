@@ -109,11 +109,12 @@ const AdminGenerator = () => {
   return (
     <div className="p-4">
       <h1 className="text-xl font-bold mb-4">
-        Gestion des Générateurs de Rapport
+       Générateurs de Rapport & applications
       </h1>
 
-      {/* Barre de recherche */}
-      <div className="mb-4">
+      <div className="flex">
+  {/* Barre de recherche */}
+  <div className="mb-4">
         <input
           type="text"
           value={searchTerm}
@@ -130,6 +131,9 @@ const AdminGenerator = () => {
       >
         <PlusCircle /> Ajouter un Générateur
       </button>
+      </div>
+
+    
 
       {/* Liste des générateurs */}
       <div className="mt-6">
@@ -143,7 +147,7 @@ const AdminGenerator = () => {
         ) : (
           <table className="min-w-full bg-white border border-gray-200 rounded shadow">
             <thead>
-              <tr className="bg-gray-100 border-b border-gray-200">
+              <tr className="bg-blue-300 text-blue-900 border-b border-gray-200">
                 <th className="px-4 py-2 text-left">Nom</th>
                 <th className="px-4 py-2 text-left">Type</th>
                 <th className="px-4 py-2 text-left">Statut</th>
@@ -163,7 +167,25 @@ const AdminGenerator = () => {
                       {generator.nom}
                     </Link>
                   </td>
-                  <td className="px-4 py-2 text-[13px]">{generator.type}</td>
+                  <td className="border border-gray-300 px-4 py-2">
+  <span
+    className={`px-2 py-1 text-xs font-bold rounded ${
+      generator.type === "Access"
+        ? "bg-red-100 text-red-700 "
+        : generator.type === "Script"
+        ? "bg-yellow-100 text-yellow-700"
+        : generator.type === "Python"
+        ? "bg-green-100 text-green-700"
+        : generator.type === "Excel"
+        ? "bg-purple-100 text-purple-700"
+        : generator.type === "PowerBI"
+        ? "bg-red-100 text-yellow-700"
+        : "bg-gray-100 text-gray-700"
+    }`}
+  >
+    {generator.type}
+  </span>
+</td>
                   <td className="px-4 py-2 text-[13px]">
   {generator.status === "Actif" ? (
     <span className="flex items-center text-green-500">
