@@ -214,7 +214,7 @@ const AdminLayout = ({ children }) => {
                       <ListItem
                         button
                         component={Link}
-                        to={`/admin/tables/${filliale.acronyme}/articles`}
+                        to={`/admin/${filliale.acronyme}/articles`}
                         sx={{ padding: "6px 36px" }}
                       >
                         <ListItemText primary="Articles" />
@@ -222,7 +222,7 @@ const AdminLayout = ({ children }) => {
                       <ListItem
                         button
                         component={Link}
-                        to={`/admin/${filliale.acronyme}-fournisseurs`}
+                        to={`/admin/tables/${filliale.acronyme}/fournisseurs`}
                         sx={{ padding: "6px 36px" }}
                       >
                         <ListItemText primary="Fournisseurs" />
