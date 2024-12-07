@@ -1,35 +1,77 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { FaUsers, FaBuilding, FaFileAlt } from "react-icons/fa";
 
 const AdminSettings = () => {
   return (
-    <div className="mx-auto">
-      <h1 className="text-lg font-semibold text-gray-800 mb-4">
-        Paramètres d'Administration
-      </h1>
-      <p className="text-sm text-gray-600 mb-6">
-        Accédez aux différentes sections d'administration pour gérer les
-        utilisateurs et les filiales de manière efficace.
-      </p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Link
-          to="/admin/users"
-          className="flex items-center justify-center p-4 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition-colors"
-        >
-          Gestion des Utilisateurs
-        </Link>
-        <Link
-          to="/admin/filliales"
-          className="flex items-center justify-center p-4 bg-green-500 text-white rounded-lg shadow hover:bg-green-600 transition-colors"
-        >
-          Gestion des Filiales
-        </Link>
-        <Link
-          to="/admin/logs"
-          className="flex items-center justify-center p-4 bg-green-500 text-white rounded-lg shadow hover:bg-green-600 transition-colors"
-        >
-          Voir les logs
-        </Link>
+    <div className="p-4">
+      <div className= "p-4">
+        <h1 className="text-2xl font-bold text-gray-800 mb-4">
+          Paramètres d'Administration
+        </h1>
+        <p className="text-gray-600 mb-8">
+          Gérez les différentes sections de l'application avec des outils
+          adaptés pour une administration efficace.
+        </p>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Gestion des Utilisateurs */}
+          <Link
+            to="/admin/users"
+            className="group block p-6 border rounded-lg shadow-md hover:shadow-lg transition-shadow bg-gradient-to-r from-blue-500 to-blue-600 text-white"
+          >
+            <div className="flex items-center mb-4">
+              <FaUsers className="text-4xl mr-4" />
+              <div>
+                <h2 className="text-xl font-semibold">Gestion des Utilisateurs</h2>
+                <p className="text-sm">
+                  Ajouter, modifier ou supprimer des utilisateurs.
+                </p>
+              </div>
+            </div>
+            <div className="text-right text-sm group-hover:underline">
+              Voir les détails →
+            </div>
+          </Link>
+
+          {/* Gestion des Filiales */}
+          <Link
+            to="/admin/filliales"
+            className="group block p-6 border rounded-lg shadow-md hover:shadow-lg transition-shadow bg-gradient-to-r from-green-500 to-green-600 text-white"
+          >
+            <div className="flex items-center mb-4">
+              <FaBuilding className="text-4xl mr-4" />
+              <div>
+                <h2 className="text-xl font-semibold">Gestion des Filiales</h2>
+                <p className="text-sm">
+                  Configurer et gérer les filiales.
+                </p>
+              </div>
+            </div>
+            <div className="text-right text-sm group-hover:underline">
+              Voir les détails →
+            </div>
+          </Link>
+
+          {/* Voir les Logs */}
+          <Link
+            to="/admin/logs"
+            className="group block p-6 border rounded-lg shadow-md hover:shadow-lg transition-shadow bg-gradient-to-r from-purple-500 to-purple-600 text-white"
+          >
+            <div className="flex items-center mb-4">
+              <FaFileAlt className="text-4xl mr-4" />
+              <div>
+                <h2 className="text-xl font-semibold">Voir les Logs</h2>
+                <p className="text-sm">
+                  Consulter les journaux d'activité pour le suivi.
+                </p>
+              </div>
+            </div>
+            <div className="text-right text-sm group-hover:underline">
+              Voir les détails →
+            </div>
+          </Link>
+        </div>
       </div>
     </div>
   );
