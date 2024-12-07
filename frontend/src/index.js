@@ -41,6 +41,9 @@ import AdminGenerator from "./screens/admin/AdminGenerator.jsx";
 import AdminAppGeneratorDetails from "./screens/admin/AdminAppGeneratorDetails.jsx";
 import UserInventorieBoard from "./screens/user/UserInventorieBoard.jsx";
 import AdminReportDetails from "./screens/admin/AdminReportDetails.jsx";
+import AdminFournisseurQcApiSlice from "./screens/admin/AdminFournisseurQcApiSlice.jsx";
+import AdminQcFournisseurDetails from "./screens/admin/AdminQcFournisseurDetails.jsx";
+import AdminQcArticles from "./screens/admin/AdminQcArticles.jsx";
 
 
 
@@ -60,6 +63,9 @@ const router = createBrowserRouter(
         <Route path="filliales/:id" element={<AdminfillialeDetails/>} />
         <Route path="repports" element={<AdminReports/>} />
         <Route path="reports/:id" element={<AdminReportDetails/>} />
+        <Route path="QC-fournisseurs" element={<AdminFournisseurQcApiSlice/>} />
+        <Route path="QC-fournisseur/:id" element={<AdminQcFournisseurDetails/>} />
+        <Route path="QC-articles" element={<AdminQcArticles/>} />
 
         <Route path="users/:id" element={<AdminUserDetails />} />
         <Route path="inventories/documentation" element={<AdminInventoryDocumentation />} />
