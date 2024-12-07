@@ -48,8 +48,39 @@ const AdminLogs = () => {
   }
 
   return (
-    <div className="p-4">
-      <h1 className="text-xl font-bold mb-4">Administration des Logs</h1>
+    <div className="p-4 ">
+      <h1 className="text-xl font-bold mb-4">Logs</h1>
+
+         {/* Analyses des Logs */}
+         <div className="mb-5">
+        
+        {isAnalyticsLoading ? (
+          <div>Chargement des analyses...</div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {analytics?.map((entry) => (
+             <div
+             key={entry._id}
+             className={`p-4 rounded shadow border  ${
+               entry._id === "Créer"
+                 ? "bg-green-300 border-green-500 text-green-800"
+                 : entry._id === "Modifier"
+                 ? "bg-yellow-300 border-yellow-500 text-yellow-800"
+                 : entry._id === "Supprimer"
+                 ? "bg-red-200 border-red-500 text-red-800"
+                 : entry._id === "Consulter"
+                 ? "bg-blue-300 border-blue-500 text-blue-800"
+                 : "bg-gray-300 border-gray-500 text-gray-800"
+             }`}
+           >
+             <h3 className="text-sm font-semibold">{entry._id}</h3>
+             <p className="text-xs font-bold">{entry.total} occurrences</p>
+           </div>
+           
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* Filtres */}
       <form
@@ -60,7 +91,7 @@ const AdminLogs = () => {
           name="user"
           value={filters.user}
           onChange={handleFilterChange}
-          className="border border-gray-400 rounded px-4 py-2"
+          className="border border-gray-400 rounded  text-[13px]"
           disabled={isUsersLoading} // Désactive si la liste des utilisateurs est en cours de chargement
         >
           <option value="">-- Utilisateur --</option>
@@ -74,7 +105,7 @@ const AdminLogs = () => {
           name="action"
           value={filters.action}
           onChange={handleFilterChange}
-          className="border border-gray-400 rounded px-4 py-2"
+          className="border border-gray-400 rounded text-[13px]"
         >
           <option value="">-- Action --</option>
           <option value="Créer">Créer</option>
@@ -86,7 +117,7 @@ const AdminLogs = () => {
           name="category"
           value={filters.category}
           onChange={handleFilterChange}
-          className="border border-gray-400 rounded px-4 py-2"
+          className="border border-gray-400 rounded text-[13px]"
         >
           <option value="">-- Catégorie --</option>
           <option value="Utilisateur">Utilisateur</option>
@@ -99,26 +130,21 @@ const AdminLogs = () => {
           name="startDate"
           value={filters.startDate}
           onChange={handleFilterChange}
-          className="border border-gray-400 rounded px-4 py-2"
+          className="border border-gray-400 rounded text-[13px]"
         />
         <input
           type="date"
           name="endDate"
           value={filters.endDate}
           onChange={handleFilterChange}
-          className="border border-gray-400 rounded px-4 py-2"
+          className="border border-gray-400 rounded text-[13px]"
         />
-        <button
-          type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          Appliquer les filtres
-        </button>
+      
       </form>
 
       {/* Liste des Logs */}
       <div className="mb-6">
-        <h2 className="text-lg font-semibold mb-4">Liste des Logs</h2>
+       
         <div className="overflow-x-auto">
           <table className="min-w-full bg-white border border-gray-200 rounded shadow">
             <thead>
@@ -135,19 +161,37 @@ const AdminLogs = () => {
             <tbody>
               {logs?.map((log) => (
                 <tr key={log._id} className="border-b">
-                  <td className="px-4 py-2">
+                  <td className="px-4 py-2 text-[13px]">
                     {log.user?.name || "Utilisateur inconnu"}
                   </td>
-                  <td className="px-4 py-2">{log.action}</td>
-                  <td className="px-4 py-2">{log.category}</td>
-                  <td className="px-4 py-2">{log.target}</td>
-                  <td className="px-4 py-2">
+                  
+                  <td className="px-4 py-2 text-[13px]">
+  <span
+    className={`px-2 py-1 rounded  text-xs font-bold w-[2rem] ${
+      log.action === "Créer"
+        ? "bg-green-300 text-green-800"
+        : log.action === "Modifier"
+        ? "bg-yellow-300 text-yellow-800"
+        : log.action === "Supprimer"
+        ? "bg-red-300 text-red-800"
+        : log.action === "Consulter"
+        ? "bg-blue-300"
+        : "bg-blue-800"
+    }`}
+  >
+    {log.action}
+  </span>
+</td>
+
+                  <td className="px-4 py-2 text-[13px]">{log.category}</td>
+                  <td className="px-4 py-2 text-[13px]">{log.target}</td>
+                  <td className="px-4 py-2 text-[13px]">
                     {formatIpAddress(log.ipAddress)}
                   </td>
-                  <td className="px-4 py-2">
+                  <td className="px-4 py-2 text-[13px]">
                     {new Date(log.timestamp).toLocaleString()}
                   </td>
-                  <td className="px-4 py-2">
+                  <td className="px-4 py-2 text-[13px]">
                     {typeof log.details === "object"
                       ? JSON.stringify(log.details, null, 2)
                       : log.details}
@@ -159,27 +203,7 @@ const AdminLogs = () => {
         </div>
       </div>
 
-      {/* Analyses des Logs */}
-      <div>
-        <h2 className="text-lg font-semibold mb-4">Analyse des Logs</h2>
-        {isAnalyticsLoading ? (
-          <div>Chargement des analyses...</div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {analytics?.map((entry) => (
-              <div
-                key={entry._id}
-                className="p-4 bg-gray-50 rounded shadow border border-gray-200"
-              >
-                <h3 className="text-sm font-semibold text-gray-800">
-                  Action : {entry._id}
-                </h3>
-                <p className="text-lg font-bold">{entry.total} occurrences</p>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+   
     </div>
   );
 };

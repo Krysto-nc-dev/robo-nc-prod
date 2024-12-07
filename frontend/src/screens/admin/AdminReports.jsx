@@ -7,6 +7,7 @@ import {
 import { useGetUsersQuery } from '../../slices/userApiSlice'; // Hook pour récupérer les utilisateurs
 import { useNavigate } from 'react-router-dom';
 import { Eye, PlusCircle, Trash } from 'lucide-react';
+import { Search } from "lucide-react";
 
 const AdminReports = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -81,26 +82,30 @@ const AdminReports = () => {
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Rapports</h1>
+      <h1 className="text-xl font-bold mb-4">Rapports</h1>
       <div className="flex justify-between items-center mb-4">
         <button
           onClick={openModal}
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center justify-center"
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center justify-center text-[13px]"
         >
-          <PlusCircle className="mr-2"/> Ajouter un rapport
+          <PlusCircle className="mr-2" /> Ajouter un rapport
         </button>
-
-        <input
-          type="text"
-          placeholder="Rechercher par nom"
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
-          className="px-3 py-2 border rounded"
-        />
+        <div className="relative">
+      <span className="absolute inset-y-0 left-3 flex items-center text-gray-400">
+        <Search className="w-5 h-5" />
+      </span>
+      <input
+        type="text"
+        placeholder="Rechercher par nom"
+        value={filter}
+        onChange={(e) => setFilter(e.target.value)}
+        className="pl-10 pr-3 py-2 border rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+    </div>
       </div>
 
       {/* Filtres */}
-      <div className="flex gap-4 mb-4">
+      <div className="flex gap-4 mb-4 text-[13px]">
         <select
           value={typeFilter}
           onChange={(e) => setTypeFilter(e.target.value)}
@@ -130,9 +135,9 @@ const AdminReports = () => {
 
       {/* Tableau des rapports */}
       <div className="overflow-x-auto">
-        <table className="table-auto w-full border-collapse border border-gray-200">
+        <table className="table-auto w-full border-collapse border border-gray-200 text-[13px]">
           <thead>
-            <tr>
+            <tr className="bg-blue-300 text-blue-900">
               <th className="border border-gray-300 px-4 py-2">Nom</th>
               <th className="border border-gray-300 px-4 py-2">Description</th>
               <th className="border border-gray-300 px-4 py-2">Statut</th>
@@ -150,9 +155,90 @@ const AdminReports = () => {
                   <td className="border border-gray-300 px-4 py-2">
                     {report.description || '-'}
                   </td>
-                  <td className="border border-gray-300 px-4 py-2">{report.status}</td>
-                  <td className="border border-gray-300 px-4 py-2">{report.type}</td>
-                  <td className="border border-gray-300 px-4 py-2">{report.category}</td>
+
+
+  
+
+                  <td className="border border-gray-300 px-4 py-2">
+  {report.status === "Actif" ? (
+    <span className="flex items-center text-green-500">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="h-5 w-5 mr-2"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth={2}
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M5 13l4 4L19 7"
+        />
+      </svg>
+      Actif
+    </span>
+  ) : (
+    <span className="flex items-center text-red-500">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="h-5 w-5 mr-2"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth={2}
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M6 18L18 6M6 6l12 12"
+        />
+      </svg>
+      Inactif
+    </span>
+  )}
+</td>
+
+
+
+<td className="border border-gray-300 px-4 py-2">
+  <span
+    className={`px-2 py-1 text-xs font-bold rounded ${
+      report.type === "Access"
+        ? "bg-red-100 text-red-700 "
+        : report.type === "Script"
+        ? "bg-yellow-100 text-yellow-700"
+        : report.type === "Python"
+        ? "bg-green-100 text-green-700"
+        : report.type === "Excel"
+        ? "bg-purple-100 text-purple-700"
+        : report.type === "PowerBI"
+        ? "bg-red-100 text-yellow-700"
+        : "bg-gray-100 text-gray-700"
+    }`}
+  >
+    {report.type}
+  </span>
+</td>
+
+<td className="border border-gray-300 px-4 py-2">
+  <span
+    className={`px-2 py-1 text-xs font-bold rounded ${
+      report.category === "Codeve"
+        ? "bg-indigo-100 text-indigo-700"
+        : report.category === "Global"
+        ? "bg-teal-100 text-teal-700"
+        : report.category === "Master"
+        ? "bg-orange-100 text-orange-700"
+        : report.category === "Autre"
+        ? "bg-blue-100 text-blue-700"
+        : "bg-gray-100 text-gray-700"
+    }`}
+  >
+    {report.category}
+  </span>
+</td>
+
                   <td className="border border-gray-300 px-4 py-2">
                     {report.maintainedBy?.name || 'Non attribué'}
                   </td>
@@ -176,7 +262,7 @@ const AdminReports = () => {
               <tr>
                 <td
                   colSpan="7"
-                  className="text-center border border-gray-300 px-4 py-2"
+                  className="text-center border border-gray-300 px-4 py-2 text-red-400"
                 >
                   Aucun rapport trouvé.
                 </td>
