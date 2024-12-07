@@ -45,7 +45,7 @@ const AdminQcArticles = () => {
   };
 
   const handleDetailsClick = (id) => {
-    navigate(`/admin/articles/${id}`);
+    navigate(`/admin/QC-article/${id}`);
   };
 
   const handlePageChange = (newPage) => {
