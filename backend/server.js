@@ -20,6 +20,8 @@ import filialeRoutes from "./routes/fillialeRoutes.js";
 import ticketRoutes from "./routes/ticketRoutes.js";
 import logRoutes from "./routes/logRoutes.js";
 import reportRoutes from "./routes/reportRoutes.js";
+import fournisseurRoutes from "./routes/fournisseurRoutes.js";
+import articleRoutes from "./routes/articleRoutes.js";
 
 // Configuration des variables d'environnement
 dotenv.config();
@@ -94,6 +96,8 @@ app.use("/repports-generator", repportGeneratorRoutes);
 app.use("/tickets", ticketRoutes);
 app.use("/logs", logRoutes);
 app.use("/reports", reportRoutes);
+app.use("/qc-fournisseurs", fournisseurRoutes);
+app.use("/qc-articles", articleRoutes);
 
 // Middleware pour vérifier l'autorisation et déboguer
 app.use((req, res, next) => {
