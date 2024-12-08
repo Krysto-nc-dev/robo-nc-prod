@@ -13,7 +13,10 @@ node_modules
 /build
 
 # dbfs
-/backend/dbf/
+/backend/dbf/*
+!/backend/dbf/.gitkeep
+
+
 
 # misc
 .DS_Store
