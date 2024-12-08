@@ -12,11 +12,8 @@ node_modules
 # production
 /build
 
-# dbfs
-/backend/dbf/*
-!/backend/dbf/.gitkeep
-
-
+# Ignorer tous les fichiers .dbf
+*.dbf
 
 # misc
 .DS_Store
