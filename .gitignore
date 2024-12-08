@@ -11,8 +11,9 @@ node_modules
 
 # production
 /build
+
 # dbfs
-/dbf
+/backend/dbf/
 
 # misc
 .DS_Store
