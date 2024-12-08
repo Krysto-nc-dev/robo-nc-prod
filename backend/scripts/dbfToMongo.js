@@ -8,7 +8,8 @@ import connectDB from '../config/db.js';
 
 // Import des modèles
 import Fournisseur from '../models/qc/fournisseurModel.js';
-import Article from '../models/qc/articleModel.js'; // Ajout du modèle Article
+import Article from '../models/qc/articleModel.js';
+import Classnum from '../models/qc/classNumModel.js'; // Ajout du modèle Classnum
 
 // Gestion des chemins compatibles avec ES Modules
 import { fileURLToPath } from 'url';
@@ -21,8 +22,9 @@ const DBF_FOLDER = path.join(__dirname, '../dbf/qc');
 
 // Liste des fichiers DBF avec leurs modèles associés
 const dbfFiles = [
+  { fileName: 'classes.dbf', model: Classnum, label: 'Classnums' }, // Ajout de la table Classnums
   { fileName: 'fourniss.dbf', model: Fournisseur, label: 'Fournisseurs' },
-  { fileName: 'article.dbf', model: Article, label: 'Articles' }, // Ajout de la table Articles
+  { fileName: 'article.dbf', model: Article, label: 'Articles' },
 ];
 
 // Fonction pour nettoyer les enregistrements avant insertion
