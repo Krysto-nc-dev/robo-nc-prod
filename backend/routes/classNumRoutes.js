@@ -1,5 +1,5 @@
 import express from "express";
-import { getClassnums, getClassnumByClassnum } from "../controllers/classnumController.js";
+import { getClassnums, getClassnumByClassnum } from "../controllers/classNumControlleur.js";
 
 const router = express.Router();
 

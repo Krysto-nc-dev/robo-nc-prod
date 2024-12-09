@@ -23,6 +23,7 @@ import reportRoutes from "./routes/reportRoutes.js";
 import fournisseurRoutes from "./routes/fournisseurRoutes.js";
 import articleRoutes from "./routes/articleRoutes.js";
 import classNumRoutes from "./routes/classNumRoutes.js";
+import tierRoutes from "./routes/tierRoutes.js";
 
 // Configuration des variables d'environnement
 dotenv.config();
@@ -100,6 +101,7 @@ app.use("/reports", reportRoutes);
 app.use("/qc-fournisseurs", fournisseurRoutes);
 app.use("/qc-articles", articleRoutes);
 app.use("/qc-classnums", classNumRoutes);
+app.use("/qc-tiers", tierRoutes);
 
 
 // Middleware pour vérifier l'autorisation et déboguer

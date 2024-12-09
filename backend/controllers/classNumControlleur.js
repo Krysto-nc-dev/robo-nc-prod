@@ -1,5 +1,5 @@
 import asyncHandler from "../middlewares/async.js";
-import Classnum from "../models/classnumModel.js";
+import Classnum from "../models/qc/classNumModel.js"
 
 // @desc    Get all classnums
 // @route   GET /api/classnums

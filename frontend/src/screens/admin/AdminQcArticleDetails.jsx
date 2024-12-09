@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useParams } from "react-router-dom";
 import { useGetArticleByIdQuery } from "../../slices/qcArticleApiSlice";
 import { useGetFournisseurByIdQuery } from "../../slices/qcFournisseurApiSlice";
@@ -12,7 +12,6 @@ import {
   Grid,
   Paper,
   Avatar,
-  Button,
   Chip,
   Tooltip,
 } from "@mui/material";
@@ -63,19 +62,26 @@ const AdminQcArticleDetails = () => {
 
   return (
     <div
-      className={`p-6 min-h-screen ${
+      className={`p-6 min-h-screen relative ${
         isDeprecated ? "bg-red-50" : "bg-gray-100"
       }`}
     >
-      <Typography
-        variant="h4"
-        component="h1"
-        className="text-center text-gray-800 mb-6 font-bold"
-      >
-        Fiche Produit
-      </Typography>
+      {/* Chip affichant NART */}
+      <Box position="absolute" top={-20} left={16}>
+        <Chip
+          label={article.NART || "N/A"}
+          color="secondary"
+          sx={{
+            fontSize: "1.2rem", // Taille du texte plus grande
+            fontWeight: "bold", // Texte en gras
+            padding: "5px 10px", // Augmenter l'espace intérieur
+            height: "auto", // Ajuste automatiquement la hauteur
+          }}
+        />
+      </Box>
 
-      <Card className="shadow-md">
+      {/* Contenu principal */}
+      <Card className="shadow-md w-full">
         <CardContent>
           <Grid container spacing={4}>
             <Grid item xs={12} md={4}>
@@ -92,8 +98,8 @@ const AdminQcArticleDetails = () => {
             <Grid item xs={12} md={8}>
               <Box className="flex justify-between items-center mb-4">
                 <Box>
-                  <Typography variant="h5" className="font-bold text-gray-800">
-                    {article.DESIGN} ({article.NART})
+                  <Typography variant="h6" className="font-bold text-gray-800">
+                    {article.DESIGN}
                   </Typography>
                   {isDeprecated && (
                     <Tooltip title="Cet article est déprécié">
@@ -150,7 +156,7 @@ const AdminQcArticleDetails = () => {
 
                 <Grid item xs={6}>
                   <Typography variant="body1" className="font-semibold">
-                    Prix prévu
+                    Prix de revient
                   </Typography>
                   <Typography variant="body2" className="text-gray-600">
                     {article.PREV ? `${article.PREV.toFixed(2)} XPF` : "N/A"}
@@ -186,24 +192,6 @@ const AdminQcArticleDetails = () => {
               </Grid>
 
               <Divider className="my-4" />
-
-              <Box>
-                <Typography variant="body1" className="font-semibold">
-                  Observations
-                </Typography>
-                <Typography variant="body2" className="text-gray-600">
-                  {article.OBSERV || "Aucune observation"}
-                </Typography>
-              </Box>
-
-              <Box className="mt-4 flex justify-end">
-                <Button variant="contained" color="primary">
-                  Modifier
-                </Button>
-                <Button variant="outlined" color="secondary" className="ml-2">
-                  Supprimer
-                </Button>
-              </Box>
             </Grid>
           </Grid>
         </CardContent>

@@ -1,23 +1,38 @@
 import React, { useState, useEffect } from "react";
 import { useGetArticlesQuery } from "../../slices/qcArticleApiSlice";
+import {
+  Box,
+  Typography,
+  TextField,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  TablePagination,
+  TableSortLabel,
+  Button,
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
 const AdminQcArticles = () => {
   const [search, setSearch] = useState(""); // Recherche par DESIGN
   const [sort, setSort] = useState("createdAt");
   const [order, setOrder] = useState("desc");
-  const [page, setPage] = useState(1);
-  const [limit] = useState(20); // Nombre d'articles par page
+  const [page, setPage] = useState(0); // Page actuelle (base 0)
+  const [rowsPerPage, setRowsPerPage] = useState(10); // Nombre d'articles par page
 
   const navigate = useNavigate();
 
   // Requête pour récupérer les articles avec recherche par `DESIGN`
   const { data, isLoading, isError, error } = useGetArticlesQuery({
-    page,
-    limit,
+    page: page + 1, // API utilise une base 1 pour les pages
+    limit: rowsPerPage,
     sort,
     order,
-    search, // Utilisé pour filtrer les articles par DESIGN
+    search,
   });
 
   useEffect(() => {
@@ -26,133 +41,148 @@ const AdminQcArticles = () => {
     }
   }, [data]);
 
-  if (isLoading) return <div>Chargement...</div>;
+  if (isLoading) return <Typography>Chargement...</Typography>;
   if (isError) {
     console.error("Erreur lors du chargement :", error);
-    return <div>Une erreur est survenue lors du chargement des articles.</div>;
+    return (
+      <Typography>
+        Une erreur est survenue lors du chargement des articles.
+      </Typography>
+    );
   }
 
-  const { articles, totalItems, totalPages } = data || {};
+  const { articles, totalItems } = data || {};
 
   const handleSortChange = (field) => {
+    const isAsc = sort === field && order === "asc";
+    setOrder(isAsc ? "desc" : "asc");
     setSort(field);
-    setOrder(order === "desc" ? "asc" : "desc");
   };
 
   const handleSearchChange = (e) => {
-    setSearch(e.target.value); // Recherche par DESIGN
-    setPage(1); // Réinitialise à la première page lors d'une recherche
+    setSearch(e.target.value);
+    setPage(0); // Réinitialiser à la première page lors d'une recherche
   };
 
   const handleDetailsClick = (id) => {
     navigate(`/admin/QC-article/${id}`);
   };
 
-  const handlePageChange = (newPage) => {
-    if (newPage > 0 && newPage <= totalPages) {
-      setPage(newPage);
-    }
+  const handlePageChange = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleRowsPerPageChange = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0); // Réinitialiser à la première page
   };
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Gestion des Articles</h1>
+    <Box padding={4}>
+      <div className="">
+        <Typography variant="h5" fontWeight="bold" marginBottom={4}>
+          Articles QC
+        </Typography>
 
-      {/* Barre de recherche */}
-      <div className="mb-4">
-        <input
-          type="text"
-          placeholder="Rechercher par désignation (DESIGN)..."
-          value={search}
-          onChange={handleSearchChange}
-          className="px-4 py-2 border rounded w-1/2"
-        />
+        {/* Barre de recherche */}
+        <Box marginBottom={3}>
+          <TextField
+            label="Rechercher par Nart ou Désigation"
+            variant="outlined"
+            value={search}
+            onChange={handleSearchChange}
+          />
+        </Box>
       </div>
 
       {/* Tableau des articles */}
-      <div className="overflow-x-auto">
-        <table className="table-auto w-full border-collapse bg-white shadow rounded">
-          <thead className="bg-gray-100">
-            <tr>
-              <th
-                className="px-4 py-2 text-left cursor-pointer"
-                onClick={() => handleSortChange("NART")}
-              >
-                Code Article {sort === "NART" && (order === "asc" ? "▲" : "▼")}
-              </th>
-              <th
-                className="px-4 py-2 text-left cursor-pointer"
-                onClick={() => handleSortChange("DESIGN")}
-              >
-                Désignation {sort === "DESIGN" && (order === "asc" ? "▲" : "▼")}
-              </th>
-              <th
-                className="px-4 py-2 text-left cursor-pointer"
-                onClick={() => handleSortChange("PVTE")}
-              >
-                Prix Vente {sort === "PVTE" && (order === "asc" ? "▲" : "▼")}
-              </th>
-              <th className="px-4 py-2 text-left">Stock</th>
-              <th className="px-4 py-2 text-left">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>
+                <TableSortLabel
+                  active={sort === "NART"}
+                  direction={sort === "NART" ? order : "asc"}
+                  onClick={() => handleSortChange("NART")}
+                >
+                  Nart
+                </TableSortLabel>
+              </TableCell>
+              <TableCell>
+                <TableSortLabel
+                  active={sort === "DESIGN"}
+                  direction={sort === "DESIGN" ? order : "asc"}
+                  onClick={() => handleSortChange("DESIGN")}
+                >
+                  Désignation
+                </TableSortLabel>
+              </TableCell>
+              <TableCell>
+                <TableSortLabel
+                  active={sort === "PVTE"}
+                  direction={sort === "PVTE" ? order : "asc"}
+                  onClick={() => handleSortChange("PVTE")}
+                >
+                  Prix Vente
+                </TableSortLabel>
+              </TableCell>
+              <TableCell>Stock</TableCell>
+              <TableCell>Actions</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
             {articles?.length > 0 ? (
               articles.map((article) => (
-                <tr
+                <TableRow
                   key={article._id}
-                  className={`border-b hover:bg-gray-50 ${
-                    article.DESIGN.startsWith("**") ? "bg-red-100" : ""
-                  }`}
+                  hover
+                  sx={{
+                    backgroundColor: article.DESIGN.startsWith("**")
+                      ? "rgba(255, 0, 0, 0.1)"
+                      : "inherit",
+                  }}
                 >
-                  <td className="px-4 py-2">{article.NART}</td>
-                  <td className="px-4 py-2">{article.DESIGN}</td>
-                  <td className="px-4 py-2">{article.PVTE?.toFixed(2)} F</td>
-                  <td className="px-4 py-2">{article.STOCK}</td>
-                  <td className="px-4 py-2">
-                    <button
+                  <TableCell sx={{ py: 1 }}>{article.NART}</TableCell>
+                  <TableCell sx={{ py: 1 }}>{article.DESIGN}</TableCell>
+                  <TableCell sx={{ py: 1 }}>
+                    {article.PVTE?.toFixed(2)} F
+                  </TableCell>
+                  <TableCell sx={{ py: 1 }}>{article.STOCK}</TableCell>
+                  <TableCell sx={{ py: 1 }}>
+                    <Button
+                      variant="contained"
+                      color="primary"
                       onClick={() => handleDetailsClick(article._id)}
-                      className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
                     >
                       Détails
-                    </button>
-                  </td>
-                </tr>
+                    </Button>
+                  </TableCell>
+                </TableRow>
               ))
             ) : (
-              <tr>
-                <td colSpan="5" className="text-center py-4">
+              <TableRow>
+                <TableCell colSpan={5} align="center">
                   Aucun article trouvé
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             )}
-          </tbody>
-        </table>
-      </div>
+          </TableBody>
+        </Table>
+      </TableContainer>
 
       {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="mt-4 flex justify-between items-center">
-          <button
-            onClick={() => handlePageChange(page - 1)}
-            disabled={page === 1}
-            className="px-3 py-1 border rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
-          >
-            Précédent
-          </button>
-          <span>
-            Page {page} sur {totalPages}
-          </span>
-          <button
-            onClick={() => handlePageChange(page + 1)}
-            disabled={page === totalPages}
-            className="px-3 py-1 border rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
-          >
-            Suivant
-          </button>
-        </div>
-      )}
-    </div>
+      <TablePagination
+        component="div"
+        count={totalItems || 0}
+        page={page}
+        onPageChange={handlePageChange}
+        rowsPerPage={rowsPerPage}
+        onRowsPerPageChange={handleRowsPerPageChange}
+        rowsPerPageOptions={[50, 100, 200]}
+        labelRowsPerPage="Articles par page"
+      />
+    </Box>
   );
 };
 
