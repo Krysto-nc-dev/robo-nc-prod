@@ -12,7 +12,7 @@
     "data:import": "node backend/seeder.js",
     "data:destroy": "node backend/seeder.js -d",
     "build": "npm install && npm install --prefix frontend && npm run build --prefix frontend",
-    "dbf:import": "node backend/scripts/dbfToMongo.js"
+    "dbf:import": "node --max-old-space-size=8192 backend/scripts/dbfToMongo.js"
   },
   "repository": {
     "type": "git",
