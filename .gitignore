@@ -14,6 +14,10 @@ node_modules
 
 # Ignorer tous les fichiers .dbf
 *.dbf
+backend/dbf/qc/article.dbf
+backend/dbf/qc/facture.dbf
+backend/dbf/qc/detail.dbf
+
 
 # misc
 .DS_Store
