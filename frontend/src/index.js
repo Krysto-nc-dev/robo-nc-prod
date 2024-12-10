@@ -45,6 +45,8 @@ import AdminFournisseurQcApiSlice from "./screens/admin/AdminFournisseurQcApiSli
 import AdminQcFournisseurDetails from "./screens/admin/AdminQcFournisseurDetails.jsx";
 import AdminQcArticles from "./screens/admin/AdminQcArticles.jsx";
 import AdminQcArticleDetails from "./screens/admin/AdminQcArticleDetails.jsx";
+import AdminModules from "./screens/admin/AdminModules.jsx";
+import AdminModuleDetails from "./screens/admin/AdminModuleDetails.jsx";
 
 
 
@@ -64,6 +66,8 @@ const router = createBrowserRouter(
         <Route path="filliales/:id" element={<AdminfillialeDetails/>} />
         <Route path="repports" element={<AdminReports/>} />
         <Route path="reports/:id" element={<AdminReportDetails/>} />
+        <Route path="modules" element={<AdminModules/>} />
+        <Route path="module/:id" element={<AdminModuleDetails/>} />
         <Route path="QC-fournisseurs" element={<AdminFournisseurQcApiSlice/>} />
         <Route path="QC-fournisseur/:id" element={<AdminQcFournisseurDetails/>} />
         <Route path="QC-article/:id" element={<AdminQcArticleDetails/>} />

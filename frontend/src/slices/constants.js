@@ -10,6 +10,7 @@ export const FILLIALES_URL = `${BASE_URL}/filiales`;
 export const LOGS_URL = `${BASE_URL}/logs`;
 export const REPPORTGENERATORS_URL = `${BASE_URL}/repports-generator`;
 export const TICKETS_URL = `${BASE_URL}/tickets`;
+export const MODULES_URL = `${BASE_URL}/modules`;
 export const DOCUMENTS_URL = `${BASE_URL}/documents`;
 export const REPPORTS_URL = `${BASE_URL}/reports`;
 export const FOURNISSEURS_URL = `${BASE_URL}/qc-fournisseurs`;

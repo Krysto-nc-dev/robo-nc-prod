@@ -24,6 +24,7 @@ import fournisseurRoutes from "./routes/fournisseurRoutes.js";
 import articleRoutes from "./routes/articleRoutes.js";
 import classNumRoutes from "./routes/classNumRoutes.js";
 import tierRoutes from "./routes/tierRoutes.js";
+import moduleRoutes from "./routes/moduleRoutes.js";
 
 // Configuration des variables d'environnement
 dotenv.config();
@@ -98,6 +99,7 @@ app.use("/repports-generator", repportGeneratorRoutes);
 app.use("/tickets", ticketRoutes);
 app.use("/logs", logRoutes);
 app.use("/reports", reportRoutes);
+app.use("/modules", moduleRoutes);
 app.use("/qc-fournisseurs", fournisseurRoutes);
 app.use("/qc-articles", articleRoutes);
 app.use("/qc-classnums", classNumRoutes);
