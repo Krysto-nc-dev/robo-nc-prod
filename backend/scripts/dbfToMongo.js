@@ -10,7 +10,7 @@ import connectDB from '../config/db.js';
 import Fournisseur from '../models/qc/fournisseurModel.js';
 import Article from '../models/qc/articleModel.js';
 import Classnum from '../models/qc/classNumModel.js'; 
-import Classnum from '../models/qc/tierModel.js'; 
+import Tier from '../models/qc/tierModel.js'; 
 // Gestion des chemins compatibles avec ES Modules
 import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
@@ -23,7 +23,7 @@ const DBF_FOLDER = path.join(__dirname, '../dbf/qc');
 // Liste des fichiers DBF avec leurs modèles associés
 const dbfFiles = [
   { fileName: 'classes.dbf', model: Classnum, label: 'Classnums' }, // Ajout de la table Classnums
-  { fileName: 'tiers.dbf', model: Classnum, label: 'Tiers' }, // Ajout de la table Classnums
+  { fileName: 'tiers.dbf', model: Tier, label: 'Tiers' }, // Ajout de la table Classnums
   { fileName: 'fourniss.dbf', model: Fournisseur, label: 'Fournisseurs' },
   { fileName: 'article.dbf', model: Article, label: 'Articles' },
 ];
