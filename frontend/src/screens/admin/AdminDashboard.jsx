@@ -45,11 +45,11 @@ const monthlySalesData = [
 ];
 
 const bestSellingProducts = [
-  { id: 1, nom: "Produit A", ventes: 300 },
-  { id: 2, nom: "Produit B", ventes: 250 },
-  { id: 3, nom: "Produit C", ventes: 200 },
-  { id: 4, nom: "Produit D", ventes: 150 },
-  { id: 5, nom: "Produit E", ventes: 100 },
+  { id: 342315, nom: "Produit A", ventes: 300 },
+  { id: 453765, nom: "Produit B", ventes: 250 },
+  { id: 453222, nom: "Produit C", ventes: 200 },
+  { id: 765432, nom: "Produit D", ventes: 150 },
+  { id: 545987, nom: "Produit E", ventes: 100 },
 ];
 
 const suppliersByCountry = [
@@ -114,8 +114,10 @@ const AdminDashboard = () => {
                   <TrendingUp color="white" />
                 </Avatar>
                 <Box>
-                  <Typography variant="body2">Ventes Journalières</Typography>
-                  <Typography variant="h6">{fakeKPIs.dailySales} €</Typography>
+                  <Typography variant="body2">Ventes j-1</Typography>
+                  <Typography variant="h6">
+                    {fakeKPIs.dailySales} Xpf
+                  </Typography>
                 </Box>
               </Box>
             </CardContent>
@@ -131,7 +133,7 @@ const AdminDashboard = () => {
                 <Box>
                   <Typography variant="body2">Ventes Mensuelles</Typography>
                   <Typography variant="h6">
-                    {fakeKPIs.monthlySales} €
+                    {fakeKPIs.monthlySales} Xpf
                   </Typography>
                 </Box>
               </Box>
@@ -282,7 +284,7 @@ const AdminDashboard = () => {
                 <DataGrid
                   rows={bestSellingProducts}
                   columns={[
-                    { field: "id", headerName: "ID", width: 70 },
+                    { field: "id", headerName: "NART", width: 70 },
                     { field: "nom", headerName: "Produit", flex: 1 },
                     { field: "ventes", headerName: "Ventes", width: 150 },
                   ]}
