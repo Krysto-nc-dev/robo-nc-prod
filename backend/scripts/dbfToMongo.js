@@ -11,6 +11,8 @@ import Fournisseur from '../models/qc/fournisseurModel.js';
 import Article from '../models/qc/articleModel.js';
 import Classnum from '../models/qc/classNumModel.js'; 
 import Tier from '../models/qc/tierModel.js'; 
+import Facture from '../models/qc/factureModel.js'; 
+import FactureDetails from '../models/qc/factureDetailsModel.js'; 
 // Gestion des chemins compatibles avec ES Modules
 import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
@@ -25,6 +27,8 @@ const dbfFiles = [
   { fileName: 'classes.dbf', model: Classnum, label: 'Classnums' }, // Ajout de la table Classnums
   { fileName: 'tiers.dbf', model: Tier, label: 'Tiers' }, // Ajout de la table Classnums
   { fileName: 'fourniss.dbf', model: Fournisseur, label: 'Fournisseurs' },
+  { fileName: 'facture.dbf', model: Facture, label: 'factures' },
+  { fileName: 'detail.dbf', model: FactureDetails, label: 'factureDetails' },
   { fileName: 'article.dbf', model: Article, label: 'Articles' },
 ];
 
