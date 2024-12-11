@@ -5,48 +5,43 @@ import Article from "../models/qc/articleModel.js";
 // @route   GET /api/articles
 // @access  Public
 const getArticles = asyncHandler(async (req, res) => {
-    const { page = 1, limit = 20, sort = 'createdAt', order = 'desc', search, filter } = req.query;
-  
-    // Convertir `page` et `limit` en nombres entiers
-    const pageNumber = parseInt(page, 10);
-    const pageSize = parseInt(limit, 10);
-  
-    // Construire les filtres
-    const queryFilters = {};
-  
-    if (search) {
-      queryFilters.$or = [
-        { NART: { $regex: search, $options: 'i' } },
-        { DESIGN: { $regex: search, $options: 'i' } },
-        { DESIGN2: { $regex: search, $options: 'i' } },
-      ];
-    }
-  
-    if (filter) {
-      const parsedFilter = JSON.parse(filter);
-      Object.entries(parsedFilter).forEach(([key, value]) => {
-        queryFilters[key] = value;
-      });
-    }
-  
-    // Obtenir les articles avec pagination, tri et filtres
-    const totalItems = await Article.countDocuments(queryFilters); // Compte total des articles correspondant aux filtres
-  
-    const articles = await Article.find(queryFilters)
-      .sort({ [sort]: order === 'desc' ? -1 : 1 }) // Tri
-      .skip((pageNumber - 1) * pageSize) // Sauter les articles des pages précédentes
-      .limit(pageSize); // Limiter le nombre d'articles retournés
-  
-    // Retourner les données
-    res.status(200).json({
-      page: pageNumber,
-      limit: pageSize,
-      totalItems,
-      totalPages: Math.ceil(totalItems / pageSize),
-      articles,
+  const { page = 1, limit = 20, sort = "createdAt", order = "desc", search, filter } = req.query;
+
+  const pageNumber = parseInt(page, 10);
+  const pageSize = parseInt(limit, 10);
+
+  const queryFilters = {};
+
+  if (search) {
+    queryFilters.$or = [
+      { NART: { $regex: search, $options: "i" } },
+      { DESIGN: { $regex: search, $options: "i" } },
+      { DESIGN2: { $regex: search, $options: "i" } },
+    ];
+  }
+
+  if (filter) {
+    const parsedFilter = JSON.parse(filter);
+    Object.entries(parsedFilter).forEach(([key, value]) => {
+      queryFilters[key] = value;
     });
+  }
+
+  const totalItems = await Article.countDocuments(queryFilters);
+
+  const articles = await Article.find(queryFilters)
+    .sort({ [sort]: order === "desc" ? -1 : 1 })
+    .skip((pageNumber - 1) * pageSize)
+    .limit(pageSize);
+
+  res.status(200).json({
+    page: pageNumber,
+    limit: pageSize,
+    totalItems,
+    totalPages: Math.ceil(totalItems / pageSize),
+    articles,
   });
-  
+});
 
 // @desc    Get article by ID
 // @route   GET /api/articles/:id
@@ -62,61 +57,25 @@ const getArticleById = asyncHandler(async (req, res) => {
   res.status(200).json(article);
 });
 
-// @desc    Create a new article
-// @route   POST /api/articles
+// @desc    Get all articles by a specific fournisseur
+// @route   GET /api/articles/fournisseur/:fournisseurId
 // @access  Public
-const createArticle = asyncHandler(async (req, res) => {
-  const articleData = req.body;
+const getArticlesByFournisseur = asyncHandler(async (req, res) => {
+  const fournisseurId = parseInt(req.params.fournisseurId, 10);
 
-  const existingArticle = await Article.findOne({ NART: articleData.NART });
-
-  if (existingArticle) {
+  if (isNaN(fournisseurId)) {
     res.status(400);
-    throw new Error("Un article avec ce code existe déjà.");
+    throw new Error("L'identifiant du fournisseur doit être un nombre.");
   }
 
-  const article = new Article(articleData);
-  const createdArticle = await article.save();
+  const articles = await Article.find({ FOURN: fournisseurId });
 
-  res.status(201).json(createdArticle);
-});
-
-// @desc    Update an article
-// @route   PUT /api/articles/:id
-// @access  Public
-const updateArticle = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-
-  const article = await Article.findById(id);
-
-  if (!article) {
+  if (!articles || articles.length === 0) {
     res.status(404);
-    throw new Error("Article introuvable.");
+    throw new Error("Aucun article trouvé pour ce fournisseur.");
   }
 
-  Object.keys(req.body).forEach((key) => {
-    article[key] = req.body[key];
-  });
-
-  const updatedArticle = await article.save();
-  res.status(200).json(updatedArticle);
+  res.status(200).json(articles);
 });
 
-// @desc    Delete an article
-// @route   DELETE /api/articles/:id
-// @access  Public
-const deleteArticle = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-
-  const article = await Article.findById(id);
-
-  if (!article) {
-    res.status(404);
-    throw new Error("Article introuvable.");
-  }
-
-  await article.deleteOne();
-  res.status(200).json({ message: "Article supprimé avec succès." });
-});
-
-export { getArticles, getArticleById, createArticle, updateArticle, deleteArticle };
+export { getArticles, getArticleById, getArticlesByFournisseur };
