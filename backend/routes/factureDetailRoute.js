@@ -2,18 +2,15 @@ import express from "express";
 import {
   getFactureDetails,
   getFactureDetailsByNumfact,
-  getFactureDetailsByNart,
+  exportFactureDetailsByNumfactToExcel,
+  exportFactureDetailsByDateToExcel,
 } from "../controllers/factureDetailsControlleur.js";
 
 const router = express.Router();
 
-// Route pour obtenir tous les détails de factures
-router.route("/").get(getFactureDetails);
-
-// Route pour obtenir les détails d'une facture par son NUMFACT
-router.route("/:numfact").get(getFactureDetailsByNumfact);
-
-// Route pour obtenir les détails d'une facture par le code article (NART)
-router.route("/article/:nart").get(getFactureDetailsByNart);
+router.get("/", getFactureDetails); // Obtenir tous les détails des factures avec pagination et filtres
+router.get("/:numfact", getFactureDetailsByNumfact); // Obtenir les détails d'une facture par NUMFACT
+router.get("/export/:numfact", exportFactureDetailsByNumfactToExcel); // Exporter les détails d'une facture en Excel
+router.get("/export/date/:date", exportFactureDetailsByDateToExcel); // Exporter les détails des factures d'une date en Excel
 
 export default router;
