@@ -18,7 +18,8 @@ import {
 import { useNavigate } from "react-router-dom";
 
 const AdminQcArticles = () => {
-  const [search, setSearch] = useState(""); // Recherche par DESIGN
+  const [search, setSearch] = useState(""); // Recherche par DESIGN ou NART
+  const [searchGencod, setSearchGencod] = useState(""); // Recherche par GENCOD
   const [sort, setSort] = useState("createdAt");
   const [order, setOrder] = useState("desc");
   const [page, setPage] = useState(0); // Page actuelle (base 0)
@@ -26,14 +27,22 @@ const AdminQcArticles = () => {
 
   const navigate = useNavigate();
 
-  // Requête pour récupérer les articles avec recherche par `DESIGN`
-  const { data, isLoading, isError, error } = useGetArticlesQuery({
+  // Définir les paramètres de recherche en fonction des champs remplis
+  const searchParams = {
     page: page + 1, // API utilise une base 1 pour les pages
     limit: rowsPerPage,
     sort,
     order,
-    search,
-  });
+  };
+
+  if (searchGencod) {
+    searchParams.gencod = searchGencod; // Priorité à GENCOD si rempli
+  } else if (search) {
+    searchParams.search = search; // Sinon recherche par DESIGN ou NART
+  }
+
+  // Requête pour récupérer les articles
+  const { data, isLoading, isError, error } = useGetArticlesQuery(searchParams);
 
   useEffect(() => {
     if (data) {
@@ -62,6 +71,13 @@ const AdminQcArticles = () => {
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
     setPage(0); // Réinitialiser à la première page lors d'une recherche
+    setSearchGencod(""); // Réinitialiser la recherche GENCOD
+  };
+
+  const handleSearchGencodChange = (e) => {
+    setSearchGencod(e.target.value);
+    setPage(0); // Réinitialiser à la première page lors d'une recherche
+    setSearch(""); // Réinitialiser la recherche DESIGN/NART
   };
 
   const handleDetailsClick = (id) => {
@@ -84,13 +100,21 @@ const AdminQcArticles = () => {
           Articles QC
         </Typography>
 
-        {/* Barre de recherche */}
-        <Box marginBottom={3}>
+        {/* Barres de recherche */}
+        <Box marginBottom={3} display="flex" gap={2}>
           <TextField
-            label="Rechercher par Nart ou Désigation"
+            label="Rechercher par NART ou Désignation"
             variant="outlined"
             value={search}
             onChange={handleSearchChange}
+            fullWidth
+          />
+          <TextField
+            label="Rechercher par GENCOD"
+            variant="outlined"
+            value={searchGencod}
+            onChange={handleSearchGencodChange}
+            fullWidth
           />
         </Box>
       </div>
@@ -106,7 +130,7 @@ const AdminQcArticles = () => {
                   direction={sort === "NART" ? order : "asc"}
                   onClick={() => handleSortChange("NART")}
                 >
-                  Nart
+                  NART
                 </TableSortLabel>
               </TableCell>
               <TableCell>
@@ -116,6 +140,15 @@ const AdminQcArticles = () => {
                   onClick={() => handleSortChange("DESIGN")}
                 >
                   Désignation
+                </TableSortLabel>
+              </TableCell>
+              <TableCell>
+                <TableSortLabel
+                  active={sort === "GENCOD"}
+                  direction={sort === "GENCOD" ? order : "asc"}
+                  onClick={() => handleSortChange("GENCOD")}
+                >
+                  GENCOD
                 </TableSortLabel>
               </TableCell>
               <TableCell>
@@ -145,6 +178,7 @@ const AdminQcArticles = () => {
                 >
                   <TableCell sx={{ py: 1 }}>{article.NART}</TableCell>
                   <TableCell sx={{ py: 1 }}>{article.DESIGN}</TableCell>
+                  <TableCell sx={{ py: 1 }}>{article.GENCOD}</TableCell>
                   <TableCell sx={{ py: 1 }}>
                     {article.PVTE?.toFixed(2)} F
                   </TableCell>
@@ -162,7 +196,7 @@ const AdminQcArticles = () => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={5} align="center">
+                <TableCell colSpan={6} align="center">
                   Aucun article trouvé
                 </TableCell>
               </TableRow>
@@ -179,7 +213,7 @@ const AdminQcArticles = () => {
         onPageChange={handlePageChange}
         rowsPerPage={rowsPerPage}
         onRowsPerPageChange={handleRowsPerPageChange}
-        rowsPerPageOptions={[50, 100, 200]}
+        rowsPerPageOptions={[10, 20, 50]}
         labelRowsPerPage="Articles par page"
       />
     </Box>

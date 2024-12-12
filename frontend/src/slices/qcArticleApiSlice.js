@@ -6,7 +6,6 @@ export const articleApiSlice = apiSlice.injectEndpoints({
     // Get all articles with pagination and filters
     getArticles: builder.query({
       query: ({ page = 1, limit = 20, sort = 'createdAt', order = 'desc', search = '', filter = '' } = {}) => {
-        // Construire les paramètres de l'URL
         const params = new URLSearchParams({
           page: page.toString(),
           limit: limit.toString(),
@@ -18,7 +17,7 @@ export const articleApiSlice = apiSlice.injectEndpoints({
         if (filter) params.append('filter', JSON.stringify(filter));
 
         return {
-          url: `${ARTICLES_URL}?${params.toString()}`, // Construit l'URL avec les paramètres
+          url: `${ARTICLES_URL}?${params.toString()}`,
           method: 'GET',
           credentials: 'include',
         };
@@ -35,6 +34,17 @@ export const articleApiSlice = apiSlice.injectEndpoints({
         credentials: 'include',
       }),
       providesTags: (result, error, id) => [{ type: 'Article', id }],
+      keepUnusedDataFor: 5,
+    }),
+
+    // Get articles by fournisseur ID
+    getArticlesByFournisseur: builder.query({
+      query: (fournisseurId) => ({
+        url: `${ARTICLES_URL}/fournisseur/${fournisseurId}`,
+        method: 'GET',
+        credentials: 'include',
+      }),
+      providesTags: ['Article'],
       keepUnusedDataFor: 5,
     }),
 
@@ -75,6 +85,7 @@ export const articleApiSlice = apiSlice.injectEndpoints({
 export const {
   useGetArticlesQuery,
   useGetArticleByIdQuery,
+  useGetArticlesByFournisseurQuery, // Hook pour récupérer les articles par fournisseur
   useCreateArticleMutation,
   useUpdateArticleMutation,
   useDeleteArticleMutation,

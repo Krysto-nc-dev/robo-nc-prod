@@ -1,19 +1,28 @@
 import React from "react";
 import { useParams, Link } from "react-router-dom";
 import { useGetFournisseurByIdQuery } from "../../slices/qcFournisseurApiSlice";
+import { useGetArticlesByFournisseurQuery } from "../../slices/qcArticleApiSlice";
 import { Loader } from "lucide-react";
 
 const AdminQcFournisseurDetails = () => {
-  const { id } = useParams();
+  const { id } = useParams(); // `id` correspond au champ `FOURN`
 
   // Récupérer les détails du fournisseur via RTK Query
   const {
     data: fournisseur,
-    isLoading,
-    error,
+    isLoading: fournisseurLoading,
+    error: fournisseurError,
   } = useGetFournisseurByIdQuery(id);
 
-  if (isLoading) {
+  // Récupérer les articles du fournisseur via le champ `FOURN`
+  const {
+    data: articles,
+    isLoading: articlesLoading,
+    error: articlesError,
+  } = useGetArticlesByFournisseurQuery(parseInt(id, 10)); // Convertir `id` en entier
+
+  // Gestion du chargement
+  if (fournisseurLoading || articlesLoading) {
     return (
       <div className="text-center mt-8">
         <Loader />
@@ -21,22 +30,28 @@ const AdminQcFournisseurDetails = () => {
     );
   }
 
-  if (error) {
+  // Gestion des erreurs
+  if (fournisseurError) {
     return (
       <div className="text-center text-red-600 mt-8">
-        Erreur lors du chargement des détails : {error.message}
+        Erreur lors du chargement des détails du fournisseur :{" "}
+        {fournisseurError.message}
       </div>
     );
   }
 
-  // Combiner l'adresse complète
+  if (articlesError) {
+    console.error("Erreur lors du chargement des articles :", articlesError);
+  }
+
+  // Construire l'adresse complète
   const fullAddress = [
     fournisseur.AD1,
     fournisseur.AD2,
     fournisseur.AD3,
     fournisseur.AD4,
   ]
-    .filter(Boolean) // Supprimer les champs vides ou `undefined`
+    .filter(Boolean) // Supprime les champs vides ou `undefined`
     .join(", ");
 
   return (
@@ -84,49 +99,39 @@ const AdminQcFournisseurDetails = () => {
             {fournisseur.OBSERV || "Non spécifiées"}
           </p>
         </div>
-        <div className="p-4 bg-gray-100 rounded-lg">
-          <h2 className="font-semibold text-gray-600">Franco</h2>
-          <p className="text-gray-800">
-            {fournisseur.FRANCO || "Non spécifié"}
-          </p>
-        </div>
-        <div className="p-4 bg-gray-100 rounded-lg">
-          <h2 className="font-semibold text-gray-600">Local</h2>
-          <p className="text-gray-800">{fournisseur.LOCAL || "Non spécifié"}</p>
-        </div>
       </div>
 
-      {/* Notes */}
-      <div className="mt-6">
-        <h2 className="text-lg font-semibold text-gray-700 mb-4">Notes</h2>
-        <div className="grid grid-cols-2 gap-6">
-          {[...Array(10)].map((_, index) => {
-            const noteField = fournisseur[`NOT${index + 1}`];
-            return (
-              <div key={index} className="p-4 bg-gray-100 rounded-lg">
-                <h3 className="font-semibold text-gray-600">
-                  Note {index + 1}
+      {/* Liste des articles du fournisseur */}
+      <div className="mt-8">
+        <h2 className="text-lg font-semibold text-gray-700 mb-4">
+          Articles du fournisseur
+        </h2>
+        {articles?.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {articles.map((article) => (
+              <div
+                key={article.NART}
+                className="p-4 bg-white shadow-md rounded-lg"
+              >
+                <h3 className="text-gray-800 font-semibold">
+                  {article.DESIGN}
                 </h3>
-                <p className="text-gray-800">{noteField || "Non spécifiée"}</p>
+                <p className="text-gray-600">NART : {article.NART}</p>
+                <p className="text-gray-600">
+                  Stock : {article.STOCK || "Non spécifié"}
+                </p>
+                <p className="text-gray-600">
+                  Prix :{" "}
+                  {article.PREV ? `${article.PREV.toFixed(2)} XPF` : "N/A"}
+                </p>
               </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Entêtes */}
-      <div className="mt-6">
-        <h2 className="text-lg font-semibold text-gray-700 mb-4">Entêtes</h2>
-        <div className="grid grid-cols-3 gap-6">
-          {["ENT1", "ENT2", "ENT3"].map((field) => (
-            <div key={field} className="p-4 bg-gray-100 rounded-lg">
-              <h3 className="font-semibold text-gray-600">{field}</h3>
-              <p className="text-gray-800">
-                {fournisseur[field] || "Non spécifié"}
-              </p>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-600">
+            Aucun article disponible pour ce fournisseur.
+          </p>
+        )}
       </div>
 
       {/* Bouton d'action */}
