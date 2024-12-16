@@ -83,6 +83,7 @@ const importDbfsData = async () => {
 
       const batchSize = 1000; // Taille des lots pour insertion
       let start = 0;
+      const failedInserts = [];
 
       // Initialiser la barre de progression
       const progressBar = new SingleBar(
@@ -99,24 +100,42 @@ const importDbfsData = async () => {
 
       while (start < dbf.recordCount) {
         // Lire un lot d'enregistrements
-        const records = await dbf.readRecords(batchSize);
+        const records = await dbf.readRecords(batchSize, start);
 
         // Nettoyer les enregistrements
         const sanitizedRecords = records.map(sanitizeRecord);
 
         // Insérer les enregistrements dans la base de données
-        await model.insertMany(sanitizedRecords);
+        try {
+          await model.insertMany(sanitizedRecords);
+        } catch (insertionError) {
+          console.error(`Erreur lors de l'insertion des données dans ${label}: ${insertionError.message}`.red);
+          failedInserts.push({
+            start,
+            batchSize: records.length,
+            error: insertionError.message,
+          });
+        }
 
         // Mettre à jour la barre de progression
         progressBar.increment(records.length);
 
-        start += batchSize;
+        start += records.length;
       }
 
       // Terminer la barre de progression
       progressBar.stop();
 
-      console.log(`Importation pour ${label} terminée avec succès !`.green.inverse);
+      if (failedInserts.length > 0) {
+        console.warn(`Des erreurs se sont produites lors de l'importation pour ${label}:`.yellow);
+        failedInserts.forEach((failure) => {
+          console.warn(
+            `	Lot à partir de l'enregistrement ${failure.start} (${failure.batchSize} enregistrements): ${failure.error}`.yellow
+          );
+        });
+      } else {
+        console.log(`Importation pour ${label} terminée avec succès !`.green.inverse);
+      }
     }
 
     process.exit();
