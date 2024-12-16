@@ -6,7 +6,6 @@ import {
 } from "../../slices/zoneSlice";
 import Barcode from "react-barcode";
 
-
 const AdminZoneDetails = () => {
   const { id: zoneId } = useParams();
   const [scannedCode, setScannedCode] = useState("");
@@ -68,7 +67,6 @@ const AdminZoneDetails = () => {
           "et partie:",
           selectedPart
         );
-
 
         // Mettre à jour le statut de la partie
         const updatedParties = zone.parties.map((p) =>

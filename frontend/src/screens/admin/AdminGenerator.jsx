@@ -7,7 +7,7 @@ import {
   useUpdateRepportGeneratorMutation,
 } from "../../slices/repportGeneratorsApiSlice";
 import { useGetUsersQuery } from "../../slices/userApiSlice";
-import { PlusCircle,  Trash } from "lucide-react";
+import { PlusCircle, Trash } from "lucide-react";
 
 const AdminGenerator = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -109,31 +109,29 @@ const AdminGenerator = () => {
   return (
     <div className="p-4">
       <h1 className="text-xl font-bold mb-4">
-       Générateurs de Rapport & applications
+        Générateurs de Rapport & applications
       </h1>
 
       <div className="flex">
-  {/* Barre de recherche */}
-  <div className="mb-4">
-        <input
-          type="text"
-          value={searchTerm}
-          onChange={handleSearchChange}
-          placeholder="Rechercher par nom..."
-          className="w-full px-4 py-2 border rounded"
-        />
-      </div>
+        {/* Barre de recherche */}
+        <div className="mb-4">
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={handleSearchChange}
+            placeholder="Rechercher par nom..."
+            className="w-full px-4 py-2 border rounded"
+          />
+        </div>
 
-      {/* Bouton pour ouvrir la modal */}
-      <button
-        onClick={() => setIsModalOpen(true)}
-        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 flex items-center gap-2 text-[13px]"
-      >
-        <PlusCircle /> Ajouter un Générateur
-      </button>
+        {/* Bouton pour ouvrir la modal */}
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 flex items-center gap-2 text-[13px]"
+        >
+          <PlusCircle /> Ajouter un Générateur
+        </button>
       </div>
-
-    
 
       {/* Liste des générateurs */}
       <div className="mt-6">
@@ -168,63 +166,63 @@ const AdminGenerator = () => {
                     </Link>
                   </td>
                   <td className="border border-gray-300 px-4 py-2">
-  <span
-    className={`px-2 py-1 text-xs font-bold rounded ${
-      generator.type === "Access"
-        ? "bg-red-100 text-red-700 "
-        : generator.type === "Script"
-        ? "bg-yellow-100 text-yellow-700"
-        : generator.type === "Python"
-        ? "bg-green-100 text-green-700"
-        : generator.type === "Excel"
-        ? "bg-purple-100 text-purple-700"
-        : generator.type === "PowerBI"
-        ? "bg-red-100 text-yellow-700"
-        : "bg-gray-100 text-gray-700"
-    }`}
-  >
-    {generator.type}
-  </span>
-</td>
+                    <span
+                      className={`px-2 py-1 text-xs font-bold rounded ${
+                        generator.type === "Access"
+                          ? "bg-red-100 text-red-700 "
+                          : generator.type === "Script"
+                          ? "bg-yellow-100 text-yellow-700"
+                          : generator.type === "Python"
+                          ? "bg-green-100 text-green-700"
+                          : generator.type === "Excel"
+                          ? "bg-purple-100 text-purple-700"
+                          : generator.type === "PowerBI"
+                          ? "bg-red-100 text-yellow-700"
+                          : "bg-gray-100 text-gray-700"
+                      }`}
+                    >
+                      {generator.type}
+                    </span>
+                  </td>
                   <td className="px-4 py-2 text-[13px]">
-  {generator.status === "Actif" ? (
-    <span className="flex items-center text-green-500">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        className="h-5 w-5 mr-2"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        strokeWidth={2}
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M5 13l4 4L19 7"
-        />
-      </svg>
-      Actif
-    </span>
-  ) : (
-    <span className="flex items-center text-red-500 ">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        className="h-5 w-5 mr-2"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        strokeWidth={2}
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M6 18L18 6M6 6l12 12"
-        />
-      </svg>
-      Inactif
-    </span>
-  )}
-</td>
+                    {generator.status === "Actif" ? (
+                      <span className="flex items-center text-green-500">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5 mr-2"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M5 13l4 4L19 7"
+                          />
+                        </svg>
+                        Actif
+                      </span>
+                    ) : (
+                      <span className="flex items-center text-red-500 ">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5 mr-2"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M6 18L18 6M6 6l12 12"
+                          />
+                        </svg>
+                        Inactif
+                      </span>
+                    )}
+                  </td>
 
                   <td className="px-4 py-2 text-[13px]">{generator.version}</td>
                   <td className="px-4 py-2 text-[13px]">
