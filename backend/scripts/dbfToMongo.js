@@ -58,83 +58,88 @@ const importDbfsData = async () => {
     await connectDB();
 
     for (const { fileName, model, label } of dbfFiles) {
-      const filePath = path.join(DBF_FOLDER, fileName);
+      try {
+        const filePath = path.join(DBF_FOLDER, fileName);
 
-      console.log(`Lecture du fichier DBF : ${filePath}`.yellow);
+        console.log(`Lecture du fichier DBF : ${filePath}`.yellow);
 
-      if (!fs.existsSync(filePath)) {
-        console.error(`Le fichier ${filePath} est introuvable.`.red);
-        continue;
-      }
-
-      // Lire le fichier DBF avec dbffile
-      const dbf = await DBFFile.open(filePath);
-      console.log(
-        `Fichier DBF ${label} ouvert. Nombre d'enregistrements : ${dbf.recordCount}`.blue
-      );
-
-      if (dbf.recordCount === 0) {
-        console.warn(`Aucun enregistrement trouvé dans le fichier ${label}.`.yellow);
-        continue;
-      }
-
-      console.log(`Suppression des anciennes données pour ${label}...`.yellow);
-      await model.deleteMany();
-
-      const batchSize = 1000; // Taille des lots pour insertion
-      let start = 0;
-      const failedInserts = [];
-
-      // Initialiser la barre de progression
-      const progressBar = new SingleBar(
-        {
-          format: `${label} |{bar}| {percentage}% | {value}/{total} Enregistrements`,
-          barCompleteChar: "\u2588",
-          barIncompleteChar: "\u2591",
-          hideCursor: true,
-        },
-        Presets.shades_classic
-      );
-
-      progressBar.start(dbf.recordCount, 0);
-
-      while (start < dbf.recordCount) {
-        // Lire un lot d'enregistrements
-        const records = await dbf.readRecords(batchSize, start);
-
-        // Nettoyer les enregistrements
-        const sanitizedRecords = records.map(sanitizeRecord);
-
-        // Insérer les enregistrements dans la base de données
-        try {
-          await model.insertMany(sanitizedRecords);
-        } catch (insertionError) {
-          console.error(`Erreur lors de l'insertion des données dans ${label}: ${insertionError.message}`.red);
-          failedInserts.push({
-            start,
-            batchSize: records.length,
-            error: insertionError.message,
-          });
+        if (!fs.existsSync(filePath)) {
+          console.error(`Le fichier ${filePath} est introuvable.`.red);
+          continue;
         }
 
-        // Mettre à jour la barre de progression
-        progressBar.increment(records.length);
+        // Lire le fichier DBF avec dbffile
+        const dbf = await DBFFile.open(filePath);
+        console.log(
+          `Fichier DBF ${label} ouvert. Nombre d'enregistrements : ${dbf.recordCount}`.blue
+        );
 
-        start += records.length;
-      }
+        if (dbf.recordCount === 0) {
+          console.warn(`Aucun enregistrement trouvé dans le fichier ${label}.`.yellow);
+          continue;
+        }
 
-      // Terminer la barre de progression
-      progressBar.stop();
+        console.log(`Suppression des anciennes données pour ${label}...`.yellow);
+        await model.deleteMany();
 
-      if (failedInserts.length > 0) {
-        console.warn(`Des erreurs se sont produites lors de l'importation pour ${label}:`.yellow);
-        failedInserts.forEach((failure) => {
-          console.warn(
-            `	Lot à partir de l'enregistrement ${failure.start} (${failure.batchSize} enregistrements): ${failure.error}`.yellow
-          );
-        });
-      } else {
-        console.log(`Importation pour ${label} terminée avec succès !`.green.inverse);
+        const batchSize = 1000; // Taille des lots pour insertion
+        let start = 0;
+        const failedInserts = [];
+
+        // Initialiser la barre de progression
+        const progressBar = new SingleBar(
+          {
+            format: `${label} |{bar}| {percentage}% | {value}/{total} Enregistrements`,
+            barCompleteChar: "\u2588",
+            barIncompleteChar: "\u2591",
+            hideCursor: true,
+          },
+          Presets.shades_classic
+        );
+
+        progressBar.start(dbf.recordCount, 0);
+
+        while (start < dbf.recordCount) {
+          try {
+            // Lire un lot d'enregistrements
+            const records = await dbf.readRecords(batchSize, start);
+
+            // Nettoyer les enregistrements
+            const sanitizedRecords = records.map(sanitizeRecord);
+
+            // Insérer les enregistrements dans la base de données
+            await model.insertMany(sanitizedRecords);
+
+            // Mettre à jour la barre de progression
+            progressBar.increment(records.length);
+
+            start += records.length;
+          } catch (batchError) {
+            console.error(`Erreur lors du traitement d'un lot pour ${label}: ${batchError.message}`.red);
+            failedInserts.push({
+              start,
+              batchSize,
+              error: batchError.message,
+            });
+            break;
+          }
+        }
+
+        // Terminer la barre de progression
+        progressBar.stop();
+
+        if (failedInserts.length > 0) {
+          console.warn(`Des erreurs se sont produites lors de l'importation pour ${label}:`.yellow);
+          failedInserts.forEach((failure) => {
+            console.warn(
+              `\tLot à partir de l'enregistrement ${failure.start} (${failure.batchSize} enregistrements): ${failure.error}`.yellow
+            );
+          });
+        } else {
+          console.log(`Importation pour ${label} terminée avec succès !`.green.inverse);
+        }
+      } catch (fileError) {
+        console.error(`Erreur lors du traitement du fichier ${label}: ${fileError.message}`.red);
       }
     }
 
@@ -149,8 +154,12 @@ const importDbfsData = async () => {
 const destroyDbfsData = async () => {
   console.log("Suppression des données existantes pour tous les fichiers...".yellow);
   for (const { model, label } of dbfFiles) {
-    console.log(`Suppression des données pour ${label}...`.yellow);
-    await model.deleteMany();
+    try {
+      console.log(`Suppression des données pour ${label}...`.yellow);
+      await model.deleteMany();
+    } catch (deletionError) {
+      console.error(`Erreur lors de la suppression des données pour ${label}: ${deletionError.message}`.red);
+    }
   }
   console.log("Toutes les données ont été supprimées avec succès !".red.inverse);
   process.exit();
