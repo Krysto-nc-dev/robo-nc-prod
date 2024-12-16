@@ -144,6 +144,7 @@ import Classnum from "../models/qc/classNumModel.js";
 import Tier from "../models/qc/tierModel.js";
 import Facture from "../models/qc/factureModel.js";
 import FactureDetails from "../models/qc/factureDetailsModel.js";
+import Commande from "../models/qc/commandeModel.js";
 
 // Gestion des chemins compatibles avec ES Modules
 import { fileURLToPath } from "url";
@@ -162,6 +163,7 @@ const dbfFiles = [
   { fileName: "facture.dbf", model: Facture, label: "Factures" },
   { fileName: "detail.dbf", model: FactureDetails, label: "FactureDetails" },
   { fileName: "article.dbf", model: Article, label: "Articles" },
+  { fileName: "cmdref.dbf", model: Article, label: "Commandes" },
 ];
 
 // Fonction pour nettoyer les enregistrements avant insertion
